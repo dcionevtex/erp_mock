@@ -12,7 +12,11 @@ Show the complete end-to-end operational handoff from VTEX OMS to a simulated ER
 
 ### Validated
 
-(None yet — ship to validate)
+- ✓ App token never exposed in public config shape (`AppConfigPublic` type-level guard) — Validated in Phase 1: Foundation
+- ✓ Env vars read server-side via `getServerConfig()` — Validated in Phase 1: Foundation
+- ✓ In-memory store with `globalThis` guard, typed CRUD for `ErpOrderRecord` — Validated in Phase 1: Foundation
+- ✓ `.env.example` committed with all 8 required env var names — Validated in Phase 1: Foundation
+- ✓ Shared TypeScript types: `ErpOrderRecord`, `ErpOrderPayload`, `VtexOrder`, all enums — Validated in Phase 1: Foundation
 
 ### Active
 
@@ -82,4 +86,4 @@ Show the complete end-to-end operational handoff from VTEX OMS to a simulated ER
 | PII masking in UI | Demo environments may use real VTEX accounts | — Pending |
 
 ---
-*Last updated: 2026-04-28 after initialization*
+*Last updated: 2026-04-28 after Phase 1: Foundation complete*
