@@ -168,25 +168,81 @@ Deferred to post-MVP. Not in current roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CONFIG-01 through CONFIG-06 | Phase 4 (UI Dashboard) | Pending |
-| HOOK-01 through HOOK-05 | Phase 3 (API Routes) | Pending |
-| FEED-01 through FEED-05 | Phase 3 (API Routes) | Pending |
-| PIPE-01 through PIPE-08 | Phase 2 (Core Library Modules) | Pending |
-| INBOX-01 through INBOX-06 | Phase 4 (UI Dashboard) | Pending |
-| DETAIL-01 through DETAIL-09 | Phase 4 (UI Dashboard) | Pending |
-| ERR-01 through ERR-06 | Phase 3 (API Routes) | Pending |
-| SEC-01 through SEC-03 | Phase 2 (Core Library Modules) | Pending |
+| CONFIG-01 | Phase 4 (UI Dashboard) | Pending |
+| CONFIG-02 | Phase 4 (UI Dashboard) | Pending |
+| CONFIG-03 | Phase 4 (UI Dashboard) | Pending |
+| CONFIG-04 | Phase 4 (UI Dashboard) | Pending |
+| CONFIG-05 | Phase 1 (Foundation) | Pending |
+| CONFIG-06 | Phase 1 (Foundation) | Pending |
+| HOOK-01 | Phase 3 (API Routes) | Pending |
+| HOOK-02 | Phase 3 (API Routes) | Pending |
+| HOOK-03 | Phase 3 (API Routes) | Pending |
+| HOOK-04 | Phase 3 (API Routes) | Pending |
+| HOOK-05 | Phase 3 (API Routes) | Pending |
+| FEED-01 | Phase 3 (API Routes) | Pending |
+| FEED-02 | Phase 3 (API Routes) | Pending |
+| FEED-03 | Phase 3 (API Routes) | Pending |
+| FEED-04 | Phase 3 (API Routes) | Pending |
+| FEED-05 | Phase 3 (API Routes) | Pending |
+| PIPE-01 | Phase 2 (Core Library Modules) | Pending |
+| PIPE-02 | Phase 2 (Core Library Modules) | Pending |
+| PIPE-03 | Phase 2 (Core Library Modules) | Pending |
+| PIPE-04 | Phase 2 (Core Library Modules) | Pending |
+| PIPE-05 | Phase 2 (Core Library Modules) | Pending |
+| PIPE-06 | Phase 2 (Core Library Modules) | Pending |
+| PIPE-07 | Phase 2 (Core Library Modules) | Pending |
+| PIPE-08 | Phase 2 (Core Library Modules) | Pending |
+| INBOX-01 | Phase 4 (UI Dashboard) | Pending |
+| INBOX-02 | Phase 4 (UI Dashboard) | Pending |
+| INBOX-03 | Phase 4 (UI Dashboard) | Pending |
+| INBOX-04 | Phase 4 (UI Dashboard) | Pending |
+| INBOX-05 | Phase 4 (UI Dashboard) | Pending |
+| INBOX-06 | Phase 4 (UI Dashboard) | Pending |
+| DETAIL-01 | Phase 4 (UI Dashboard) | Pending |
+| DETAIL-02 | Phase 4 (UI Dashboard) | Pending |
+| DETAIL-03 | Phase 4 (UI Dashboard) | Pending |
+| DETAIL-04 | Phase 4 (UI Dashboard) | Pending |
+| DETAIL-05 | Phase 4 (UI Dashboard) | Pending |
+| DETAIL-06 | Phase 4 (UI Dashboard) | Pending |
+| DETAIL-07 | Phase 4 (UI Dashboard) | Pending |
+| DETAIL-08 | Phase 4 (UI Dashboard) | Pending |
+| DETAIL-09 | Phase 4 (UI Dashboard) | Pending |
+| ERR-01 | Phase 4 (UI Dashboard) | Pending |
+| ERR-02 | Phase 3 (API Routes) | Pending |
+| ERR-03 | Phase 3 (API Routes) | Pending |
+| ERR-04 | Phase 3 (API Routes) | Pending |
+| ERR-05 | Phase 3 (API Routes) | Pending |
+| ERR-06 | Phase 3 (API Routes) | Pending |
+| SEC-01 | Phase 2 (Core Library Modules) | Pending |
+| SEC-02 | Phase 2 (Core Library Modules) | Pending |
+| SEC-03 | Phase 2 (Core Library Modules) | Pending |
 | SEC-04 | Phase 3 (API Routes) | Pending |
 | SEC-05 | Phase 1 (Foundation) | Pending |
-| API-01 through API-07 | Phase 3 (API Routes) | Pending |
-| TEST-01 through TEST-06 | Phase 2 (Core Library Modules) | Pending |
-| DOCS-01 through DOCS-06 | Phase 5 (Documentation) | Pending |
+| API-01 | Phase 3 (API Routes) | Pending |
+| API-02 | Phase 3 (API Routes) | Pending |
+| API-03 | Phase 3 (API Routes) | Pending |
+| API-04 | Phase 3 (API Routes) | Pending |
+| API-05 | Phase 3 (API Routes) | Pending |
+| API-06 | Phase 3 (API Routes) | Pending |
+| API-07 | Phase 3 (API Routes) | Pending |
+| TEST-01 | Phase 2 (Core Library Modules) | Pending |
+| TEST-02 | Phase 2 (Core Library Modules) | Pending |
+| TEST-03 | Phase 2 (Core Library Modules) | Pending |
+| TEST-04 | Phase 2 (Core Library Modules) | Pending |
+| TEST-05 | Phase 2 (Core Library Modules) | Pending |
+| TEST-06 | Phase 2 (Core Library Modules) | Pending |
+| DOCS-01 | Phase 5 (Documentation) | Pending |
+| DOCS-02 | Phase 5 (Documentation) | Pending |
+| DOCS-03 | Phase 5 (Documentation) | Pending |
+| DOCS-04 | Phase 5 (Documentation) | Pending |
+| DOCS-05 | Phase 5 (Documentation) | Pending |
+| DOCS-06 | Phase 5 (Documentation) | Pending |
 
 **Coverage:**
-- v1 requirements: 58 total
-- Mapped to phases: 58
+- v1 requirements: 69 total
+- Mapped to phases: 69
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-04-28*
-*Last updated: 2026-04-28 after initial definition*
+*Last updated: 2026-04-28 — traceability updated after roadmap creation*
