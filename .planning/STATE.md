@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: in-progress
-stopped_at: "Completed 01-01-PLAN.md — Next.js scaffold with TypeScript strict, shadcn/ui, Vitest"
-last_updated: "2026-04-28T14:44:10Z"
+stopped_at: "Completed 01-02-PLAN.md — Shared TypeScript Types"
+last_updated: "2026-04-28T14:48:30Z"
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 3
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State
@@ -24,21 +24,21 @@ See: .planning/PROJECT.md (updated 2026-04-28)
 ## Current Position
 
 Phase: 1 (Foundation) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 1
-- Average duration: 6 min
-- Total execution time: 0.1 hours
+- Total plans completed: 2
+- Average duration: 4 min
+- Total execution time: 0.13 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| Phase 1 | 1 | 6 min | 6 min |
+| Phase 1 | 2 | 8 min | 4 min |
 
 **Recent Trend:**
 
@@ -62,6 +62,9 @@ Recent decisions affecting current work:
 - shadcn/ui with base-nova preset (neutral base color): shadcn v4.5.0 removed --base-color flag, --defaults selects correct preset
 - Vitest over Jest: Simpler TypeScript/ESM setup for pure function unit tests
 - Node.js >= 24.0.0 pinned: Matches Vercel 2025 default runtime
+- All VTEX fields typed optional (?:) except VtexFeedItem.handle: Defends PITFALL S4 (partial order crashes)
+- appToken excluded from all exported types (SEC-04): AppConfigPublic uses appTokenConfigured boolean instead
+- ErpOrderRecord.erpPayload typed as ErpOrderPayload (not unknown): Enables downstream type-safe access
 
 ### Pending Todos
 
@@ -74,5 +77,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-04-28
-Stopped at: Completed 01-01-PLAN.md — Next.js scaffold with TypeScript strict, shadcn/ui, Vitest
+Stopped at: Completed 01-02-PLAN.md — Shared TypeScript Types (ErpOrderRecord, VtexOrder, all domain types)
 Resume file: None
