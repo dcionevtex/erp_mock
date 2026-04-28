@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: in-progress
-stopped_at: "Completed 01-02-PLAN.md — Shared TypeScript Types"
-last_updated: "2026-04-28T14:48:30Z"
+status: unknown
+stopped_at: Completed 01-03-PLAN.md — In-Memory Store, Constants, Env Config, and .env.example
+last_updated: "2026-04-28T14:57:01.798Z"
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 3
-  completed_plans: 2
+  completed_plans: 3
 ---
 
 # Project State
@@ -46,6 +46,7 @@ Plan: 3 of 3
 - Trend: Establishing baseline
 
 *Updated after each plan completion*
+| Phase 01-foundation P03 | 4min | 4 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -65,6 +66,9 @@ Recent decisions affecting current work:
 - All VTEX fields typed optional (?:) except VtexFeedItem.handle: Defends PITFALL S4 (partial order crashes)
 - appToken excluded from all exported types (SEC-04): AppConfigPublic uses appTokenConfigured boolean instead
 - ErpOrderRecord.erpPayload typed as ErpOrderPayload (not unknown): Enables downstream type-safe access
+- [Phase 01-foundation]: globalThis guard for store singletons prevents Fast Refresh from resetting Map/Set/Array on each hot reload
+- [Phase 01-foundation]: ServerAppConfig internal type (not exported): appToken containment boundary — only getPublicConfig() crosses server/client surface
+- [Phase 01-foundation]: Persistence seam: all store mutations through typed function interface, enabling body-only swap to Vercel KV/Supabase without changing callers
 
 ### Pending Todos
 
@@ -76,6 +80,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-28
-Stopped at: Completed 01-02-PLAN.md — Shared TypeScript Types (ErpOrderRecord, VtexOrder, all domain types)
+Last session: 2026-04-28T14:57:01.795Z
+Stopped at: Completed 01-03-PLAN.md — In-Memory Store, Constants, Env Config, and .env.example
 Resume file: None

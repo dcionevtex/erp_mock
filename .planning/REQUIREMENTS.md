@@ -13,8 +13,8 @@
 - [ ] **CONFIG-02**: User can select integration mode (Feed or Hook) from the config panel
 - [ ] **CONFIG-03**: User can toggle auto-commit of feed item handles on/off
 - [ ] **CONFIG-04**: User can toggle simulate-ERP-failure mode on/off from the config panel
-- [ ] **CONFIG-05**: App token is masked/hidden in the UI after being saved — never displayed in plain text
-- [ ] **CONFIG-06**: App reads VTEX credentials from server-side environment variables when deployed to Vercel
+- [x] **CONFIG-05**: App token is masked/hidden in the UI after being saved — never displayed in plain text
+- [x] **CONFIG-06**: App reads VTEX credentials from server-side environment variables when deployed to Vercel
 
 ### Hook Integration (HOOK)
 
@@ -78,8 +78,8 @@
 - [ ] **SEC-01**: Customer email address is masked in all UI views (e.g., `d***@vtex.com`)
 - [ ] **SEC-02**: Customer document number (CPF/CNPJ) is masked in all UI views
 - [ ] **SEC-03**: PII masking is applied server-side at normalization time — raw VTEX payloads stored in the record do NOT contain unmasked PII
-- [ ] **SEC-04**: VTEX app token is never written to server logs
-- [ ] **SEC-05**: `.env.example` file is committed with all required environment variable names and safe placeholder values
+- [x] **SEC-04**: VTEX app token is never written to server logs
+- [x] **SEC-05**: `.env.example` file is committed with all required environment variable names and safe placeholder values
 
 ### API Endpoints (API)
 
@@ -172,8 +172,8 @@ Deferred to post-MVP. Not in current roadmap.
 | CONFIG-02 | Phase 4 (UI Dashboard) | Pending |
 | CONFIG-03 | Phase 4 (UI Dashboard) | Pending |
 | CONFIG-04 | Phase 4 (UI Dashboard) | Pending |
-| CONFIG-05 | Phase 1 (Foundation) | Pending |
-| CONFIG-06 | Phase 1 (Foundation) | Pending |
+| CONFIG-05 | Phase 1 (Foundation) | Complete |
+| CONFIG-06 | Phase 1 (Foundation) | Complete |
 | HOOK-01 | Phase 3 (API Routes) | Pending |
 | HOOK-02 | Phase 3 (API Routes) | Pending |
 | HOOK-03 | Phase 3 (API Routes) | Pending |
@@ -216,8 +216,8 @@ Deferred to post-MVP. Not in current roadmap.
 | SEC-01 | Phase 2 (Core Library Modules) | Pending |
 | SEC-02 | Phase 2 (Core Library Modules) | Pending |
 | SEC-03 | Phase 2 (Core Library Modules) | Pending |
-| SEC-04 | Phase 3 (API Routes) | Pending |
-| SEC-05 | Phase 1 (Foundation) | Pending |
+| SEC-04 | Phase 3 (API Routes) | Complete |
+| SEC-05 | Phase 1 (Foundation) | Complete |
 | API-01 | Phase 3 (API Routes) | Pending |
 | API-02 | Phase 3 (API Routes) | Pending |
 | API-03 | Phase 3 (API Routes) | Pending |
