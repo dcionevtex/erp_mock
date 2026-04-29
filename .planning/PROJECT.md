@@ -86,4 +86,11 @@ Show the complete end-to-end operational handoff from VTEX OMS to a simulated ER
 | PII masking in UI | Demo environments may use real VTEX accounts | — Pending |
 
 ---
-*Last updated: 2026-04-28 after Phase 1: Foundation complete*
+- ✓ `piiMasker.ts` — maskEmail, maskDocument, maskOrderPayload (PII at normalization time) — Validated in Phase 2: Core Library Modules
+- ✓ `deduplicator.ts` — eventId-based dedup with orderId+state+timestamp fallback — Validated in Phase 2: Core Library Modules
+- ✓ `vtexClient.ts` — injectable factory, getOrder/getFeedItems/commitFeedItems/startHandling — Validated in Phase 2: Core Library Modules
+- ✓ `hookParser.ts` — extractOrderId from 6 VTEX payload shapes — Validated in Phase 2: Core Library Modules
+- ✓ `erpSimulator.ts` — normalizeOrder + simulateErpAcceptance (SUCCESS/FAILURE modes) — Validated in Phase 2: Core Library Modules
+- ✓ `orderProcessor.ts` — full pipeline with all 3 Start Handling guards — Validated in Phase 2: Core Library Modules
+
+*Last updated: 2026-04-29 after Phase 2: Core Library Modules complete*
