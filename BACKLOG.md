@@ -12,6 +12,10 @@
 
 ## Configuration Panel
 
+- [ ] `BL-005` **Persist configuration across Vercel cold starts using an encrypted cookie**
+  Currently all config entered via the UI is stored in server memory and lost on every cold start / new serverless invocation. Fix by persisting the config as an **encrypted HttpOnly cookie** using `iron-session`. Non-secret fields (account, environment, mode) and the App Key are stored as-is; the App Token is encrypted with a server-side `SESSION_SECRET` env var. On every request the server reads the cookie and decrypts it — no external service (no Vercel KV) required, zero infra cost, and the App Token is never exposed in plaintext in the browser.
+  **Approach:** `npm i iron-session` → wrap POST /api/config to write a sealed cookie → wrap GET /api/config and all VTEX-calling routes to read it → add `SESSION_SECRET` to `.env.example` and Vercel env vars.
+
 - [x] `BL-003` **App Key does not need to be masked**
   The App Key is not a secret — it can be displayed in plain text in the UI. Only the App Token must remain hidden.
 
