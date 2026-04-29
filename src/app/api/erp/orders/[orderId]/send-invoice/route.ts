@@ -55,12 +55,18 @@ export async function POST(
     });
 
     const r = await getOrderByOrderId(orderId);
+    let vtexStatus = r?.vtexStatus;
+    try {
+      const vtexOrder = await vtexClient.getOrder(orderId);
+      if (vtexOrder.status) vtexStatus = vtexOrder.status;
+    } catch { /* non-critical */ }
     if (r) {
       await upsertOrder({
         ...r,
         invoiceStatus: 'SUCCESS',
         invoiceNumber,
         invoiceIssuedAt: new Date().toISOString(),
+        vtexStatus,
       });
     }
     await setOrderStatus(existing.id, 'INVOICED');
@@ -68,7 +74,7 @@ export async function POST(
       timestamp: new Date().toISOString(),
       step: 'INVOICE_SUCCESS',
       status: 'SUCCESS',
-      message: `Invoice ${invoiceNumber} accepted by VTEX`,
+      message: `Invoice ${invoiceNumber} accepted by VTEX${vtexStatus ? ` — VTEX status: ${vtexStatus}` : ''}`,
     });
 
     return Response.json({ ok: true, orderId, invoiceNumber });
