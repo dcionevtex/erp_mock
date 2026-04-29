@@ -89,6 +89,7 @@ export async function processOrder(
       vtexOrderRaw: maskedRaw,
       erpPayload,
       vtexStatus: vtexOrder.status,
+      receivedAt: vtexOrder.creationDate ?? freshRecord.receivedAt,
       customerName: erpPayload.customer?.name,
       customerEmailMasked: erpPayload.customer?.emailMasked,
       totalValue: vtexOrder.value,
