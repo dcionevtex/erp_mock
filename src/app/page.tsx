@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { ConfigPanel } from '@/components/ConfigPanel';
 import { OrderRow } from '@/components/OrderRow';
+import { Footer } from '@/components/Footer';
 import { DASHBOARD_POLL_INTERVAL_MS, ERP_STATUS_VALUES } from '@/lib/constants';
 import type { ErpOrderRecord, AppConfigPublic, EventLogEntry } from '@/types';
 
@@ -119,7 +120,7 @@ export default function DashboardPage() {
   const credsMissing = config !== null && !config.appTokenConfigured;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header — VTEX brand: navy bg, pink accents */}
       <header className="border-b border-border px-4 py-0 flex items-stretch justify-between gap-4" style={{ background: '#142032' }}>
         <div className="flex items-center gap-4 py-3">
@@ -348,6 +349,7 @@ export default function DashboardPage() {
           </div>
         )}
       </main>
+      <Footer />
     </div>
   );
 }
