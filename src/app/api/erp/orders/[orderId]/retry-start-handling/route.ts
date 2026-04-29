@@ -34,18 +34,13 @@ export async function POST(
     await vtexClient.startHandling(orderId);
     const r = await getOrderByOrderId(orderId);
     if (r) {
-      let vtexStatus = r.vtexStatus;
-      try {
-        const vtexOrder = await vtexClient.getOrder(orderId);
-        if (vtexOrder.status) vtexStatus = vtexOrder.status;
-      } catch { /* non-critical */ }
-      await upsertOrder({ ...r, startHandlingStatus: 'SUCCESS', vtexStatus });
+      await upsertOrder({ ...r, startHandlingStatus: 'SUCCESS' });
       await setOrderStatus(r.id, 'START_HANDLING_SUCCESS');
       await appendTimelineEntry(r.id, {
         timestamp: new Date().toISOString(),
         step: 'START_HANDLING_SUCCESS',
         status: 'SUCCESS',
-        message: `Manual retry succeeded${vtexStatus ? ` — VTEX status: ${vtexStatus}` : ''}`,
+        message: 'Manual retry succeeded',
       });
     }
     return Response.json({ ok: true, orderId, startHandlingStatus: 'SUCCESS' });
