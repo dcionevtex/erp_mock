@@ -15,8 +15,6 @@ interface OrderRowProps {
 
 export function OrderRow({ order, onAction }: OrderRowProps) {
   const [open, setOpen] = useState(false);
-  const [rawOpen, setRawOpen] = useState(false);
-  const [labelOpen, setLabelOpen] = useState(false);
 
   function fmt(iso?: string) {
     if (!iso) return '—';
@@ -61,185 +59,181 @@ export function OrderRow({ order, onAction }: OrderRowProps) {
         <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">{fmt(order.lastAttemptAt)}</td>
         <td className="px-3 py-2 text-xs text-center">{order.attempts}</td>
         <td className="px-3 py-2 text-xs text-destructive max-w-[140px] truncate" title={order.errorMessage}>{order.errorMessage ?? '—'}</td>
-        <td className="px-3 py-2 text-xs text-center text-muted-foreground">{open ? '▲' : '▼'}</td>
+        <td className="px-3 py-2 text-xs text-center text-muted-foreground">
+          <Chevron open={open} />
+        </td>
       </tr>
 
       {open && (
         <tr>
-          <td colSpan={18} className="bg-muted/20 border-b border-border px-4 py-4">
-            <div className="space-y-4 max-w-5xl">
+          <td colSpan={18} className="border-b border-border bg-muted/10">
+            <div className="px-5 py-5 space-y-3 max-w-6xl">
 
-              {/* 1. ERP Summary */}
-              <Section title="ERP Summary">
-                <dl className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm sm:grid-cols-3">
-                  <Pair label="Account" value={order.account} />
-                  <Pair label="Order ID" value={order.orderId} />
-                  <Pair label="Sequence" value={order.sequence} />
-                  <Pair label="Customer" value={order.customerName} />
-                  <Pair label="Email" value={order.customerEmailMasked} />
-                  <Pair label="Total" value={fmtCurrency(order.totalValue)} />
-                  <Pair label="Payment" value={order.paymentSummary} />
-                  <Pair label="Shipping" value={order.shippingSummary} />
-                  <Pair label="ERP Status" value={<StatusBadge status={order.erpStatus} />} />
-                  <Pair label="SH Status" value={<StatusBadge status={order.startHandlingStatus} />} />
-                </dl>
-              </Section>
+              {/* Row 1: Summary + Timeline */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
 
-              {/* 2. Order Items */}
-              {order.erpPayload && order.erpPayload.items.length > 0 && (
-                <Section title="Order Items">
-                  <table className="w-full text-xs border-collapse">
+                {/* Order Summary */}
+                <InfoCard title="Order Summary" className="lg:col-span-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-4">
+                    <Field label="Account" value={order.account} mono />
+                    <Field label="Order ID" value={order.orderId} mono />
+                    <Field label="Sequence" value={order.sequence} />
+                    <Field label="Customer" value={order.customerName} />
+                    <Field label="Email" value={order.customerEmailMasked} />
+                    <Field label="Total" value={fmtCurrency(order.totalValue)} />
+                    <Field label="Payment" value={order.paymentSummary} />
+                    <Field label="Shipping" value={order.shippingSummary} />
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide">ERP Status</span>
+                      <StatusBadge status={order.erpStatus} />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide">SH Status</span>
+                      <StatusBadge status={order.startHandlingStatus} />
+                    </div>
+                  </div>
+                  {order.errorMessage && (
+                    <div className="mt-4 flex items-start gap-2 rounded-md border border-destructive/20 bg-destructive/5 px-3 py-2">
+                      <svg className="w-3.5 h-3.5 text-destructive mt-0.5 shrink-0" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm.75 3.5v4a.75.75 0 0 1-1.5 0v-4a.75.75 0 0 1 1.5 0zm0 6.5a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0z"/>
+                      </svg>
+                      <span className="text-xs text-destructive leading-relaxed">{order.errorMessage}</span>
+                    </div>
+                  )}
+                </InfoCard>
+
+                {/* Processing Timeline */}
+                <InfoCard title="Processing Timeline">
+                  {order.timeline.length === 0 ? (
+                    <p className="text-xs text-muted-foreground py-6 text-center">No entries yet.</p>
+                  ) : (
+                    <ol className="relative space-y-0">
+                      {order.timeline.map((entry, i) => (
+                        <TimelineEntry key={i} entry={entry} last={i === order.timeline.length - 1} />
+                      ))}
+                    </ol>
+                  )}
+                </InfoCard>
+              </div>
+
+              {/* Row 2: Order Items */}
+              {order.erpPayload?.items && order.erpPayload.items.length > 0 && (
+                <InfoCard title="Order Items">
+                  <table className="w-full text-xs">
                     <thead>
-                      <tr className="text-left text-muted-foreground border-b border-border">
-                        <th className="pb-1 pr-3">SKU</th>
-                        <th className="pb-1 pr-3">Product ID</th>
-                        <th className="pb-1 pr-3">Name</th>
-                        <th className="pb-1 pr-3 text-right">Qty</th>
-                        <th className="pb-1 pr-3 text-right">Unit Price</th>
-                        <th className="pb-1 pr-3 text-right">Selling Price</th>
-                        <th className="pb-1 text-right">Total</th>
+                      <tr className="text-left border-b border-border">
+                        <th className="pb-2 pr-4 font-semibold text-muted-foreground uppercase tracking-wide text-[10px]">SKU</th>
+                        <th className="pb-2 pr-4 font-semibold text-muted-foreground uppercase tracking-wide text-[10px]">Product ID</th>
+                        <th className="pb-2 pr-4 font-semibold text-muted-foreground uppercase tracking-wide text-[10px]">Name</th>
+                        <th className="pb-2 pr-4 font-semibold text-muted-foreground uppercase tracking-wide text-[10px] text-right">Qty</th>
+                        <th className="pb-2 pr-4 font-semibold text-muted-foreground uppercase tracking-wide text-[10px] text-right">Unit Price</th>
+                        <th className="pb-2 pr-4 font-semibold text-muted-foreground uppercase tracking-wide text-[10px] text-right">Selling Price</th>
+                        <th className="pb-2 font-semibold text-muted-foreground uppercase tracking-wide text-[10px] text-right">Total</th>
                       </tr>
                     </thead>
                     <tbody>
                       {order.erpPayload.items.map((item, i) => (
-                        <tr key={i} className="border-b border-border/50 last:border-0">
-                          <td className="py-1 pr-3 font-mono">{item.skuId ?? '—'}</td>
-                          <td className="py-1 pr-3 font-mono">{item.productId ?? '—'}</td>
-                          <td className="py-1 pr-3">{item.name ?? '—'}</td>
-                          <td className="py-1 pr-3 text-right">{item.quantity ?? '—'}</td>
-                          <td className="py-1 pr-3 text-right">{fmtCurrency(item.price)}</td>
-                          <td className="py-1 pr-3 text-right">{fmtCurrency(item.sellingPrice)}</td>
-                          <td className="py-1 text-right">{fmtCurrency(item.total)}</td>
+                        <tr key={i} className="border-b border-border/40 last:border-0 hover:bg-muted/30 transition-colors">
+                          <td className="py-2.5 pr-4 font-mono text-foreground">{item.skuId ?? '—'}</td>
+                          <td className="py-2.5 pr-4 font-mono text-muted-foreground">{item.productId ?? '—'}</td>
+                          <td className="py-2.5 pr-4 text-foreground font-medium">{item.name ?? '—'}</td>
+                          <td className="py-2.5 pr-4 text-right tabular-nums">{item.quantity ?? '—'}</td>
+                          <td className="py-2.5 pr-4 text-right tabular-nums text-muted-foreground">{fmtCurrency(item.price)}</td>
+                          <td className="py-2.5 pr-4 text-right tabular-nums text-muted-foreground">{fmtCurrency(item.sellingPrice)}</td>
+                          <td className="py-2.5 text-right tabular-nums font-semibold">{fmtCurrency(item.total)}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
-                </Section>
+                </InfoCard>
               )}
 
-              {/* 3. Shipping Details */}
-              {order.erpPayload?.logisticsInfo != null && (
-                <Section title="Shipping Details">
-                  <pre className="text-xs bg-muted rounded p-2 overflow-auto max-h-32">
-                    {JSON.stringify(order.erpPayload.logisticsInfo, null, 2)}
-                  </pre>
-                </Section>
-              )}
+              {/* Row 3: Shipping Details + Payment + Shipping Label */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {order.erpPayload?.logisticsInfo != null && (
+                  <CollapsibleCard title="Shipping Details">
+                    <JsonViewer data={order.erpPayload.logisticsInfo} maxHeight="max-h-56" />
+                  </CollapsibleCard>
+                )}
 
-              {/* 4. Shipping Label — collapsible */}
-              <div>
-                <button
-                  type="button"
-                  onClick={(e) => { e.stopPropagation(); setLabelOpen((v) => !v); }}
-                  className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide hover:text-foreground transition-colors w-full text-left"
-                >
-                  <span>Shipping Label</span>
-                  <span className="text-[10px]">{labelOpen ? '▲' : '▼'}</span>
-                </button>
-                {labelOpen && (
-                  <div className="mt-3 flex justify-center" onClick={(e) => e.stopPropagation()}>
+                {order.erpPayload?.paymentSummary && (
+                  <CollapsibleCard title="Payment Details">
+                    <div className="space-y-3 py-1">
+                      <Field label="Method" value={order.erpPayload.paymentSummary} />
+                      <Field label="Total charged" value={fmtCurrency(order.totalValue)} />
+                    </div>
+                  </CollapsibleCard>
+                )}
+
+                <CollapsibleCard title="Shipping Label">
+                  <div className="flex justify-center py-2" onClick={(e) => e.stopPropagation()}>
                     <ShippingLabel order={order} />
                   </div>
+                </CollapsibleCard>
+              </div>
+
+              {/* Row 4: JSON payloads side by side */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {order.erpPayload && (
+                  <CollapsibleCard title="ERP Normalized Payload" tag="JSON">
+                    <JsonViewer data={order.erpPayload} maxHeight="max-h-72" />
+                  </CollapsibleCard>
+                )}
+                {order.vtexOrderRaw != null && (
+                  <CollapsibleCard title="Raw VTEX Payload" tag="JSON">
+                    <JsonViewer data={order.vtexOrderRaw} maxHeight="max-h-72" />
+                  </CollapsibleCard>
                 )}
               </div>
 
-              {/* 5. Payment Details */}
-              {order.erpPayload?.paymentSummary && (
-                <Section title="Payment Details">
-                  <dl className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm">
-                    <Pair label="Payment Summary" value={order.erpPayload.paymentSummary} />
-                    <Pair label="Total" value={fmtCurrency(order.totalValue)} />
-                  </dl>
-                </Section>
-              )}
-
-              {/* 5. ERP Normalized Payload */}
-              {order.erpPayload && (
-                <Section title="ERP Normalized Payload">
-                  <JsonViewer data={order.erpPayload} />
-                </Section>
-              )}
-
-              {/* 6. Raw VTEX Order Payload (collapsed by default) */}
-              {order.vtexOrderRaw != null && (
-                <div>
-                  <button
-                    type="button"
-                    onClick={(e) => { e.stopPropagation(); setRawOpen((v) => !v); }}
-                    className="text-xs font-semibold text-muted-foreground uppercase tracking-wide hover:text-foreground flex items-center gap-1"
-                  >
-                    Raw VTEX Payload {rawOpen ? '▲' : '▼'}
-                  </button>
-                  {rawOpen && (
-                    <div className="mt-2">
-                      <JsonViewer data={order.vtexOrderRaw} maxHeight="max-h-64" />
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* 7. Processing Timeline */}
-              <Section title="Processing Timeline">
-                {order.timeline.length === 0 ? (
-                  <p className="text-xs text-muted-foreground">No timeline entries.</p>
-                ) : (
-                  <ol className="space-y-1">
-                    {order.timeline.map((entry, i) => (
-                      <TimelineEntry key={i} entry={entry} />
-                    ))}
-                  </ol>
-                )}
-              </Section>
-
-              {/* 8. Actions */}
-              <Section title="Actions">
-                <div
-                  className="flex flex-wrap gap-2"
-                  onClick={(e) => e.stopPropagation()}
+              {/* Actions */}
+              <div className="rounded-lg border border-border bg-card px-4 py-3 flex flex-wrap gap-2" onClick={(e) => e.stopPropagation()}>
+                <ActionBtn onClick={() => onAction('reprocess', order.orderId)}>
+                  <BtnIcon d="M4 4v3h3M12 12v-3h-3M3.5 7a5.5 5.5 0 1 1 .7 4" />
+                  Reprocess
+                </ActionBtn>
+                <ActionBtn
+                  onClick={() => onAction('retry-start-handling', order.orderId)}
+                  disabled={order.startHandlingStatus === 'SUCCESS'}
                 >
-                  <ActionBtn onClick={() => onAction('reprocess', order.orderId)}>Reprocess Order</ActionBtn>
-                  <ActionBtn
-                    onClick={() => onAction('retry-start-handling', order.orderId)}
-                    disabled={order.startHandlingStatus === 'SUCCESS'}
-                  >
-                    Retry Start Handling
-                  </ActionBtn>
-                  <ActionBtn onClick={() => onAction('resolve', order.orderId)}>Mark as Resolved</ActionBtn>
-                  <ActionBtn
-                    variant="danger"
-                    onClick={() => onAction('cancel', order.orderId)}
-                    disabled={order.erpStatus === 'CANCELLED'}
-                  >
-                    Cancel Order
-                  </ActionBtn>
-                  <ActionBtn
-                    variant="danger"
-                    onClick={() => onAction('delete', order.orderId)}
-                  >
-                    Delete Order
-                  </ActionBtn>
-                  <ActionBtn
-                    variant="ghost"
-                    onClick={() => {
-                      if (order.erpPayload) {
-                        navigator.clipboard.writeText(JSON.stringify(order.erpPayload, null, 2)).catch(() => {});
-                      }
-                    }}
-                  >
-                    Copy ERP Payload
-                  </ActionBtn>
-                  <ActionBtn
-                    variant="ghost"
-                    onClick={() => {
-                      if (order.vtexOrderRaw != null) {
-                        navigator.clipboard.writeText(JSON.stringify(order.vtexOrderRaw, null, 2)).catch(() => {});
-                      }
-                    }}
-                  >
-                    Copy VTEX Payload
-                  </ActionBtn>
-                </div>
-              </Section>
+                  <BtnIcon d="M5 12h7M9 8l4 4-4 4" />
+                  Retry Start Handling
+                </ActionBtn>
+                <ActionBtn onClick={() => onAction('resolve', order.orderId)}>
+                  <BtnIcon d="M4 8l3 3 5-5" />
+                  Mark Resolved
+                </ActionBtn>
+                <div className="w-px self-stretch bg-border mx-1" />
+                <ActionBtn
+                  variant="ghost"
+                  onClick={() => {
+                    if (order.erpPayload) navigator.clipboard.writeText(JSON.stringify(order.erpPayload, null, 2)).catch(() => {});
+                  }}
+                >
+                  <BtnIcon d="M8 4H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-2M8 4h6l2 2v4M8 4v4h6" />
+                  Copy ERP
+                </ActionBtn>
+                <ActionBtn
+                  variant="ghost"
+                  onClick={() => {
+                    if (order.vtexOrderRaw != null) navigator.clipboard.writeText(JSON.stringify(order.vtexOrderRaw, null, 2)).catch(() => {});
+                  }}
+                >
+                  <BtnIcon d="M8 4H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-2M8 4h6l2 2v4M8 4v4h6" />
+                  Copy VTEX
+                </ActionBtn>
+                <div className="flex-1" />
+                <ActionBtn
+                  variant="danger"
+                  onClick={() => onAction('cancel', order.orderId)}
+                  disabled={order.erpStatus === 'CANCELLED'}
+                >
+                  Cancel
+                </ActionBtn>
+                <ActionBtn variant="danger" onClick={() => onAction('delete', order.orderId)}>
+                  Delete
+                </ActionBtn>
+              </div>
 
             </div>
           </td>
@@ -249,47 +243,106 @@ export function OrderRow({ order, onAction }: OrderRowProps) {
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+/* ─── Sub-components ──────────────────────────────────────────── */
+
+function Chevron({ open, className }: { open: boolean; className?: string }) {
   return (
-    <div>
-      <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">{title}</h4>
-      {children}
+    <svg
+      className={cn('w-3.5 h-3.5 text-muted-foreground transition-transform duration-150', open && 'rotate-180', className)}
+      viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+    >
+      <path d="M3 5l4 4 4-4" />
+    </svg>
+  );
+}
+
+function InfoCard({ title, children, className }: { title: string; children: React.ReactNode; className?: string }) {
+  return (
+    <div className={cn('rounded-lg border border-border bg-card overflow-hidden', className)}>
+      <div className="px-4 py-2.5 border-b border-border bg-muted/30">
+        <h4 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">{title}</h4>
+      </div>
+      <div className="p-4">{children}</div>
     </div>
   );
 }
 
-function Pair({ label, value }: { label: string; value: React.ReactNode }) {
+function CollapsibleCard({ title, tag, children }: { title: string; tag?: string; children: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
   return (
-    <div>
-      <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd className="text-sm font-medium truncate">{value ?? '—'}</dd>
+    <div className="rounded-lg border border-border bg-card overflow-hidden">
+      <button
+        type="button"
+        onClick={(e) => { e.stopPropagation(); setOpen((v) => !v); }}
+        className="w-full flex items-center justify-between px-4 py-2.5 bg-muted/30 border-b border-border hover:bg-muted/50 transition-colors text-left gap-2"
+      >
+        <div className="flex items-center gap-2">
+          <h4 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">{title}</h4>
+          {tag && (
+            <span className="text-[9px] font-mono font-semibold px-1.5 py-0.5 rounded bg-muted border border-border text-muted-foreground">
+              {tag}
+            </span>
+          )}
+        </div>
+        <Chevron open={open} />
+      </button>
+      {open && <div className="p-4">{children}</div>}
+    </div>
+  );
+}
+
+function Field({ label, value, mono }: { label: string; value: React.ReactNode; mono?: boolean }) {
+  return (
+    <div className="flex flex-col gap-0.5 min-w-0">
+      <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">{label}</span>
+      <span className={cn('text-sm font-medium text-foreground truncate', mono && 'font-mono text-xs')}>
+        {value ?? '—'}
+      </span>
     </div>
   );
 }
 
 function JsonViewer({ data, maxHeight = 'max-h-48' }: { data: unknown; maxHeight?: string }) {
   return (
-    <pre className={cn('text-xs bg-muted rounded p-3 overflow-auto', maxHeight)}>
+    <pre className={cn('text-[11px] leading-relaxed bg-muted/60 rounded-md p-3 overflow-auto font-mono', maxHeight)}>
       {JSON.stringify(data, null, 2)}
     </pre>
   );
 }
 
-const TIMELINE_COLORS: Record<string, string> = {
-  SUCCESS: 'bg-green-500',
-  ERROR:   'bg-red-500',
-  INFO:    'bg-blue-400',
-  SKIPPED: 'bg-gray-300',
+const TIMELINE_STYLES: Record<string, { dot: string; icon: string }> = {
+  SUCCESS: { dot: 'bg-emerald-500 ring-emerald-200', icon: 'text-emerald-600' },
+  ERROR:   { dot: 'bg-red-500 ring-red-200',         icon: 'text-red-600' },
+  INFO:    { dot: 'bg-blue-400 ring-blue-200',        icon: 'text-blue-600' },
+  SKIPPED: { dot: 'bg-gray-300 ring-gray-100',        icon: 'text-gray-400' },
 };
 
-function TimelineEntry({ entry }: { entry: ErpTimelineEntry }) {
+function TimelineEntry({ entry, last }: { entry: ErpTimelineEntry; last: boolean }) {
+  const style = TIMELINE_STYLES[entry.status] ?? TIMELINE_STYLES.SKIPPED;
   return (
-    <li className="flex items-start gap-2 text-xs">
-      <span className={cn('mt-1 h-2 w-2 rounded-full shrink-0', TIMELINE_COLORS[entry.status] ?? 'bg-gray-300')} />
-      <span className="text-muted-foreground shrink-0 w-36">{new Date(entry.timestamp).toLocaleTimeString()}</span>
-      <span className="font-mono text-foreground">{entry.step}</span>
-      {entry.message && <span className="text-muted-foreground ml-2">{entry.message}</span>}
+    <li className="relative flex gap-3 pb-3 last:pb-0">
+      {/* Connecting line */}
+      {!last && <div className="absolute left-[5px] top-[14px] bottom-0 w-px bg-border" />}
+      {/* Dot */}
+      <span className={cn('mt-1 h-3 w-3 rounded-full shrink-0 ring-2', style.dot)} />
+      <div className="flex flex-col gap-0.5 min-w-0">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-[10px] font-mono font-medium text-foreground">{entry.step}</span>
+          <span className="text-[10px] text-muted-foreground">{new Date(entry.timestamp).toLocaleTimeString()}</span>
+        </div>
+        {entry.message && (
+          <span className={cn('text-[11px] leading-snug', style.icon)}>{entry.message}</span>
+        )}
+      </div>
     </li>
+  );
+}
+
+function BtnIcon({ d }: { d: string }) {
+  return (
+    <svg className="w-3 h-3 shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <path d={d} />
+    </svg>
   );
 }
 
@@ -310,7 +363,7 @@ function ActionBtn({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        'px-3 py-1.5 text-xs font-medium rounded-md border transition-colors disabled:opacity-40 disabled:pointer-events-none',
+        'inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border transition-colors disabled:opacity-40 disabled:pointer-events-none',
         variant === 'ghost'
           ? 'border-border bg-background hover:bg-muted text-foreground'
           : variant === 'danger'
