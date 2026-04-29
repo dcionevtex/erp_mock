@@ -87,6 +87,7 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   const vtexClient = createVtexClient(cfg as Parameters<typeof createVtexClient>[0]);
+  await new Promise((r) => setTimeout(r, 5000));
   await processOrder(orderId, 'HOOK', { vtexClient, config: cfg });
 
   return Response.json({ received: true, orderId });
