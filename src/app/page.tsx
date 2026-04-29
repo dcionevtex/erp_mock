@@ -145,7 +145,7 @@ export default function DashboardPage() {
           {/* VTEX wordmark */}
           <span className="text-xl font-black tracking-tighter leading-none" style={{ color: '#F71963' }}>VTEX</span>
           <span className="text-white/20 text-lg font-thin">|</span>
-          <h1 className="text-sm font-semibold text-white/90">ERP Integration Console</h1>
+          <h1 className="text-sm font-semibold text-white/90">ERP Connect</h1>
           {config && (
             <span className="text-xs text-white/40 hidden sm:inline">
               {config.account || 'no account set'} · {config.integrationMode}
