@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 02-01-PLAN.md — PII Masker and Deduplicator
-last_updated: "2026-04-29T00:24:25.320Z"
+stopped_at: Completed 02-02-PLAN.md — VTEX Client and Hook Payload Parser
+last_updated: "2026-04-29T00:28:18.000Z"
 progress:
   total_phases: 5
   completed_phases: 1
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-04-28)
 ## Current Position
 
 Phase: 2 (Core Library Modules) — EXECUTING
-Plan: 1 of 4
+Plan: 2 of 4
 
 ## Performance Metrics
 
@@ -48,6 +48,7 @@ Plan: 1 of 4
 *Updated after each plan completion*
 | Phase 01-foundation P03 | 4min | 4 tasks | 7 files |
 | Phase 02-01 P01 | 8 | 3 tasks | 5 files |
+| Phase 02-02 P02 | 3 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -74,6 +75,10 @@ Recent decisions affecting current work:
 - [Phase 02-01]: deduplicator delegates storage to store.processedKeys — no local Set, inherits bounded overflow pruning
 - [Phase 02-01]: buildDeduplicationKey checks eventId.length > 0 explicitly — guards empty string edge case
 - [Phase 02-01]: PII masking at ingestion time (SEC-03): maskOrderPayload called before store write, not at display time
+- [Phase 02-02]: Injectable VtexFetcher parameter — vi.fn() in tests, globalThis.fetch in production; no vi.stubGlobal needed
+- [Phase 02-02]: VtexApiError message: "VTEX API error {status} on {url}" — appToken never reachable from error surface (SEC-04)
+- [Phase 02-02]: getFeedItems normalizes both raw-array and {events:[]} wrapper shapes defensively (VTEX docs ambiguous)
+- [Phase 02-02]: extractOrderId priority: orderId > OrderId > order.* > data.* (covers all 6 known VTEX hook payload shapes)
 
 ### Pending Todos
 
@@ -85,6 +90,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-29T00:24:25.314Z
-Stopped at: Completed 02-01-PLAN.md — PII Masker and Deduplicator
+Last session: 2026-04-29T00:28:18.000Z
+Stopped at: Completed 02-02-PLAN.md — VTEX Client and Hook Payload Parser
 Resume file: None
