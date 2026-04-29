@@ -5,7 +5,7 @@ import { StatusBadge } from './StatusBadge';
 import { cn } from '@/lib/utils';
 import type { ErpOrderRecord, ErpTimelineEntry } from '@/types';
 
-type ActionType = 'reprocess' | 'retry-start-handling' | 'resolve' | 'cancel' | 'copy-erp' | 'copy-vtex';
+type ActionType = 'reprocess' | 'retry-start-handling' | 'resolve' | 'cancel' | 'delete' | 'copy-erp' | 'copy-vtex';
 
 interface OrderRowProps {
   order: ErpOrderRecord;
@@ -192,6 +192,12 @@ export function OrderRow({ order, onAction }: OrderRowProps) {
                     disabled={order.erpStatus === 'CANCELLED'}
                   >
                     Cancel Order
+                  </ActionBtn>
+                  <ActionBtn
+                    variant="danger"
+                    onClick={() => onAction('delete', order.orderId)}
+                  >
+                    Delete Order
                   </ActionBtn>
                   <ActionBtn
                     variant="ghost"
