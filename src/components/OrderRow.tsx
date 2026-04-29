@@ -395,9 +395,17 @@ export function OrderRow({ order, onAction }: OrderRowProps) {
                       Copy VTEX
                     </ActionBtn>
                     <div className="flex-1" />
-                    <ActionBtn variant="danger" onClick={() => onAction('cancel', order.orderId)}>
-                      Cancel
-                    </ActionBtn>
+                    {order.invoiceStatus === 'SUCCESS' ? (
+                      <span title="Order cannot be cancelled after invoice is sent">
+                        <ActionBtn variant="danger" onClick={() => {}} disabled>
+                          Cancel
+                        </ActionBtn>
+                      </span>
+                    ) : (
+                      <ActionBtn variant="danger" onClick={() => onAction('cancel', order.orderId)}>
+                        Cancel
+                      </ActionBtn>
+                    )}
                     <ActionBtn variant="danger" onClick={() => onAction('delete', order.orderId)}>
                       Delete
                     </ActionBtn>
