@@ -5,6 +5,11 @@
 
 import type { IntegrationSource, AppConfig } from '@/types/erp';
 import type { VtexClient } from '@/lib/vtexClient';
+
+// VTEX statuses that mean Start Handling already happened upstream
+const SH_DONE = new Set(['handling', 'verifying-invoice', 'invoiced', 'canceled']);
+// VTEX statuses that mean the invoice was already accepted by VTEX
+const INVOICE_DONE = new Set(['verifying-invoice', 'invoiced']);
 import {
   upsertOrder,
   getOrderByOrderId,
@@ -129,6 +134,38 @@ export async function processOrder(
   });
 
   // Step 4: Start Handling (PIPE-04)
+  // If VTEX already advanced to 'handling' or beyond, skip the API call and reflect reality.
+  const vtexStatus = vtexOrder.status ?? '';
+  const shAlreadyDone = SH_DONE.has(vtexStatus);
+  const invoiceAlreadyDone = INVOICE_DONE.has(vtexStatus);
+
+  if (shAlreadyDone) {
+    const r = await getOrderByOrderId(orderId);
+    if (r) {
+      await upsertOrder({
+        ...r,
+        startHandlingStatus: 'SUCCESS',
+        ...(invoiceAlreadyDone ? { invoiceStatus: 'SUCCESS' } : {}),
+      });
+    }
+    await setOrderStatus(record.id, invoiceAlreadyDone ? 'INVOICED' : 'START_HANDLING_SUCCESS');
+    await appendTimelineEntry(record.id, {
+      timestamp: new Date().toISOString(),
+      step: 'START_HANDLING_SUCCESS',
+      status: 'SUCCESS',
+      message: `VTEX status is '${vtexStatus}' — Start Handling already completed`,
+    });
+    if (invoiceAlreadyDone) {
+      await appendTimelineEntry(record.id, {
+        timestamp: new Date().toISOString(),
+        step: 'INVOICE_SUCCESS',
+        status: 'SUCCESS',
+        message: `VTEX status is '${vtexStatus}' — Invoice already accepted`,
+      });
+    }
+    return;
+  }
+
   await appendTimelineEntry(record.id, {
     timestamp: new Date().toISOString(),
     step: 'START_HANDLING_REQUESTED',
