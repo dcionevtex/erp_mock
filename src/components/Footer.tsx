@@ -2,7 +2,7 @@
 
 function BrazilianEngineeringLogo() {
   return (
-    <div className="flex flex-col items-start select-none">
+    <div className="flex flex-col items-center select-none">
       {/* Wordmark */}
       <span
         className="font-black italic leading-none tracking-tight"
@@ -60,7 +60,6 @@ export function Footer() {
       style={{ background: '#142032', borderColor: 'rgba(255,255,255,0.08)' }}
     >
       <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-4 flex-wrap">
-        <BrazilianEngineeringLogo />
         <a
           href="https://github.com/dcionevtex"
           target="_blank"
@@ -74,6 +73,19 @@ export function Footer() {
           </span>
           {' '}· VTEX
         </a>
+
+        <a
+          href="https://brazilian.engineering/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="transition-opacity hover:opacity-80"
+          aria-label="Brazilian Engineering"
+        >
+          <BrazilianEngineeringLogo />
+        </a>
+
+        {/* Spacer to keep logo centered */}
+        <div className="w-[120px] hidden sm:block" />
       </div>
     </footer>
   );
