@@ -25,6 +25,8 @@ export const VTEX_API_PATHS = {
   feedCommit: () => `/api/orders/feed`,
   /** Start handling for a given order. */
   startHandling: (orderId: string) => `/api/oms/pvt/orders/${encodeURIComponent(orderId)}/start-handling`,
+  /** Cancel an order. */
+  cancelOrder: (orderId: string) => `/api/oms/pvt/orders/${encodeURIComponent(orderId)}/cancel`,
 } as const;
 
 /** VTEX-required headers (token MUST come from server config — never hard-coded). */
@@ -51,6 +53,7 @@ export const ERP_STATUS_VALUES = [
   'ERROR',
   'DUPLICATE_IGNORED',
   'MANUALLY_RESOLVED',
+  'CANCELLED',
 ] as const;
 
 export const INTEGRATION_SOURCE_VALUES = ['FEED', 'HOOK'] as const;

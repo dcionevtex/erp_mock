@@ -44,6 +44,7 @@ export interface VtexClient {
   getFeedItems(maxLot?: number): Promise<VtexFeedItem[]>;
   commitFeedItems(handles: string[]): Promise<void>;
   startHandling(orderId: string): Promise<void>;
+  cancelOrder(orderId: string): Promise<void>;
 }
 
 /**
@@ -121,6 +122,9 @@ export function createVtexClient(
     async startHandling(orderId) {
       // Empty body {} required — Content-Type: application/json must still be set (PITFALL M6)
       await request<void>('POST', VTEX_API_PATHS.startHandling(orderId), {});
+    },
+    async cancelOrder(orderId) {
+      await request<void>('POST', VTEX_API_PATHS.cancelOrder(orderId), {});
     },
   };
 }

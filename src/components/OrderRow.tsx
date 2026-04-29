@@ -5,7 +5,7 @@ import { StatusBadge } from './StatusBadge';
 import { cn } from '@/lib/utils';
 import type { ErpOrderRecord, ErpTimelineEntry } from '@/types';
 
-type ActionType = 'reprocess' | 'retry-start-handling' | 'resolve' | 'copy-erp' | 'copy-vtex';
+type ActionType = 'reprocess' | 'retry-start-handling' | 'resolve' | 'cancel' | 'copy-erp' | 'copy-vtex';
 
 interface OrderRowProps {
   order: ErpOrderRecord;
@@ -185,6 +185,13 @@ export function OrderRow({ order, onAction }: OrderRowProps) {
                   </ActionBtn>
                   <ActionBtn onClick={() => onAction('resolve', order.orderId)}>Mark as Resolved</ActionBtn>
                   <ActionBtn
+                    variant="danger"
+                    onClick={() => onAction('cancel', order.orderId)}
+                    disabled={order.erpStatus === 'CANCELLED'}
+                  >
+                    Cancel Order
+                  </ActionBtn>
+                  <ActionBtn
                     variant="ghost"
                     onClick={() => {
                       if (order.erpPayload) {
@@ -268,7 +275,7 @@ function ActionBtn({
   children: React.ReactNode;
   onClick: () => void;
   disabled?: boolean;
-  variant?: 'default' | 'ghost';
+  variant?: 'default' | 'ghost' | 'danger';
 }) {
   return (
     <button
@@ -279,6 +286,8 @@ function ActionBtn({
         'px-3 py-1.5 text-xs font-medium rounded-md border transition-colors disabled:opacity-40 disabled:pointer-events-none',
         variant === 'ghost'
           ? 'border-border bg-background hover:bg-muted text-foreground'
+          : variant === 'danger'
+          ? 'border-transparent bg-red-600 text-white hover:bg-red-700'
           : 'border-transparent bg-primary text-primary-foreground hover:bg-primary/90',
       )}
     >

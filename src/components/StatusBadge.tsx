@@ -14,6 +14,7 @@ const COLOR_MAP: Record<string, string> = {
   ERROR:                  'bg-red-100 text-red-700',
   DUPLICATE_IGNORED:      'bg-gray-100 text-gray-500',
   MANUALLY_RESOLVED:      'bg-purple-100 text-purple-700',
+  CANCELLED:              'bg-orange-100 text-orange-700',
   NOT_STARTED:            'bg-slate-100 text-slate-500',
   SUCCESS:                'bg-green-100 text-green-700',
 };
@@ -27,6 +28,7 @@ const LABEL_MAP: Record<string, string> = {
   ERROR:                  'Error',
   DUPLICATE_IGNORED:      'Duplicate',
   MANUALLY_RESOLVED:      'Resolved',
+  CANCELLED:              'Cancelled',
   NOT_STARTED:            'Not Started',
   SUCCESS:                'Success',
 };

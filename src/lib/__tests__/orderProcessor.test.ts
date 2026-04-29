@@ -47,6 +47,7 @@ function makeMockVtexClient(overrides: Partial<VtexClient> = {}): VtexClient {
     getFeedItems: vi.fn().mockResolvedValue([]),
     commitFeedItems: vi.fn().mockResolvedValue(undefined),
     startHandling: vi.fn().mockResolvedValue(undefined),
+    cancelOrder: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   };
 }

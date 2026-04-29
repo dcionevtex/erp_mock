@@ -14,7 +14,8 @@ export type ErpStatus =
   | "START_HANDLING_ERROR"
   | "ERROR"
   | "DUPLICATE_IGNORED"
-  | "MANUALLY_RESOLVED";
+  | "MANUALLY_RESOLVED"
+  | "CANCELLED";
 
 export type StartHandlingStatus =
   | "NOT_STARTED"
@@ -36,6 +37,9 @@ export type PipelineStepName =
   | "FEED_ITEM_COMMITTED"
   | "DUPLICATE_IGNORED"
   | "MANUALLY_RESOLVED"
+  | "CANCEL_REQUESTED"
+  | "CANCEL_SUCCESS"
+  | "CANCEL_ERROR"
   | "ERROR";
 
 export type ErpTimelineEntry = {

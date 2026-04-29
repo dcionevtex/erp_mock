@@ -91,6 +91,7 @@ export default function DashboardPage() {
       reprocess: `/api/erp/orders/${encodeURIComponent(orderId)}/reprocess`,
       'retry-start-handling': `/api/erp/orders/${encodeURIComponent(orderId)}/retry-start-handling`,
       resolve: `/api/erp/orders/${encodeURIComponent(orderId)}/resolve`,
+      cancel: `/api/erp/orders/${encodeURIComponent(orderId)}/cancel`,
     };
     const path = pathMap[action];
     if (!path) return;
