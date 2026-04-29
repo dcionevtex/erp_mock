@@ -26,6 +26,7 @@ const baseRecord = (id: string, orderId: string, receivedAt: string): ErpOrderRe
   source: 'HOOK',
   erpStatus: 'RECEIVED',
   startHandlingStatus: 'NOT_STARTED',
+  invoiceStatus: 'NOT_SENT',
   receivedAt,
   attempts: 0,
   timeline: [],

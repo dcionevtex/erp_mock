@@ -12,6 +12,8 @@ export type ErpStatus =
   | "ERP_ACCEPTED"
   | "START_HANDLING_SUCCESS"
   | "START_HANDLING_ERROR"
+  | "INVOICED"
+  | "INVOICE_ERROR"
   | "ERROR"
   | "DUPLICATE_IGNORED"
   | "MANUALLY_RESOLVED"
@@ -19,6 +21,11 @@ export type ErpStatus =
 
 export type StartHandlingStatus =
   | "NOT_STARTED"
+  | "SUCCESS"
+  | "ERROR";
+
+export type InvoiceStatus =
+  | "NOT_SENT"
   | "SUCCESS"
   | "ERROR";
 
@@ -34,6 +41,9 @@ export type PipelineStepName =
   | "START_HANDLING_REQUESTED"
   | "START_HANDLING_SUCCESS"
   | "START_HANDLING_ERROR"
+  | "INVOICE_REQUESTED"
+  | "INVOICE_SUCCESS"
+  | "INVOICE_ERROR"
   | "FEED_ITEM_COMMITTED"
   | "DUPLICATE_IGNORED"
   | "MANUALLY_RESOLVED"
@@ -97,6 +107,14 @@ export type ErpOrderRecord = {
   vtexStatus?: string;
   erpStatus: ErpStatus;
   startHandlingStatus: StartHandlingStatus;
+  invoiceStatus: InvoiceStatus;
+  invoiceNumber?: string;
+  invoiceIssuedAt?: string;
+  invoiceTracking?: {
+    courier?: string;
+    trackingNumber?: string;
+    trackingUrl?: string;
+  };
   customerName?: string;
   customerEmailMasked?: string;
   totalValue?: number;

@@ -88,6 +88,7 @@ async function runPoll(): Promise<Response> {
           source: 'FEED',
           erpStatus: 'DUPLICATE_IGNORED',
           startHandlingStatus: 'NOT_STARTED',
+          invoiceStatus: 'NOT_SENT',
           receivedAt: now,
           attempts: 0,
           timeline: [{
@@ -119,6 +120,7 @@ async function runPoll(): Promise<Response> {
       source: 'FEED',
       erpStatus: 'RECEIVED',
       startHandlingStatus: 'NOT_STARTED',
+      invoiceStatus: 'NOT_SENT',
       receivedAt: itemNow,
       attempts: 0,
       timeline: [{

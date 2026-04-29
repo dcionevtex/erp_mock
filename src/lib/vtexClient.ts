@@ -39,12 +39,38 @@ export interface VtexClientConfig {
 /** Function-shape compatible with global fetch — the only HTTP surface this module needs. */
 export type VtexFetcher = (input: string, init?: RequestInit) => Promise<Response>;
 
+export interface VtexInvoicePayload {
+  type: 'Output' | 'Input';
+  invoiceNumber: string;
+  invoiceValue: number;
+  issuanceDate: string;
+  invoiceKey?: string;
+  invoiceUrl?: string;
+  courier?: string;
+  trackingNumber?: string;
+  trackingUrl?: string;
+  items: Array<{ id: string; price: number; quantity: number }>;
+}
+
+export interface VtexInvoiceTrackingUpdate {
+  courier?: string;
+  trackingNumber?: string;
+  trackingUrl?: string;
+}
+
+/** Generate a safe invoice number from a VTEX orderId. Strips '/' to avoid VTEX routing bug. */
+export function buildInvoiceNumber(orderId: string): string {
+  return `NF-${orderId.replace(/\//g, '-')}-${Date.now()}`;
+}
+
 export interface VtexClient {
   getOrder(orderId: string): Promise<VtexOrder>;
   getFeedItems(maxLot?: number): Promise<VtexFeedItem[]>;
   commitFeedItems(handles: string[]): Promise<void>;
   startHandling(orderId: string): Promise<void>;
   cancelOrder(orderId: string): Promise<void>;
+  sendInvoice(orderId: string, payload: VtexInvoicePayload): Promise<void>;
+  updateInvoiceTracking(orderId: string, invoiceNumber: string, tracking: VtexInvoiceTrackingUpdate): Promise<void>;
 }
 
 /**
@@ -125,6 +151,12 @@ export function createVtexClient(
     },
     async cancelOrder(orderId) {
       await request<void>('POST', VTEX_API_PATHS.cancelOrder(orderId), {});
+    },
+    async sendInvoice(orderId, payload) {
+      await request<void>('POST', VTEX_API_PATHS.sendInvoice(orderId), payload);
+    },
+    async updateInvoiceTracking(orderId, invoiceNumber, tracking) {
+      await request<void>('PATCH', VTEX_API_PATHS.updateInvoiceTracking(orderId, invoiceNumber), tracking);
     },
   };
 }

@@ -33,6 +33,7 @@ describe('shared types', () => {
       source: 'HOOK',
       erpStatus: 'RECEIVED',
       startHandlingStatus: 'NOT_STARTED',
+      invoiceStatus: 'NOT_SENT',
       receivedAt: '2026-04-28T00:00:00.000Z',
       attempts: 0,
       timeline: [],

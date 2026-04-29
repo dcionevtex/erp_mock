@@ -157,4 +157,5 @@ export async function processOrder(
       message,
     });
   }
+  // Invoice is a manual operator action — see BL-008-D/E
 }

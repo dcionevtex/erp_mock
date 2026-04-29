@@ -27,6 +27,11 @@ export const VTEX_API_PATHS = {
   startHandling: (orderId: string) => `/api/oms/pvt/orders/${encodeURIComponent(orderId)}/start-handling`,
   /** Cancel an order. */
   cancelOrder: (orderId: string) => `/api/oms/pvt/orders/${encodeURIComponent(orderId)}/cancel`,
+  /** Send invoice (nota fiscal) notification. */
+  sendInvoice: (orderId: string) => `/api/oms/pvt/orders/${encodeURIComponent(orderId)}/invoice`,
+  /** Update tracking on an existing invoice. NOTE: invoiceNumber must not contain '/' (VTEX bug). */
+  updateInvoiceTracking: (orderId: string, invoiceNumber: string) =>
+    `/api/oms/pvt/orders/${encodeURIComponent(orderId)}/invoice/${encodeURIComponent(invoiceNumber)}`,
 } as const;
 
 /** VTEX-required headers (token MUST come from server config — never hard-coded). */
@@ -50,6 +55,8 @@ export const ERP_STATUS_VALUES = [
   'ERP_ACCEPTED',
   'START_HANDLING_SUCCESS',
   'START_HANDLING_ERROR',
+  'INVOICED',
+  'INVOICE_ERROR',
   'ERROR',
   'DUPLICATE_IGNORED',
   'MANUALLY_RESOLVED',

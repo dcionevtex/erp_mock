@@ -54,6 +54,7 @@ export async function POST(request: Request): Promise<Response> {
     source: 'HOOK',
     erpStatus: 'RECEIVED',
     startHandlingStatus: 'NOT_STARTED',
+    invoiceStatus: 'NOT_SENT',
     receivedAt: now,
     attempts: 0,
     timeline: [{

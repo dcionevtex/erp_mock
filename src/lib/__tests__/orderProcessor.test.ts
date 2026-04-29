@@ -18,6 +18,7 @@ function makeRecord(overrides: Partial<ErpOrderRecord> = {}): ErpOrderRecord {
     source: 'HOOK',
     erpStatus: 'RECEIVED',
     startHandlingStatus: 'NOT_STARTED',
+    invoiceStatus: 'NOT_SENT',
     receivedAt: new Date().toISOString(),
     attempts: 0,
     timeline: [],
@@ -48,6 +49,8 @@ function makeMockVtexClient(overrides: Partial<VtexClient> = {}): VtexClient {
     commitFeedItems: vi.fn().mockResolvedValue(undefined),
     startHandling: vi.fn().mockResolvedValue(undefined),
     cancelOrder: vi.fn().mockResolvedValue(undefined),
+    sendInvoice: vi.fn().mockResolvedValue(undefined),
+    updateInvoiceTracking: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   };
 }
