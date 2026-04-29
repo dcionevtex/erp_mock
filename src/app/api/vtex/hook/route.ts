@@ -6,7 +6,7 @@
 export const runtime = 'nodejs';
 
 import { getMissingCredentials, isHookSecretValid, buildServerConfig } from '@/lib/config';
-import { upsertOrder, getOrderByOrderId, appendEventLog, appendTimelineEntry } from '@/lib/store';
+import { upsertOrder, getOrderByOrderId, appendEventLog, appendTimelineEntry, hasProcessedKey, markProcessedKey } from '@/lib/store';
 import { createVtexClient } from '@/lib/vtexClient';
 import { extractOrderId, extractVtexStatus } from '@/lib/hookParser';
 import { processOrder } from '@/lib/orderProcessor';
@@ -106,12 +106,19 @@ export async function POST(request: Request): Promise<Response> {
     return Response.json({ received: true, orderId, warning: 'credentials_missing' });
   }
 
-  // Skip full pipeline if order is already fully processed — avoids redundant
-  // getOrder calls and timeline noise for every subsequent VTEX status-change hook.
+  // Skip full pipeline if order is already fully processed.
   const current = await getOrderByOrderId(orderId);
   if (current?.startHandlingStatus === 'SUCCESS') {
     return Response.json({ received: true, orderId, skipped: 'already_handled' });
   }
+
+  // Dedup: mark orderId as in-flight before the delay so a second concurrent hook
+  // for the same order (VTEX delivers at-least-once) cannot race into processOrder.
+  const processingKey = `hook-processing:${orderId}`;
+  if (hasProcessedKey(processingKey)) {
+    return Response.json({ received: true, orderId, skipped: 'already_processing' });
+  }
+  markProcessedKey(processingKey);
 
   const vtexClient = createVtexClient(cfg as Parameters<typeof createVtexClient>[0]);
   await new Promise((r) => setTimeout(r, 5000));
