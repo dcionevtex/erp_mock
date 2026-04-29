@@ -5,6 +5,29 @@
 - [x] `BL-001` **Apply VTEX brand guidelines to the frontend**
   Apply the official VTEX brand design system (colors, typography, spacing, components) across the entire dashboard UI to make the demo feel native to the VTEX ecosystem.
 
+## Persistence
+
+- [ ] `BL-006` **Persist ERP Orders and Event Log across deployments / cold starts**
+  Currently both the order inbox and the event log live in `globalThis` in-memory. Every Vercel cold start (new serverless instance) starts with an empty store — orders and events written by one invocation are invisible to the next.
+
+  **Recommended solution: [Neon](https://neon.tech) (serverless Postgres) via Vercel Integration**
+
+  Why Neon over the alternatives:
+  | Option | Fit | Notes |
+  |---|---|---|
+  | **Neon (Vercel Postgres)** | ✅ Best | Free tier, 1-click Vercel integration, SQL for filter/sort/search, JSON columns for timeline & payload |
+  | Upstash Redis / Vercel KV | OK | Good for simple key-value, but querying orders (filter by status, search by customer) gets ugly fast |
+  | Supabase | OK | Also Postgres, great free tier, but requires a separate account and more setup steps |
+  | PlanetScale (MySQL) | ❌ | No free tier anymore |
+
+  **Implementation scope:**
+  - Add Neon integration in Vercel dashboard → `DATABASE_URL` env var is injected automatically
+  - Replace `src/lib/store.ts` in-memory Maps with Postgres queries using `@neondatabase/serverless` (no ORM needed for this data model)
+  - Two tables: `erp_orders` (JSONB column for timeline + payload) and `event_log`
+  - All existing API routes stay the same — only the store module changes
+  - Add `DATABASE_URL=` to `.env.example`
+  - Keep the in-memory store as a fallback when `DATABASE_URL` is not set (local dev with no DB)
+
 ## Feed Polling
 
 - [ ] `BL-002` **Poll Feed modal with live status**
