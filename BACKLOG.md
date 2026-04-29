@@ -28,6 +28,11 @@
   - Add `DATABASE_URL=` to `.env.example`
   - Keep the in-memory store as a fallback when `DATABASE_URL` is not set (local dev with no DB)
 
+## Order Details
+
+- [ ] `BL-007` **Shipping label mockup in order accordion**
+  Inside the order detail accordion, show a simulated shipping label preview that an ERP operator can use to see dispatch info at a glance and print. Label must include: From (VTEX account), To (customer name + masked contact), SLA/carrier, order fields, a real CODE128 barcode generated from the orderId, and a Print button that opens a print-ready 4×6in label in a new window.
+
 ## Feed Polling
 
 - [ ] `BL-002` **Poll Feed modal with live status**

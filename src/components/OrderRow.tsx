@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { StatusBadge } from './StatusBadge';
+import { ShippingLabel } from './ShippingLabel';
 import { cn } from '@/lib/utils';
 import type { ErpOrderRecord, ErpTimelineEntry } from '@/types';
 
@@ -124,7 +125,12 @@ export function OrderRow({ order, onAction }: OrderRowProps) {
                 </Section>
               )}
 
-              {/* 4. Payment Details */}
+              {/* 4. Shipping Label */}
+              <Section title="Shipping Label">
+                <ShippingLabel order={order} />
+              </Section>
+
+              {/* 5. Payment Details */}
               {order.erpPayload?.paymentSummary && (
                 <Section title="Payment Details">
                   <dl className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm">
