@@ -11,6 +11,7 @@ The app must be simple, efficient, demo-friendly, and deployable to GitHub and V
 Official VTEX reference:
 https://developers.vtex.com/docs/guides/erp-integration-set-up-order-integration
 
+DO NOT OVER ENGINEERING 
 ---
 
 ## 1. Business Context

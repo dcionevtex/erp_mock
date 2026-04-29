@@ -8,6 +8,7 @@
 
 import type { AppConfig, AppConfigPublic, IntegrationMode } from '@/types';
 import { VTEX_DEFAULT_ENVIRONMENT } from './constants';
+import { getConfigOverrides, getServerSecrets } from '@/lib/store';
 
 // Internal-only: extends AppConfig with the secret token. NEVER export this type.
 type ServerAppConfig = AppConfig & {
@@ -79,6 +80,24 @@ export function getMissingCredentials(cfg: ServerAppConfig = getServerConfig()):
   if (!cfg.appKey) missing.push('appKey');
   if (!cfg.appToken) missing.push('appToken');
   return missing;
+}
+
+/**
+ * Build the full server config for use in API route handlers.
+ * Merges: env defaults → in-memory config overrides → server-side secret overrides.
+ * Routes must use this instead of getServerConfig() alone to support runtime credential updates from the UI.
+ * NEVER pass the result to a client or log it (it contains appToken).
+ */
+export function buildServerConfig(): ReturnType<typeof getServerConfig> {
+  const base = getServerConfig();
+  const overrides = getConfigOverrides();
+  const secrets = getServerSecrets();
+  return {
+    ...base,
+    ...overrides,
+    appToken: secrets.appToken ?? base.appToken,
+    appKey: secrets.appKey ?? base.appKey,
+  };
 }
 
 /**

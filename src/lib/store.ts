@@ -168,6 +168,8 @@ export function __resetStoreForTests(): void {
   for (const k of Object.keys(configOverrides)) {
     delete (configOverrides as Record<string, unknown>)[k];
   }
+  serverSecrets.appToken = undefined;
+  serverSecrets.appKey = undefined;
 }
 
 export function __getRawCounts() {
@@ -176,4 +178,25 @@ export function __getRawCounts() {
     eventLog: eventLog.length,
     processedKeys: processedKeys.size,
   };
+}
+
+// ---- Server-side credential overrides (runtime only, never serialized) ------
+// Allows the config panel (Phase 4) to override VTEX credentials at runtime.
+// These are NEVER returned to clients — only read by buildServerConfig() in config.ts.
+
+declare global {
+  // eslint-disable-next-line no-var
+  var __serverSecrets: { appToken?: string; appKey?: string } | undefined;
+}
+
+const serverSecrets: { appToken?: string; appKey?: string } =
+  globalThis.__serverSecrets ?? (globalThis.__serverSecrets = {});
+
+export function setServerSecrets(secrets: { appToken?: string; appKey?: string }): void {
+  if (secrets.appToken !== undefined) serverSecrets.appToken = secrets.appToken;
+  if (secrets.appKey !== undefined) serverSecrets.appKey = secrets.appKey;
+}
+
+export function getServerSecrets(): { appToken?: string; appKey?: string } {
+  return { ...serverSecrets };
 }
