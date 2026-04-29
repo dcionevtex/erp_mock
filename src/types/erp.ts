@@ -91,6 +91,7 @@ export type ErpOrderRecord = {
   id: string;                         // app-internal id (uuid or orderId)
   orderId: string;                    // VTEX orderId
   sequence?: string;                  // VTEX sequence
+  account?: string;                   // VTEX account name the order came from
   source: IntegrationSource;
   vtexStatus?: string;
   erpStatus: ErpStatus;

@@ -50,6 +50,7 @@ export async function POST(request: Request): Promise<Response> {
   const record: ErpOrderRecord = {
     id: orderId,
     orderId,
+    account: cfg.account || undefined,
     source: 'HOOK',
     erpStatus: 'RECEIVED',
     startHandlingStatus: 'NOT_STARTED',

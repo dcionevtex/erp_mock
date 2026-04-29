@@ -257,6 +257,7 @@ export default function DashboardPage() {
                   <thead className="bg-muted/50">
                     <tr className="text-left text-xs text-muted-foreground uppercase tracking-wide">
                       <th className="px-3 py-2 font-medium">Status</th>
+                      <th className="px-3 py-2 font-medium">Account</th>
                       <th className="px-3 py-2 font-medium">Order ID</th>
                       <th className="px-3 py-2 font-medium">Seq</th>
                       <th className="px-3 py-2 font-medium">VTEX Status</th>

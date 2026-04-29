@@ -84,6 +84,7 @@ async function runPoll(): Promise<Response> {
         const dupRecord: ErpOrderRecord = {
           id: `dup-${orderId}-${Date.now()}`,
           orderId,
+          account: cfg.account || undefined,
           source: 'FEED',
           erpStatus: 'DUPLICATE_IGNORED',
           startHandlingStatus: 'NOT_STARTED',
@@ -114,6 +115,7 @@ async function runPoll(): Promise<Response> {
     const record: ErpOrderRecord = {
       id: orderId,
       orderId,
+      account: cfg.account || undefined,
       source: 'FEED',
       erpStatus: 'RECEIVED',
       startHandlingStatus: 'NOT_STARTED',

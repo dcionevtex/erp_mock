@@ -36,6 +36,7 @@ export function OrderRow({ order, onAction }: OrderRowProps) {
         onClick={() => setOpen((v) => !v)}
       >
         <td className="px-3 py-2 whitespace-nowrap"><StatusBadge status={order.erpStatus} /></td>
+        <td className="px-3 py-2 text-xs font-medium text-muted-foreground whitespace-nowrap">{order.account ?? '—'}</td>
         <td className="px-3 py-2 font-mono text-xs max-w-[140px] truncate" title={order.orderId}>{order.orderId}</td>
         <td className="px-3 py-2 text-xs text-muted-foreground">{order.sequence ?? '—'}</td>
         <td className="px-3 py-2 text-xs text-muted-foreground">{order.vtexStatus ?? '—'}</td>
@@ -63,12 +64,13 @@ export function OrderRow({ order, onAction }: OrderRowProps) {
 
       {open && (
         <tr>
-          <td colSpan={17} className="bg-muted/20 border-b border-border px-4 py-4">
+          <td colSpan={18} className="bg-muted/20 border-b border-border px-4 py-4">
             <div className="space-y-4 max-w-5xl">
 
               {/* 1. ERP Summary */}
               <Section title="ERP Summary">
                 <dl className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm sm:grid-cols-3">
+                  <Pair label="Account" value={order.account} />
                   <Pair label="Order ID" value={order.orderId} />
                   <Pair label="Sequence" value={order.sequence} />
                   <Pair label="Customer" value={order.customerName} />
