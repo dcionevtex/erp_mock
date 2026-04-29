@@ -18,8 +18,10 @@ import type { VtexHookPayload } from '@/types/vtex';
 export function extractVtexStatus(payload: VtexHookPayload | null | undefined): string | undefined {
   if (!payload || typeof payload !== 'object') return undefined;
   const candidates: Array<unknown> = [
-    payload.currentState,
-    payload.state,
+    payload.State,          // VTEX OMS hook format (capital S)
+    payload.CurrentState,   // capital variant
+    payload.currentState,   // feed / normalised
+    payload.state,          // lowercase variant
     payload.order?.state,
     payload.data?.state,
   ];

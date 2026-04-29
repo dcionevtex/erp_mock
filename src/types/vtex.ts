@@ -132,9 +132,13 @@ export type VtexHookPayload = {
   orderId?: string;
   OrderId?: string;
   state?: string;
+  State?: string;          // VTEX OMS hook uses capital-S State
   domain?: string;
+  Domain?: string;
   lastState?: string;
+  LastState?: string;
   currentState?: string;
+  CurrentState?: string;
   lastChange?: string;
   vtexAccount?: string;
   order?: { orderId?: string; OrderId?: string; state?: string };
