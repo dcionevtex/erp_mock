@@ -13,6 +13,11 @@ import { processOrder } from '@/lib/orderProcessor';
 import type { ErpOrderRecord } from '@/types';
 
 
+// VTEX validates the hook URL with a GET request before sending notifications.
+export async function GET(): Promise<Response> {
+  return Response.json({ ok: true, endpoint: 'vtex-hook' });
+}
+
 export async function POST(request: Request): Promise<Response> {
   let body: unknown;
   try {
@@ -29,14 +34,16 @@ export async function POST(request: Request): Promise<Response> {
 
   const orderId = extractOrderId(body as Record<string, unknown>);
   if (!orderId) {
+    // Return 200 so VTEX validation/ping requests are accepted.
+    // Unknown payloads (e.g. test pings with no orderId) are logged and ignored.
     appendEventLog({
       timestamp: new Date().toISOString(),
       source: 'HOOK',
       level: 'WARN',
-      message: 'Hook payload received but orderId could not be extracted',
+      message: 'Hook payload received but orderId could not be extracted — ignoring',
       payload: body,
     });
-    return Response.json({ error: 'Cannot extract orderId from payload' }, { status: 400 });
+    return Response.json({ received: true, skipped: true, reason: 'no_order_id' });
   }
 
   const now = new Date().toISOString();
