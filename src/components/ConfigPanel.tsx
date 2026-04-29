@@ -12,6 +12,7 @@ export function ConfigPanel({ onSaved }: ConfigPanelProps) {
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [current, setCurrent] = useState<AppConfigPublic | null>(null);
+  const [appKeyChanged, setAppKeyChanged] = useState(false);
 
   const [account, setAccount] = useState('');
   const [environment, setEnvironment] = useState('vtexcommercestable.com.br');
@@ -55,6 +56,7 @@ export function ConfigPanel({ onSaved }: ConfigPanelProps) {
       });
       const data = await res.json() as { config: AppConfigPublic };
       setCurrent(data.config);
+      if (appKey.length > 0) setAppKeyChanged(true);
       setAppToken('');
       setAppKey('');
       onSaved?.(data.config);
@@ -174,6 +176,17 @@ export function ConfigPanel({ onSaved }: ConfigPanelProps) {
               {saving ? 'Saving…' : 'Save Configuration'}
             </button>
           </div>
+
+          {appKeyChanged && (
+            <div className="flex items-start gap-2 rounded-lg border border-yellow-300 bg-yellow-50 px-3 py-2 text-xs text-yellow-800">
+              <span className="mt-0.5 shrink-0">⚠</span>
+              <span>
+                App Key changed — remember to re-register the Hook URL in VTEX using the new App Key
+                (<code className="font-mono">PUT /api/orders/hook/config</code>).
+                Each App Key supports only one Hook endpoint.
+              </span>
+            </div>
+          )}
         </form>
       )}
     </div>

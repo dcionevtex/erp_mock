@@ -145,15 +145,20 @@ export default function DashboardPage() {
         <ConfigPanel onSaved={(cfg) => setConfig(cfg)} />
 
         {/* Hook URL display */}
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <span className="font-medium text-foreground">Hook URL:</span>
-          <code className="bg-muted px-2 py-0.5 rounded font-mono">{hookUrl}</code>
-          <button
-            onClick={() => navigator.clipboard.writeText(hookUrl).catch(() => {})}
-            className="px-2 py-0.5 text-xs border border-border rounded hover:bg-muted transition-colors"
-          >
-            Copy
-          </button>
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <span className="font-medium text-foreground">Hook URL:</span>
+            <code className="bg-muted px-2 py-0.5 rounded font-mono">{hookUrl}</code>
+            <button
+              onClick={() => navigator.clipboard.writeText(hookUrl).catch(() => {})}
+              className="px-2 py-0.5 text-xs border border-border rounded hover:bg-muted transition-colors"
+            >
+              Copy
+            </button>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Register this URL in VTEX using your App Key (<code className="font-mono">PUT /api/orders/hook/config</code>). Each App Key supports one Hook — if you change the App Key, re-register the Hook in VTEX.
+          </p>
         </div>
 
         {/* Credentials warning (ERR-01) */}
