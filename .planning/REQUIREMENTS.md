@@ -35,8 +35,8 @@
 ### Processing Pipeline (PIPE)
 
 - [ ] **PIPE-01**: App calls VTEX Get Order API for each received `orderId` after event receipt
-- [ ] **PIPE-02**: App normalizes the full VTEX order response into a typed `ErpOrderPayload` structure
-- [ ] **PIPE-03**: App simulates ERP acceptance (returns SUCCESS by default; returns FAILURE when simulate-failure toggle is on)
+- [x] **PIPE-02**: App normalizes the full VTEX order response into a typed `ErpOrderPayload` structure
+- [x] **PIPE-03**: App simulates ERP acceptance (returns SUCCESS by default; returns FAILURE when simulate-failure toggle is on)
 - [ ] **PIPE-04**: App calls VTEX Start Handling automatically after ERP simulation returns SUCCESS
 - [ ] **PIPE-05**: App does NOT call VTEX Start Handling when ERP simulation returns FAILURE
 - [ ] **PIPE-06**: App does NOT call VTEX Start Handling when Get Order API call fails
@@ -93,10 +93,10 @@
 
 ### Tests (TEST)
 
-- [ ] **TEST-01**: Unit tests for VTEX order normalization (maps required fields, handles optional/missing fields)
+- [x] **TEST-01**: Unit tests for VTEX order normalization (maps required fields, handles optional/missing fields)
 - [x] **TEST-02**: Unit tests for event deduplication (deduplicates by eventId, falls back to composite key, allows non-duplicates)
 - [ ] **TEST-03**: Unit tests for Hook payload parsing (extracts orderId from multiple payload shapes)
-- [ ] **TEST-04**: Unit tests for ERP simulator (returns SUCCESS by default, returns FAILURE in simulate-failure mode)
+- [x] **TEST-04**: Unit tests for ERP simulator (returns SUCCESS by default, returns FAILURE in simulate-failure mode)
 - [x] **TEST-05**: Unit tests for PII masking utility (masks email, masks document, leaves non-PII fields unchanged)
 - [ ] **TEST-06**: Unit tests for Start Handling guards (called after ERP success; not called after ERP failure; not called after Get Order failure; not called twice for same order)
 
@@ -185,8 +185,8 @@ Deferred to post-MVP. Not in current roadmap.
 | FEED-04 | Phase 3 (API Routes) | Pending |
 | FEED-05 | Phase 3 (API Routes) | Pending |
 | PIPE-01 | Phase 2 (Core Library Modules) | Pending |
-| PIPE-02 | Phase 2 (Core Library Modules) | Pending |
-| PIPE-03 | Phase 2 (Core Library Modules) | Pending |
+| PIPE-02 | Phase 2 (Core Library Modules) | Complete |
+| PIPE-03 | Phase 2 (Core Library Modules) | Complete |
 | PIPE-04 | Phase 2 (Core Library Modules) | Pending |
 | PIPE-05 | Phase 2 (Core Library Modules) | Pending |
 | PIPE-06 | Phase 2 (Core Library Modules) | Pending |
@@ -225,10 +225,10 @@ Deferred to post-MVP. Not in current roadmap.
 | API-05 | Phase 3 (API Routes) | Pending |
 | API-06 | Phase 3 (API Routes) | Pending |
 | API-07 | Phase 3 (API Routes) | Pending |
-| TEST-01 | Phase 2 (Core Library Modules) | Pending |
+| TEST-01 | Phase 2 (Core Library Modules) | Complete |
 | TEST-02 | Phase 2 (Core Library Modules) | Complete |
 | TEST-03 | Phase 2 (Core Library Modules) | Pending |
-| TEST-04 | Phase 2 (Core Library Modules) | Pending |
+| TEST-04 | Phase 2 (Core Library Modules) | Complete |
 | TEST-05 | Phase 2 (Core Library Modules) | Complete |
 | TEST-06 | Phase 2 (Core Library Modules) | Pending |
 | DOCS-01 | Phase 5 (Documentation) | Pending |

@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 02-02-PLAN.md — VTEX Client and Hook Payload Parser
-last_updated: "2026-04-29T00:28:18.000Z"
+stopped_at: Completed 02-03-PLAN.md — ERP Simulator and Order Normalizer
+last_updated: "2026-04-28T04:37:00.000Z"
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 7
-  completed_plans: 4
+  completed_plans: 5
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-04-28)
 ## Current Position
 
 Phase: 2 (Core Library Modules) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 
 ## Performance Metrics
 
@@ -49,6 +49,7 @@ Plan: 2 of 4
 | Phase 01-foundation P03 | 4min | 4 tasks | 7 files |
 | Phase 02-01 P01 | 8 | 3 tasks | 5 files |
 | Phase 02-02 P02 | 3 | 2 tasks | 4 files |
+| Phase 02-03 P03 | 6min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,10 @@ Recent decisions affecting current work:
 - [Phase 02-02]: VtexApiError message: "VTEX API error {status} on {url}" — appToken never reachable from error surface (SEC-04)
 - [Phase 02-02]: getFeedItems normalizes both raw-array and {events:[]} wrapper shapes defensively (VTEX docs ambiguous)
 - [Phase 02-02]: extractOrderId priority: orderId > OrderId > order.* > data.* (covers all 6 known VTEX hook payload shapes)
+- [Phase 02-03]: normalizeOrder is a pure function with no side effects or store dependencies — enables testing without setup
+- [Phase 02-03]: simulateErpAcceptance accepts config as parameter — never calls getServerConfig() — enables direct test injection with { simulateErpFailure: true }
+- [Phase 02-03]: PII masking applied at normalization time — ErpOrderPayload always carries pre-masked customer fields (SEC-01, SEC-02, SEC-03)
+- [Phase 02-03]: item.total uses strict null check (quantity != null && sellingPrice != null) to handle 0-quantity edge cases correctly
 
 ### Pending Todos
 
@@ -90,6 +95,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-29T00:28:18.000Z
-Stopped at: Completed 02-02-PLAN.md — VTEX Client and Hook Payload Parser
+Last session: 2026-04-28T04:37:00.000Z
+Stopped at: Completed 02-03-PLAN.md — ERP Simulator and Order Normalizer
 Resume file: None
