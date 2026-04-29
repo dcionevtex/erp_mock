@@ -405,12 +405,11 @@ export default function DashboardPage() {
 
 function EventLogRow({ evt }: { evt: EventLogEntry }) {
   const [open, setOpen] = useState(false);
-  const hasPayload = evt.payload != null;
   return (
     <>
       <tr
-        className={`border-b border-border/50 last:border-0 transition-colors ${hasPayload ? 'cursor-pointer hover:bg-muted/40' : ''} ${open ? 'bg-muted/30' : ''}`}
-        onClick={() => { if (hasPayload) setOpen((v) => !v); }}
+        className={`border-b border-border/50 last:border-0 transition-colors cursor-pointer hover:bg-muted/40 ${open ? 'bg-muted/30' : ''}`}
+        onClick={() => setOpen((v) => !v)}
       >
         <td className="px-3 py-1.5 text-muted-foreground whitespace-nowrap">
           {new Date(evt.timestamp).toLocaleTimeString()}
@@ -422,23 +421,25 @@ function EventLogRow({ evt }: { evt: EventLogEntry }) {
         <td className="px-3 py-1.5 max-w-[400px] truncate">{evt.message}</td>
         <td className="px-3 py-1.5 font-mono text-muted-foreground">{evt.orderId ?? '—'}</td>
         <td className="px-3 py-1.5 text-center">
-          {hasPayload && (
-            <svg
-              className={`w-3 h-3 text-muted-foreground transition-transform duration-150 inline-block ${open ? 'rotate-180' : ''}`}
-              viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
-            >
-              <path d="M3 5l4 4 4-4" />
-            </svg>
-          )}
+          <svg
+            className={`w-3 h-3 text-muted-foreground transition-transform duration-150 inline-block ${open ? 'rotate-180' : ''}`}
+            viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+          >
+            <path d="M3 5l4 4 4-4" />
+          </svg>
         </td>
       </tr>
-      {open && hasPayload && (
+      {open && (
         <tr className="border-b border-border/50 bg-muted/10">
           <td colSpan={6} className="px-4 py-3">
             <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-2">Payload</p>
-            <pre className="text-[11px] leading-relaxed bg-muted/60 rounded-md p-3 overflow-auto max-h-72 font-mono">
-              {JSON.stringify(evt.payload, null, 2)}
-            </pre>
+            {evt.payload != null ? (
+              <pre className="text-[11px] leading-relaxed bg-muted/60 rounded-md p-3 overflow-auto max-h-72 font-mono">
+                {JSON.stringify(evt.payload, null, 2)}
+              </pre>
+            ) : (
+              <p className="text-xs text-muted-foreground italic">No payload recorded for this event.</p>
+            )}
           </td>
         </tr>
       )}

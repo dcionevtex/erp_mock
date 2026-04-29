@@ -106,6 +106,13 @@ export async function POST(request: Request): Promise<Response> {
     return Response.json({ received: true, orderId, warning: 'credentials_missing' });
   }
 
+  // Skip full pipeline if order is already fully processed — avoids redundant
+  // getOrder calls and timeline noise for every subsequent VTEX status-change hook.
+  const current = await getOrderByOrderId(orderId);
+  if (current?.startHandlingStatus === 'SUCCESS') {
+    return Response.json({ received: true, orderId, skipped: 'already_handled' });
+  }
+
   const vtexClient = createVtexClient(cfg as Parameters<typeof createVtexClient>[0]);
   await new Promise((r) => setTimeout(r, 5000));
   await processOrder(orderId, 'HOOK', { vtexClient, config: cfg });
