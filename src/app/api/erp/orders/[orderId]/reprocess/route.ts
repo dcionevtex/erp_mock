@@ -12,7 +12,7 @@ export async function POST(
 ): Promise<Response> {
   const { orderId } = await params;
 
-  const existing = getOrderByOrderId(orderId);
+  const existing = await getOrderByOrderId(orderId);
   if (!existing) {
     return Response.json({ error: 'Order not found', orderId }, { status: 404 });
   }
@@ -23,7 +23,7 @@ export async function POST(
     return Response.json({ error: 'VTEX credentials not configured', missing }, { status: 401 });
   }
 
-  upsertOrder({
+  await upsertOrder({
     ...existing,
     erpStatus: 'RECEIVED',
     startHandlingStatus: 'NOT_STARTED',

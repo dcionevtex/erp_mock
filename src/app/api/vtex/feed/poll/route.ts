@@ -47,7 +47,7 @@ async function runPoll(): Promise<Response> {
     items = await vtexClient.getFeedItems(FEED_POLL_MAX_EVENTS);
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    appendEventLog({
+    await appendEventLog({
       timestamp: new Date().toISOString(),
       source: 'FEED',
       level: 'ERROR',
@@ -79,7 +79,7 @@ async function runPoll(): Promise<Response> {
       duplicates++;
       // Only create a store record if the order has never been seen before.
       // This ensures duplicates that arrive after the primary event are ignored silently.
-      if (!getOrderByOrderId(orderId)) {
+      if (!await getOrderByOrderId(orderId)) {
         const now = new Date().toISOString();
         const dupRecord: ErpOrderRecord = {
           id: `dup-${orderId}-${Date.now()}`,
@@ -96,9 +96,9 @@ async function runPoll(): Promise<Response> {
             message: `Duplicate feed event ignored for orderId: ${orderId}`,
           }],
         };
-        upsertOrder(dupRecord);
+        await upsertOrder(dupRecord);
       }
-      appendEventLog({
+      await appendEventLog({
         timestamp: new Date().toISOString(),
         source: 'FEED',
         level: 'INFO',
@@ -126,18 +126,18 @@ async function runPoll(): Promise<Response> {
         message: `Feed event received for orderId: ${orderId}`,
       }],
     };
-    upsertOrder(record);
+    await upsertOrder(record);
 
     try {
       await processOrder(orderId, 'FEED', { vtexClient, config: cfg });
 
       // Auto-commit the feed handle if configured and the order did not error out (CLAUDE.MD §11).
-      const finalRecord = getOrderByOrderId(orderId);
+      const finalRecord = await getOrderByOrderId(orderId);
       if (cfg.autoCommitFeed && item.handle && finalRecord && finalRecord.erpStatus !== 'ERROR') {
         try {
           await vtexClient.commitFeedItems([item.handle]);
         } catch {
-          appendEventLog({
+          await appendEventLog({
             timestamp: new Date().toISOString(),
             source: 'FEED',
             level: 'WARN',
@@ -150,7 +150,7 @@ async function runPoll(): Promise<Response> {
     } catch (err) {
       errors++;
       const message = err instanceof Error ? err.message : String(err);
-      appendEventLog({
+      await appendEventLog({
         timestamp: new Date().toISOString(),
         source: 'FEED',
         level: 'ERROR',

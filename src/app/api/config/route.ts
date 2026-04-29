@@ -2,7 +2,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 import { buildServerConfig, getPublicConfig } from '@/lib/config';
-import { setConfigOverrides, setServerSecrets } from '@/lib/store';
+import { setConfigOverrides, setServerSecrets, savePersistedConfig } from '@/lib/store';
 import { getSession } from '@/lib/session';
 import type { IntegrationMode } from '@/types';
 
@@ -41,6 +41,13 @@ export async function POST(request: Request): Promise<Response> {
   if (Object.keys(secrets).length > 0) setServerSecrets(secrets);
 
   await session.save();
+
+  // Persist credentials to DB so server-to-server calls (VTEX webhook) can authenticate
+  // without relying on the browser session cookie which VTEX doesn't send.
+  const dbFields: Record<string, unknown> = { ...configUpdate };
+  if (secrets.appKey) dbFields.appKey = secrets.appKey;
+  if (secrets.appToken) dbFields.appToken = secrets.appToken;
+  await savePersistedConfig(dbFields);
 
   return Response.json({ ok: true, config: getPublicConfig(await buildServerConfig()) });
 }

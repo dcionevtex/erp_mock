@@ -4,6 +4,6 @@ export const dynamic = 'force-dynamic';
 import { getEventLog } from '@/lib/store';
 
 export async function GET(_request: Request): Promise<Response> {
-  const events = getEventLog();
+  const events = await getEventLog();
   return Response.json({ events, total: events.length });
 }

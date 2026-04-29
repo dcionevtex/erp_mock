@@ -8,13 +8,13 @@ export async function POST(
 ): Promise<Response> {
   const { orderId } = await params;
 
-  const existing = getOrderByOrderId(orderId);
+  const existing = await getOrderByOrderId(orderId);
   if (!existing) {
     return Response.json({ error: 'Order not found', orderId }, { status: 404 });
   }
 
-  setOrderStatus(existing.id, 'MANUALLY_RESOLVED');
-  appendTimelineEntry(existing.id, {
+  await setOrderStatus(existing.id, 'MANUALLY_RESOLVED');
+  await appendTimelineEntry(existing.id, {
     timestamp: new Date().toISOString(),
     step: 'MANUALLY_RESOLVED',
     status: 'INFO',

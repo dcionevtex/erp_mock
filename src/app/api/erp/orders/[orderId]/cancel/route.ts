@@ -10,7 +10,7 @@ export async function POST(
 ): Promise<Response> {
   const { orderId } = await params;
 
-  const existing = getOrderByOrderId(orderId);
+  const existing = await getOrderByOrderId(orderId);
   if (!existing) {
     return Response.json({ error: 'Order not found', orderId }, { status: 404 });
   }
@@ -25,7 +25,7 @@ export async function POST(
     return Response.json({ error: 'VTEX credentials not configured', missing }, { status: 401 });
   }
 
-  appendTimelineEntry(existing.id, {
+  await appendTimelineEntry(existing.id, {
     timestamp: new Date().toISOString(),
     step: 'CANCEL_REQUESTED',
     status: 'INFO',
@@ -36,14 +36,14 @@ export async function POST(
   try {
     await vtexClient.cancelOrder(orderId);
 
-    setOrderStatus(existing.id, 'CANCELLED');
-    appendTimelineEntry(existing.id, {
+    await setOrderStatus(existing.id, 'CANCELLED');
+    await appendTimelineEntry(existing.id, {
       timestamp: new Date().toISOString(),
       step: 'CANCEL_SUCCESS',
       status: 'SUCCESS',
       message: 'Order successfully cancelled in VTEX',
     });
-    appendEventLog({
+    await appendEventLog({
       timestamp: new Date().toISOString(),
       source: 'SYSTEM',
       level: 'INFO',
@@ -55,15 +55,15 @@ export async function POST(
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
 
-    setOrderStatus(existing.id, 'ERROR');
-    appendTimelineEntry(existing.id, {
+    await setOrderStatus(existing.id, 'ERROR');
+    await appendTimelineEntry(existing.id, {
       timestamp: new Date().toISOString(),
       step: 'CANCEL_ERROR',
       status: 'ERROR',
       message,
     });
-    upsertOrder({ ...existing, errorMessage: message });
-    appendEventLog({
+    await upsertOrder({ ...existing, errorMessage: message });
+    await appendEventLog({
       timestamp: new Date().toISOString(),
       source: 'SYSTEM',
       level: 'ERROR',

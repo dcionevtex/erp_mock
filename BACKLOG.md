@@ -7,7 +7,7 @@
 
 ## Persistence
 
-- [ ] `BL-006` **Persist ERP Orders and Event Log across deployments / cold starts**
+- [x] `BL-006` **Persist ERP Orders and Event Log across deployments / cold starts**
   Currently both the order inbox and the event log live in `globalThis` in-memory. Every Vercel cold start (new serverless instance) starts with an empty store — orders and events written by one invocation are invisible to the next.
 
   **Recommended solution: [Neon](https://neon.tech) (serverless Postgres) via Vercel Integration**

@@ -1,12 +1,8 @@
 // src/lib/store.ts
-// In-memory store (process-scoped) with `globalThis` guard for Next.js Fast Refresh compatibility.
+// Persistence layer — in-memory by default, Neon Postgres when DATABASE_URL is set.
 //
-// CRITICAL CONSTRAINTS:
-//   - This module must run on the Node.js runtime ONLY, never the Edge runtime (Edge V8 isolates do not share state).
-//   - All API routes that import from this module must NOT export `runtime = 'edge'`.
-//   - State is lost on cold starts and is NOT shared across Vercel instances. Demo-only. (PITFALL C4)
-//   - The interface defined here is THE persistence seam. Replacing the Map with Vercel KV / Supabase later
-//     means swapping these function bodies — no caller changes.
+// All order/event functions are async so callers work identically in both modes.
+// Config overrides and server secrets stay in-memory (covered by the iron-session cookie).
 
 import type {
   AppConfig,
@@ -16,10 +12,9 @@ import type {
   EventLogEntry,
   IntegrationMode,
 } from '@/types';
+import { getSql, ensureSchema } from '@/lib/db';
 
-// ---- globalThis singletons ----------------------------------------------
-// Next.js Fast Refresh re-executes module code on save. Without `globalThis`, a module-level
-// `new Map()` resets on every save. The guard ensures one instance per Node.js process.
+// ---- globalThis in-memory singletons (used when DATABASE_URL is not set) ----
 
 declare global {
   // eslint-disable-next-line no-var
@@ -33,99 +28,142 @@ declare global {
 }
 
 const orders: Map<string, ErpOrderRecord> =
-  globalThis.__erpStore ?? (globalThis.__erpStore = new Map<string, ErpOrderRecord>());
-
+  globalThis.__erpStore ?? (globalThis.__erpStore = new Map());
 const eventLog: EventLogEntry[] =
   globalThis.__eventLog ?? (globalThis.__eventLog = []);
-
 const processedKeys: Set<string> =
-  globalThis.__processedKeys ?? (globalThis.__processedKeys = new Set<string>());
-
+  globalThis.__processedKeys ?? (globalThis.__processedKeys = new Set());
 const configOverrides: Partial<AppConfig> =
   globalThis.__configOverrides ?? (globalThis.__configOverrides = {});
 
-// ---- Order CRUD ----------------------------------------------------------
+// ---- helpers ----------------------------------------------------------------
 
-/** Insert or replace an order record (keyed by `id`). */
-export function upsertOrder(record: ErpOrderRecord): ErpOrderRecord {
+async function db() {
+  const sql = getSql();
+  if (sql) await ensureSchema(sql);
+  return sql;
+}
+
+// ---- Order CRUD -------------------------------------------------------------
+
+export async function upsertOrder(record: ErpOrderRecord): Promise<ErpOrderRecord> {
+  const sql = await db();
+  if (sql) {
+    await sql`
+      INSERT INTO erp_orders (id, order_id, data, received_at)
+      VALUES (${record.id}, ${record.orderId}, ${JSON.stringify(record)}, ${record.receivedAt})
+      ON CONFLICT (id) DO UPDATE
+        SET data = EXCLUDED.data, updated_at = NOW()
+    `;
+    return record;
+  }
   orders.set(record.id, record);
   return record;
 }
 
-/** Get a single order by internal id. */
-export function getOrder(id: string): ErpOrderRecord | undefined {
+export async function getOrder(id: string): Promise<ErpOrderRecord | undefined> {
+  const sql = await db();
+  if (sql) {
+    const rows = await sql`SELECT data FROM erp_orders WHERE id = ${id} LIMIT 1`;
+    return rows[0]?.data as ErpOrderRecord | undefined;
+  }
   return orders.get(id);
 }
 
-/** Find an order by VTEX orderId (most callers use this). */
-export function getOrderByOrderId(orderId: string): ErpOrderRecord | undefined {
+export async function getOrderByOrderId(orderId: string): Promise<ErpOrderRecord | undefined> {
+  const sql = await db();
+  if (sql) {
+    const rows = await sql`SELECT data FROM erp_orders WHERE order_id = ${orderId} LIMIT 1`;
+    return rows[0]?.data as ErpOrderRecord | undefined;
+  }
   for (const rec of orders.values()) {
     if (rec.orderId === orderId) return rec;
   }
   return undefined;
 }
 
-/** Return all orders sorted newest-first by `receivedAt` (INBOX-03). */
-export function getAllOrders(): ErpOrderRecord[] {
+export async function getAllOrders(): Promise<ErpOrderRecord[]> {
+  const sql = await db();
+  if (sql) {
+    const rows = await sql`SELECT data FROM erp_orders ORDER BY received_at DESC`;
+    return rows.map((r) => r.data as ErpOrderRecord);
+  }
   return Array.from(orders.values()).sort(
     (a, b) => new Date(b.receivedAt).getTime() - new Date(a.receivedAt).getTime(),
   );
 }
 
-/** Update only the ERP status and `lastAttemptAt` of an existing order. No-op if not found. */
-export function setOrderStatus(id: string, status: ErpStatus, lastAttemptAt?: string): ErpOrderRecord | undefined {
-  const rec = orders.get(id);
+export async function setOrderStatus(
+  id: string,
+  status: ErpStatus,
+  lastAttemptAt?: string,
+): Promise<ErpOrderRecord | undefined> {
+  const rec = await getOrder(id);
   if (!rec) return undefined;
-  const next: ErpOrderRecord = {
+  return upsertOrder({
     ...rec,
     erpStatus: status,
     lastAttemptAt: lastAttemptAt ?? new Date().toISOString(),
-  };
-  orders.set(id, next);
-  return next;
+  });
 }
 
-/** Append a single timeline entry to an order. No-op if not found. */
-export function appendTimelineEntry(id: string, entry: ErpTimelineEntry): ErpOrderRecord | undefined {
-  const rec = orders.get(id);
+export async function appendTimelineEntry(
+  id: string,
+  entry: ErpTimelineEntry,
+): Promise<ErpOrderRecord | undefined> {
+  const rec = await getOrder(id);
   if (!rec) return undefined;
-  const next: ErpOrderRecord = { ...rec, timeline: [...rec.timeline, entry] };
-  orders.set(id, next);
-  return next;
+  return upsertOrder({ ...rec, timeline: [...rec.timeline, entry] });
 }
 
-/** Increment attempts counter and update lastAttemptAt. No-op if not found. */
-export function incrementAttempts(id: string): ErpOrderRecord | undefined {
-  const rec = orders.get(id);
+export async function incrementAttempts(id: string): Promise<ErpOrderRecord | undefined> {
+  const rec = await getOrder(id);
   if (!rec) return undefined;
-  const next: ErpOrderRecord = {
+  return upsertOrder({
     ...rec,
     attempts: rec.attempts + 1,
     lastAttemptAt: new Date().toISOString(),
-  };
-  orders.set(id, next);
-  return next;
+  });
 }
 
-/** Remove an order — used by tests / reset endpoints. Returns true if removed. */
-export function deleteOrder(id: string): boolean {
+export async function deleteOrder(id: string): Promise<boolean> {
+  const sql = await db();
+  if (sql) {
+    await sql`DELETE FROM erp_orders WHERE id = ${id}`;
+    return true;
+  }
   return orders.delete(id);
 }
 
-// ---- Event log -----------------------------------------------------------
+// ---- Event log --------------------------------------------------------------
 
-export function appendEventLog(entry: EventLogEntry): void {
+export async function appendEventLog(entry: EventLogEntry): Promise<void> {
+  const sql = await db();
+  if (sql) {
+    await sql`INSERT INTO event_log (ts, data) VALUES (${entry.timestamp}, ${JSON.stringify(entry)})`;
+    // Keep DB log bounded (delete oldest beyond 1000 rows)
+    await sql`
+      DELETE FROM event_log
+      WHERE id NOT IN (SELECT id FROM event_log ORDER BY ts DESC LIMIT 1000)
+    `;
+    return;
+  }
   eventLog.push(entry);
-  // Cap log to a sane maximum to prevent unbounded growth in long demo sessions.
   if (eventLog.length > 1000) eventLog.splice(0, eventLog.length - 1000);
 }
 
-export function getEventLog(): EventLogEntry[] {
-  // Return newest-first for UI consumption.
-  return [...eventLog].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+export async function getEventLog(): Promise<EventLogEntry[]> {
+  const sql = await db();
+  if (sql) {
+    const rows = await sql`SELECT data FROM event_log ORDER BY ts DESC LIMIT 1000`;
+    return rows.map((r) => r.data as EventLogEntry);
+  }
+  return [...eventLog].sort(
+    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+  );
 }
 
-// ---- Idempotency / dedup keys -------------------------------------------
+// ---- Idempotency / dedup keys (always in-memory — ephemeral is fine) --------
 
 export function hasProcessedKey(key: string): boolean {
   return processedKeys.has(key);
@@ -133,7 +171,6 @@ export function hasProcessedKey(key: string): boolean {
 
 export function markProcessedKey(key: string): void {
   processedKeys.add(key);
-  // Prevent unbounded growth.
   if (processedKeys.size > 5000) {
     const arr = Array.from(processedKeys);
     processedKeys.clear();
@@ -141,9 +178,7 @@ export function markProcessedKey(key: string): void {
   }
 }
 
-// ---- In-memory config overrides ----------------------------------------
-// The Configuration Panel (Phase 4) writes to these overrides at runtime.
-// At read time, the merge order is: env defaults <- in-memory overrides.
+// ---- In-memory config overrides (covered by iron-session cookie) ------------
 
 export function getConfigOverrides(): Partial<AppConfig> {
   return { ...configOverrides };
@@ -158,8 +193,52 @@ export function setIntegrationMode(mode: IntegrationMode): void {
   configOverrides.integrationMode = mode;
 }
 
-// ---- Test helpers (NOT for production routes) ---------------------------
-// Only call these from test files. They are safe in production but expose internals.
+// ---- Server-side credential overrides (never serialized) --------------------
+
+declare global {
+  // eslint-disable-next-line no-var
+  var __serverSecrets: { appToken?: string; appKey?: string } | undefined;
+}
+
+const serverSecrets: { appToken?: string; appKey?: string } =
+  globalThis.__serverSecrets ?? (globalThis.__serverSecrets = {});
+
+export function setServerSecrets(secrets: { appToken?: string; appKey?: string }): void {
+  if (secrets.appToken !== undefined) serverSecrets.appToken = secrets.appToken;
+  if (secrets.appKey !== undefined) serverSecrets.appKey = secrets.appKey;
+}
+
+export function getServerSecrets(): { appToken?: string; appKey?: string } {
+  return { ...serverSecrets };
+}
+
+// ---- Persisted config (Neon DB only — survives cold starts for server-to-server calls) -----------
+
+export async function getPersistedConfig(): Promise<Record<string, unknown>> {
+  const sql = await db();
+  if (!sql) return {};
+  const rows = await sql`SELECT key, value FROM app_config` as { key: string; value: string }[];
+  const result: Record<string, unknown> = {};
+  for (const row of rows) {
+    try { result[row.key] = JSON.parse(row.value); } catch { result[row.key] = row.value; }
+  }
+  return result;
+}
+
+export async function savePersistedConfig(fields: Record<string, unknown>): Promise<void> {
+  const sql = await db();
+  if (!sql) return;
+  for (const [key, value] of Object.entries(fields)) {
+    if (value === undefined || value === null || value === '') continue;
+    await sql`
+      INSERT INTO app_config (key, value, updated_at)
+      VALUES (${key}, ${JSON.stringify(value)}, NOW())
+      ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()
+    `;
+  }
+}
+
+// ---- Test helpers -----------------------------------------------------------
 
 export function __resetStoreForTests(): void {
   orders.clear();
@@ -178,25 +257,4 @@ export function __getRawCounts() {
     eventLog: eventLog.length,
     processedKeys: processedKeys.size,
   };
-}
-
-// ---- Server-side credential overrides (runtime only, never serialized) ------
-// Allows the config panel (Phase 4) to override VTEX credentials at runtime.
-// These are NEVER returned to clients — only read by buildServerConfig() in config.ts.
-
-declare global {
-  // eslint-disable-next-line no-var
-  var __serverSecrets: { appToken?: string; appKey?: string } | undefined;
-}
-
-const serverSecrets: { appToken?: string; appKey?: string } =
-  globalThis.__serverSecrets ?? (globalThis.__serverSecrets = {});
-
-export function setServerSecrets(secrets: { appToken?: string; appKey?: string }): void {
-  if (secrets.appToken !== undefined) serverSecrets.appToken = secrets.appToken;
-  if (secrets.appKey !== undefined) serverSecrets.appKey = secrets.appKey;
-}
-
-export function getServerSecrets(): { appToken?: string; appKey?: string } {
-  return { ...serverSecrets };
 }

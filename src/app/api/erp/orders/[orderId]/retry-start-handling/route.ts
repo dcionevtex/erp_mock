@@ -11,7 +11,7 @@ export async function POST(
 ): Promise<Response> {
   const { orderId } = await params;
 
-  const existing = getOrderByOrderId(orderId);
+  const existing = await getOrderByOrderId(orderId);
   if (!existing) {
     return Response.json({ error: 'Order not found', orderId }, { status: 404 });
   }
@@ -32,11 +32,11 @@ export async function POST(
   const vtexClient = createVtexClient(cfg as Parameters<typeof createVtexClient>[0]);
   try {
     await vtexClient.startHandling(orderId);
-    const r = getOrderByOrderId(orderId);
+    const r = await getOrderByOrderId(orderId);
     if (r) {
-      upsertOrder({ ...r, startHandlingStatus: 'SUCCESS' });
-      setOrderStatus(r.id, 'START_HANDLING_SUCCESS');
-      appendTimelineEntry(r.id, {
+      await upsertOrder({ ...r, startHandlingStatus: 'SUCCESS' });
+      await setOrderStatus(r.id, 'START_HANDLING_SUCCESS');
+      await appendTimelineEntry(r.id, {
         timestamp: new Date().toISOString(),
         step: 'START_HANDLING_SUCCESS',
         status: 'SUCCESS',
@@ -46,18 +46,18 @@ export async function POST(
     return Response.json({ ok: true, orderId, startHandlingStatus: 'SUCCESS' });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    const r = getOrderByOrderId(orderId);
+    const r = await getOrderByOrderId(orderId);
     if (r) {
-      upsertOrder({ ...r, startHandlingStatus: 'ERROR', errorMessage: message });
-      setOrderStatus(r.id, 'START_HANDLING_ERROR');
-      appendTimelineEntry(r.id, {
+      await upsertOrder({ ...r, startHandlingStatus: 'ERROR', errorMessage: message });
+      await setOrderStatus(r.id, 'START_HANDLING_ERROR');
+      await appendTimelineEntry(r.id, {
         timestamp: new Date().toISOString(),
         step: 'START_HANDLING_ERROR',
         status: 'ERROR',
         message,
       });
     }
-    appendEventLog({
+    await appendEventLog({
       timestamp: new Date().toISOString(),
       source: 'SYSTEM',
       level: 'ERROR',

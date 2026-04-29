@@ -36,7 +36,7 @@ export async function POST(request: Request): Promise<Response> {
   if (!orderId) {
     // Return 200 so VTEX validation/ping requests are accepted.
     // Unknown payloads (e.g. test pings with no orderId) are logged and ignored.
-    appendEventLog({
+    await appendEventLog({
       timestamp: new Date().toISOString(),
       source: 'HOOK',
       level: 'WARN',
@@ -62,9 +62,9 @@ export async function POST(request: Request): Promise<Response> {
       message: `Hook event received for orderId: ${orderId}`,
     }],
   };
-  upsertOrder(record);
+  await upsertOrder(record);
 
-  appendEventLog({
+  await appendEventLog({
     timestamp: now,
     source: 'HOOK',
     level: 'INFO',
@@ -74,7 +74,7 @@ export async function POST(request: Request): Promise<Response> {
 
   const missing = getMissingCredentials(cfg as Parameters<typeof getMissingCredentials>[0]);
   if (missing.length > 0) {
-    appendEventLog({
+    await appendEventLog({
       timestamp: new Date().toISOString(),
       source: 'HOOK',
       level: 'ERROR',

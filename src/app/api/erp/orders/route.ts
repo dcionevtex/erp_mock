@@ -12,7 +12,7 @@ export async function GET(request: Request): Promise<Response> {
   const search = searchParams.get('search');
   const sort   = searchParams.get('sort') ?? 'receivedAt_desc';
 
-  let orders = getAllOrders();
+  let orders = await getAllOrders();
 
   if (source && source !== 'ALL') {
     orders = orders.filter((o): boolean => o.source === (source as IntegrationSource));

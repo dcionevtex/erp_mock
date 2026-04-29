@@ -8,7 +8,7 @@
 
 import type { AppConfig, AppConfigPublic, IntegrationMode } from '@/types';
 import { VTEX_DEFAULT_ENVIRONMENT } from './constants';
-import { getConfigOverrides, getServerSecrets } from '@/lib/store';
+import { getConfigOverrides, getServerSecrets, getPersistedConfig } from '@/lib/store';
 import { getSession } from '@/lib/session';
 
 // Internal-only: extends AppConfig with the secret token. NEVER export this type.
@@ -95,7 +95,7 @@ export async function buildServerConfig(): Promise<ReturnType<typeof getServerCo
   const overrides = getConfigOverrides();
   const secrets = getServerSecrets();
 
-  // Read persisted config from the encrypted session cookie.
+  // Read persisted config from the encrypted session cookie (browser requests).
   // Gracefully skipped if called outside a request context (e.g. unit tests).
   let saved: Partial<ReturnType<typeof getServerConfig>> = {};
   try {
@@ -108,6 +108,20 @@ export async function buildServerConfig(): Promise<ReturnType<typeof getServerCo
     });
   } catch {
     // Outside request context — ignore.
+  }
+
+  // For server-to-server calls (e.g. VTEX webhook) there is no browser cookie.
+  // Fall back to credentials persisted in Neon DB so the hook endpoint can authenticate.
+  if (!saved.appToken || !saved.appKey) {
+    try {
+      const persisted = await getPersistedConfig();
+      if (!saved.appToken && persisted.appToken) saved.appToken = persisted.appToken as string;
+      if (!saved.appKey && persisted.appKey) saved.appKey = persisted.appKey as string;
+      if (!saved.account && persisted.account) saved.account = persisted.account as string;
+      if (!saved.environment && persisted.environment) saved.environment = persisted.environment as string;
+    } catch {
+      // DB not available — ignore.
+    }
   }
 
   return {

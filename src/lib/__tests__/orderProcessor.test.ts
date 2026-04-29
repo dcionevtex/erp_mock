@@ -63,7 +63,7 @@ beforeEach(() => {
 describe('processOrder — PIPE-07: guard against double Start Handling', () => {
   it('does NOT call getOrder when startHandlingStatus is already SUCCESS', async () => {
     const record = makeRecord({ startHandlingStatus: 'SUCCESS' });
-    upsertOrder(record);
+    await upsertOrder(record);
     const mockClient = makeMockVtexClient();
     await processOrder('vtex-001', 'HOOK', {
       vtexClient: mockClient,
@@ -74,7 +74,7 @@ describe('processOrder — PIPE-07: guard against double Start Handling', () => 
 
   it('does NOT call startHandling when startHandlingStatus is already SUCCESS', async () => {
     const record = makeRecord({ startHandlingStatus: 'SUCCESS' });
-    upsertOrder(record);
+    await upsertOrder(record);
     const mockClient = makeMockVtexClient();
     await processOrder('vtex-001', 'HOOK', {
       vtexClient: mockClient,
@@ -85,13 +85,13 @@ describe('processOrder — PIPE-07: guard against double Start Handling', () => 
 
   it('writes a SKIPPED timeline entry when startHandlingStatus is already SUCCESS', async () => {
     const record = makeRecord({ startHandlingStatus: 'SUCCESS' });
-    upsertOrder(record);
+    await upsertOrder(record);
     const mockClient = makeMockVtexClient();
     await processOrder('vtex-001', 'HOOK', {
       vtexClient: mockClient,
       config: { simulateErpFailure: false },
     });
-    const stored = getOrderByOrderId('vtex-001');
+    const stored = await getOrderByOrderId('vtex-001');
     expect(
       stored?.timeline.some(
         (e) => e.step === 'START_HANDLING_REQUESTED' && e.status === 'SKIPPED',
@@ -105,7 +105,7 @@ describe('processOrder — PIPE-07: guard against double Start Handling', () => 
 // ---------------------------------------------------------------------------
 describe('processOrder — PIPE-06: guard when Get Order fails', () => {
   it('does NOT call startHandling when getOrder throws VtexApiError 404', async () => {
-    upsertOrder(makeRecord());
+    await upsertOrder(makeRecord());
     const mockClient = makeMockVtexClient({
       getOrder: vi.fn().mockRejectedValue(
         new VtexApiError({ status: 404, url: '/orders/vtex-001' }),
@@ -119,7 +119,7 @@ describe('processOrder — PIPE-06: guard when Get Order fails', () => {
   });
 
   it('does NOT call startHandling when getOrder throws VtexApiError 401', async () => {
-    upsertOrder(makeRecord());
+    await upsertOrder(makeRecord());
     const mockClient = makeMockVtexClient({
       getOrder: vi.fn().mockRejectedValue(
         new VtexApiError({ status: 401, url: '/orders/vtex-001' }),
@@ -133,7 +133,7 @@ describe('processOrder — PIPE-06: guard when Get Order fails', () => {
   });
 
   it('does NOT call startHandling when getOrder throws a generic Error', async () => {
-    upsertOrder(makeRecord());
+    await upsertOrder(makeRecord());
     const mockClient = makeMockVtexClient({
       getOrder: vi.fn().mockRejectedValue(new Error('Network timeout')),
     });
@@ -145,7 +145,7 @@ describe('processOrder — PIPE-06: guard when Get Order fails', () => {
   });
 
   it('sets erpStatus to ERROR on the record when getOrder throws', async () => {
-    upsertOrder(makeRecord());
+    await upsertOrder(makeRecord());
     const mockClient = makeMockVtexClient({
       getOrder: vi.fn().mockRejectedValue(
         new VtexApiError({ status: 404, url: '/orders/vtex-001' }),
@@ -155,11 +155,11 @@ describe('processOrder — PIPE-06: guard when Get Order fails', () => {
       vtexClient: mockClient,
       config: { simulateErpFailure: false },
     });
-    expect(getOrderByOrderId('vtex-001')?.erpStatus).toBe('ERROR');
+    expect((await getOrderByOrderId('vtex-001'))?.erpStatus).toBe('ERROR');
   });
 
   it('writes GET_ORDER_ERROR timeline entry when getOrder throws', async () => {
-    upsertOrder(makeRecord());
+    await upsertOrder(makeRecord());
     const mockClient = makeMockVtexClient({
       getOrder: vi.fn().mockRejectedValue(
         new VtexApiError({ status: 404, url: '/orders/vtex-001' }),
@@ -169,7 +169,7 @@ describe('processOrder — PIPE-06: guard when Get Order fails', () => {
       vtexClient: mockClient,
       config: { simulateErpFailure: false },
     });
-    const stored = getOrderByOrderId('vtex-001');
+    const stored = await getOrderByOrderId('vtex-001');
     expect(
       stored?.timeline.some((e) => e.step === 'GET_ORDER_ERROR' && e.status === 'ERROR'),
     ).toBe(true);
@@ -181,7 +181,7 @@ describe('processOrder — PIPE-06: guard when Get Order fails', () => {
 // ---------------------------------------------------------------------------
 describe('processOrder — PIPE-05: guard when ERP simulation fails', () => {
   it('does NOT call startHandling when simulateErpFailure config is true', async () => {
-    upsertOrder(makeRecord());
+    await upsertOrder(makeRecord());
     const mockClient = makeMockVtexClient();
     await processOrder('vtex-001', 'HOOK', {
       vtexClient: mockClient,
@@ -191,23 +191,23 @@ describe('processOrder — PIPE-05: guard when ERP simulation fails', () => {
   });
 
   it('sets erpStatus to ERROR on the record when ERP simulation fails', async () => {
-    upsertOrder(makeRecord());
+    await upsertOrder(makeRecord());
     const mockClient = makeMockVtexClient();
     await processOrder('vtex-001', 'HOOK', {
       vtexClient: mockClient,
       config: { simulateErpFailure: true },
     });
-    expect(getOrderByOrderId('vtex-001')?.erpStatus).toBe('ERROR');
+    expect((await getOrderByOrderId('vtex-001'))?.erpStatus).toBe('ERROR');
   });
 
   it('writes ERP_SIMULATION_ERROR timeline entry when ERP simulation fails', async () => {
-    upsertOrder(makeRecord());
+    await upsertOrder(makeRecord());
     const mockClient = makeMockVtexClient();
     await processOrder('vtex-001', 'HOOK', {
       vtexClient: mockClient,
       config: { simulateErpFailure: true },
     });
-    const stored = getOrderByOrderId('vtex-001');
+    const stored = await getOrderByOrderId('vtex-001');
     expect(
       stored?.timeline.some(
         (e) => e.step === 'ERP_SIMULATION_ERROR' && e.status === 'ERROR',
@@ -221,7 +221,7 @@ describe('processOrder — PIPE-05: guard when ERP simulation fails', () => {
 // ---------------------------------------------------------------------------
 describe('processOrder — PIPE-04 + PIPE-08: happy path', () => {
   it('calls startHandling after successful ERP simulation', async () => {
-    upsertOrder(makeRecord());
+    await upsertOrder(makeRecord());
     const mockClient = makeMockVtexClient();
     await processOrder('vtex-001', 'HOOK', {
       vtexClient: mockClient,
@@ -232,117 +232,117 @@ describe('processOrder — PIPE-04 + PIPE-08: happy path', () => {
   });
 
   it('sets erpStatus to START_HANDLING_SUCCESS on the record after successful full pipeline', async () => {
-    upsertOrder(makeRecord());
+    await upsertOrder(makeRecord());
     const mockClient = makeMockVtexClient();
     await processOrder('vtex-001', 'HOOK', {
       vtexClient: mockClient,
       config: { simulateErpFailure: false },
     });
-    expect(getOrderByOrderId('vtex-001')?.erpStatus).toBe('START_HANDLING_SUCCESS');
+    expect((await getOrderByOrderId('vtex-001'))?.erpStatus).toBe('START_HANDLING_SUCCESS');
   });
 
   it('sets startHandlingStatus to SUCCESS on the record', async () => {
-    upsertOrder(makeRecord());
+    await upsertOrder(makeRecord());
     const mockClient = makeMockVtexClient();
     await processOrder('vtex-001', 'HOOK', {
       vtexClient: mockClient,
       config: { simulateErpFailure: false },
     });
-    expect(getOrderByOrderId('vtex-001')?.startHandlingStatus).toBe('SUCCESS');
+    expect((await getOrderByOrderId('vtex-001'))?.startHandlingStatus).toBe('SUCCESS');
   });
 
   it('records GET_ORDER_REQUESTED timeline entry', async () => {
-    upsertOrder(makeRecord());
+    await upsertOrder(makeRecord());
     const mockClient = makeMockVtexClient();
     await processOrder('vtex-001', 'HOOK', {
       vtexClient: mockClient,
       config: { simulateErpFailure: false },
     });
     expect(
-      getOrderByOrderId('vtex-001')?.timeline.some((e) => e.step === 'GET_ORDER_REQUESTED'),
+      (await getOrderByOrderId('vtex-001'))?.timeline.some((e) => e.step === 'GET_ORDER_REQUESTED'),
     ).toBe(true);
   });
 
   it('records GET_ORDER_SUCCESS timeline entry', async () => {
-    upsertOrder(makeRecord());
+    await upsertOrder(makeRecord());
     const mockClient = makeMockVtexClient();
     await processOrder('vtex-001', 'HOOK', {
       vtexClient: mockClient,
       config: { simulateErpFailure: false },
     });
     expect(
-      getOrderByOrderId('vtex-001')?.timeline.some((e) => e.step === 'GET_ORDER_SUCCESS'),
+      (await getOrderByOrderId('vtex-001'))?.timeline.some((e) => e.step === 'GET_ORDER_SUCCESS'),
     ).toBe(true);
   });
 
   it('records ERP_PAYLOAD_NORMALIZED timeline entry', async () => {
-    upsertOrder(makeRecord());
+    await upsertOrder(makeRecord());
     const mockClient = makeMockVtexClient();
     await processOrder('vtex-001', 'HOOK', {
       vtexClient: mockClient,
       config: { simulateErpFailure: false },
     });
     expect(
-      getOrderByOrderId('vtex-001')?.timeline.some((e) => e.step === 'ERP_PAYLOAD_NORMALIZED'),
+      (await getOrderByOrderId('vtex-001'))?.timeline.some((e) => e.step === 'ERP_PAYLOAD_NORMALIZED'),
     ).toBe(true);
   });
 
   it('records ERP_SIMULATION_STARTED timeline entry', async () => {
-    upsertOrder(makeRecord());
+    await upsertOrder(makeRecord());
     const mockClient = makeMockVtexClient();
     await processOrder('vtex-001', 'HOOK', {
       vtexClient: mockClient,
       config: { simulateErpFailure: false },
     });
     expect(
-      getOrderByOrderId('vtex-001')?.timeline.some((e) => e.step === 'ERP_SIMULATION_STARTED'),
+      (await getOrderByOrderId('vtex-001'))?.timeline.some((e) => e.step === 'ERP_SIMULATION_STARTED'),
     ).toBe(true);
   });
 
   it('records ERP_SIMULATION_SUCCESS timeline entry', async () => {
-    upsertOrder(makeRecord());
+    await upsertOrder(makeRecord());
     const mockClient = makeMockVtexClient();
     await processOrder('vtex-001', 'HOOK', {
       vtexClient: mockClient,
       config: { simulateErpFailure: false },
     });
     expect(
-      getOrderByOrderId('vtex-001')?.timeline.some((e) => e.step === 'ERP_SIMULATION_SUCCESS'),
+      (await getOrderByOrderId('vtex-001'))?.timeline.some((e) => e.step === 'ERP_SIMULATION_SUCCESS'),
     ).toBe(true);
   });
 
   it('records START_HANDLING_REQUESTED timeline entry', async () => {
-    upsertOrder(makeRecord());
+    await upsertOrder(makeRecord());
     const mockClient = makeMockVtexClient();
     await processOrder('vtex-001', 'HOOK', {
       vtexClient: mockClient,
       config: { simulateErpFailure: false },
     });
     expect(
-      getOrderByOrderId('vtex-001')?.timeline.some((e) => e.step === 'START_HANDLING_REQUESTED'),
+      (await getOrderByOrderId('vtex-001'))?.timeline.some((e) => e.step === 'START_HANDLING_REQUESTED'),
     ).toBe(true);
   });
 
   it('records START_HANDLING_SUCCESS timeline entry', async () => {
-    upsertOrder(makeRecord());
+    await upsertOrder(makeRecord());
     const mockClient = makeMockVtexClient();
     await processOrder('vtex-001', 'HOOK', {
       vtexClient: mockClient,
       config: { simulateErpFailure: false },
     });
     expect(
-      getOrderByOrderId('vtex-001')?.timeline.some((e) => e.step === 'START_HANDLING_SUCCESS'),
+      (await getOrderByOrderId('vtex-001'))?.timeline.some((e) => e.step === 'START_HANDLING_SUCCESS'),
     ).toBe(true);
   });
 
   it('stores masked vtexOrderRaw — email is masked in the stored raw payload (SEC-03)', async () => {
-    upsertOrder(makeRecord());
+    await upsertOrder(makeRecord());
     const mockClient = makeMockVtexClient();
     await processOrder('vtex-001', 'HOOK', {
       vtexClient: mockClient,
       config: { simulateErpFailure: false },
     });
-    const stored = getOrderByOrderId('vtex-001');
+    const stored = await getOrderByOrderId('vtex-001');
     const rawAsString = JSON.stringify(stored?.vtexOrderRaw ?? {});
     expect(rawAsString).not.toContain('test@example.com');
   });
@@ -353,7 +353,7 @@ describe('processOrder — PIPE-04 + PIPE-08: happy path', () => {
 // ---------------------------------------------------------------------------
 describe('processOrder — Start Handling error handling', () => {
   it('sets startHandlingStatus to ERROR when startHandling throws', async () => {
-    upsertOrder(makeRecord());
+    await upsertOrder(makeRecord());
     const mockClient = makeMockVtexClient({
       startHandling: vi.fn().mockRejectedValue(
         new VtexApiError({ status: 500, url: '/orders/vtex-001/start-handling' }),
@@ -363,11 +363,11 @@ describe('processOrder — Start Handling error handling', () => {
       vtexClient: mockClient,
       config: { simulateErpFailure: false },
     });
-    expect(getOrderByOrderId('vtex-001')?.startHandlingStatus).toBe('ERROR');
+    expect((await getOrderByOrderId('vtex-001'))?.startHandlingStatus).toBe('ERROR');
   });
 
   it('sets erpStatus to START_HANDLING_ERROR when startHandling throws', async () => {
-    upsertOrder(makeRecord());
+    await upsertOrder(makeRecord());
     const mockClient = makeMockVtexClient({
       startHandling: vi.fn().mockRejectedValue(
         new VtexApiError({ status: 500, url: '/orders/vtex-001/start-handling' }),
@@ -377,11 +377,11 @@ describe('processOrder — Start Handling error handling', () => {
       vtexClient: mockClient,
       config: { simulateErpFailure: false },
     });
-    expect(getOrderByOrderId('vtex-001')?.erpStatus).toBe('START_HANDLING_ERROR');
+    expect((await getOrderByOrderId('vtex-001'))?.erpStatus).toBe('START_HANDLING_ERROR');
   });
 
   it('writes START_HANDLING_ERROR timeline entry when startHandling throws', async () => {
-    upsertOrder(makeRecord());
+    await upsertOrder(makeRecord());
     const mockClient = makeMockVtexClient({
       startHandling: vi.fn().mockRejectedValue(
         new VtexApiError({ status: 500, url: '/orders/vtex-001/start-handling' }),
@@ -391,7 +391,7 @@ describe('processOrder — Start Handling error handling', () => {
       vtexClient: mockClient,
       config: { simulateErpFailure: false },
     });
-    const stored = getOrderByOrderId('vtex-001');
+    const stored = await getOrderByOrderId('vtex-001');
     expect(
       stored?.timeline.some(
         (e) => e.step === 'START_HANDLING_ERROR' && e.status === 'ERROR',
@@ -405,7 +405,6 @@ describe('processOrder — Start Handling error handling', () => {
 // ---------------------------------------------------------------------------
 describe('processOrder — no-op when record not found', () => {
   it('does nothing when orderId does not exist in the store', async () => {
-    // Do NOT seed any record
     const mockClient = makeMockVtexClient();
     await expect(
       processOrder('nonexistent-order', 'HOOK', {

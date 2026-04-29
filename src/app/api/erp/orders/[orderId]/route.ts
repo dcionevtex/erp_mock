@@ -9,7 +9,7 @@ export async function GET(
 ): Promise<Response> {
   const { orderId } = await params;
 
-  const record = getOrderByOrderId(orderId);
+  const record = await getOrderByOrderId(orderId);
   if (!record) {
     return Response.json({ error: 'Order not found', orderId }, { status: 404 });
   }
