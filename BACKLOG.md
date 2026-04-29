@@ -39,7 +39,7 @@
 >
 > References: [ERP order processing guide](https://developers.vtex.com/docs/guides/erp-integration-set-up-order-processing) · [Invoice & tracking guide](https://developers.vtex.com/docs/guides/external-marketplace-integration-invoice-tracking) · [Order flow](https://help.vtex.com/tracks/orders--2xkTisx4SXOWXQel8Jg8sa/4811ExCe3WrEiRMV3sy9n8)
 
-- [ ] `BL-008-A` **Data model — invoice fields on ErpOrderRecord**
+- [x] `BL-008-A` **Data model — invoice fields on ErpOrderRecord**
 
   Extend the type layer so every subsequent task has a stable contract to build against.
 
@@ -59,7 +59,7 @@
   - Set `invoiceStatus: 'NOT_SENT'` as default in store upsert helpers
   - **No UI changes in this task**
 
-- [ ] `BL-008-B` **VTEX client — invoice & tracking methods**
+- [x] `BL-008-B` **VTEX client — invoice & tracking methods**
 
   Add the three invoice-related VTEX API calls to `src/lib/vtexClient.ts` and extend `VTEX_API_PATHS` in `src/lib/constants.ts`.
 
@@ -74,17 +74,9 @@
   - `invoiceValue` comes from `ErpOrderRecord.totalValue` (already in cents)
   - `items` array maps from `erpPayload.items` → `{ id: skuId, price, quantity }`
 
-- [ ] `BL-008-C` **Pipeline integration — auto-send invoice after Start Handling**
+- [~] `BL-008-C` **Pipeline integration — auto-send invoice after Start Handling** *(cancelled — invoice is always a manual operator action to show the flow)*
 
-  Wire the invoice call into the existing order processing pipeline so it fires automatically after a successful Start Handling.
-
-  - In `src/lib/orderProcessor.ts` (or wherever Start Handling is called), add the invoice step after `startHandlingStatus === 'SUCCESS'`
-  - Sequence: append `INVOICE_REQUESTED` timeline entry → call `vtexClient.sendInvoice()` → append `INVOICE_SUCCESS` or `INVOICE_ERROR` → update `invoiceStatus` on the record
-  - If invoice fails: set `invoiceStatus = 'ERROR'`, do **not** throw — pipeline should complete with a partial success (Start Handling still succeeded)
-  - If Start Handling failed: skip invoice entirely (guard clause)
-  - Update `erpStatus`: consider adding `INVOICED` as a new terminal ERP status after invoice success, or keep `START_HANDLING_SUCCESS` and rely on `invoiceStatus` field — decide at implementation time
-
-- [ ] `BL-008-D` **API endpoint — manual send & retry invoice**
+- [x] `BL-008-D` **API endpoint — manual send & retry invoice**
 
   Expose manual invoice actions so the operator can trigger/retry from the UI without reprocessing the whole pipeline.
 
@@ -94,7 +86,7 @@
   - Guard `send-invoice`: reject with `409` if `startHandlingStatus !== 'SUCCESS'` (Start Handling not done)
   - Both endpoints require credentials — return `401` if missing
 
-- [ ] `BL-008-E` **UI — invoice status in order row & accordion**
+- [x] `BL-008-E` **UI — invoice status in order row & accordion**
 
   Surface invoice status and details to the operator.
 
@@ -109,7 +101,7 @@
     - **Retry Invoice** — visible only when `invoiceStatus === 'ERROR'`
     - **Update Tracking** — enabled when `invoiceStatus === 'SUCCESS'`; opens a small inline form for courier + trackingNumber + trackingUrl
 
-- [ ] `BL-008-F` **Update tracking flow (post-invoice)**
+- [x] `BL-008-F` **Update tracking flow (post-invoice)**
 
   Two-step dispatch pattern: invoice first (without tracking), add tracking later once the carrier assigns a code.
 
@@ -118,6 +110,12 @@
     - Submit calls `POST /api/erp/orders/:orderId/update-tracking`
     - On success: update `invoiceTracking` fields on the record and show them in the Invoice Details card
   - Update shipping label (`ShippingLabel.tsx`) to show `trackingNumber` when available (currently shows orderId as barcode — optionally switch to trackingNumber if present)
+
+## Order Lifecycle
+
+- [x] `BL-009` **Cancelled orders — only Delete action available**
+  Once a VTEX order reaches `CANCELLED` status it is terminal and irreversible. The UI must reflect this: when `erpStatus === 'CANCELLED'` the accordion Actions bar must show **only** the Delete button — all other actions (Reprocess, Retry Start Handling, Send Invoice, Update Tracking, Mark Resolved) must be hidden.
+  *(Implemented in OrderRow.tsx `isCancelled` guard in the Actions bar.)*
 
 ---
 

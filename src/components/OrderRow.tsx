@@ -6,7 +6,7 @@ import { ShippingLabel } from './ShippingLabel';
 import { cn } from '@/lib/utils';
 import type { ErpOrderRecord, ErpTimelineEntry } from '@/types';
 
-type ActionType = 'reprocess' | 'retry-start-handling' | 'resolve' | 'cancel' | 'delete' | 'copy-erp' | 'copy-vtex';
+type ActionType = 'reprocess' | 'retry-start-handling' | 'resolve' | 'cancel' | 'delete' | 'copy-erp' | 'copy-vtex' | 'send-invoice' | 'refresh';
 
 interface OrderRowProps {
   order: ErpOrderRecord;
@@ -15,6 +15,28 @@ interface OrderRowProps {
 
 export function OrderRow({ order, onAction }: OrderRowProps) {
   const [open, setOpen] = useState(false);
+  const [trackingFormOpen, setTrackingFormOpen] = useState(false);
+  const [trackingForm, setTrackingForm] = useState({ courier: '', trackingNumber: '', trackingUrl: '' });
+  const [trackingSubmitting, setTrackingSubmitting] = useState(false);
+
+  async function handleUpdateTracking(e: React.FormEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    setTrackingSubmitting(true);
+    try {
+      await fetch(`/api/erp/orders/${encodeURIComponent(order.orderId)}/update-tracking`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(trackingForm),
+      });
+      setTrackingFormOpen(false);
+      onAction('refresh', order.orderId);
+    } finally {
+      setTrackingSubmitting(false);
+    }
+  }
+
+  const isCancelled = order.erpStatus === 'CANCELLED';
 
   function fmt(iso?: string) {
     if (!iso) return '—';
@@ -57,6 +79,7 @@ export function OrderRow({ order, onAction }: OrderRowProps) {
         <td className="px-3 py-2 text-xs text-muted-foreground max-w-[100px] truncate">{order.shippingSummary ?? '—'}</td>
         <td className="px-3 py-2 text-xs text-muted-foreground max-w-[100px] truncate">{order.paymentSummary ?? '—'}</td>
         <td className="px-3 py-2 whitespace-nowrap"><StatusBadge status={order.startHandlingStatus} /></td>
+        <td className="px-3 py-2 whitespace-nowrap"><StatusBadge status={order.invoiceStatus} /></td>
         <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">{fmt(order.receivedAt)}</td>
         <td className="px-3 py-2 text-xs text-center">{order.attempts}</td>
         <td className="px-3 py-2 text-xs text-destructive max-w-[140px] truncate" title={order.errorMessage}>{order.errorMessage ?? '—'}</td>
@@ -67,7 +90,7 @@ export function OrderRow({ order, onAction }: OrderRowProps) {
 
       {open && (
         <tr>
-          <td colSpan={17} className="border-b border-border bg-muted/10">
+          <td colSpan={18} className="border-b border-border bg-muted/10">
             <div className="px-5 py-5 space-y-3 max-w-6xl">
 
               {/* Row 1: Summary + Timeline */}
@@ -91,6 +114,10 @@ export function OrderRow({ order, onAction }: OrderRowProps) {
                     <div className="flex flex-col gap-1">
                       <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide">SH Status</span>
                       <StatusBadge status={order.startHandlingStatus} />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide">Invoice</span>
+                      <StatusBadge status={order.invoiceStatus} />
                     </div>
                   </div>
                   {order.errorMessage && (
@@ -172,6 +199,112 @@ export function OrderRow({ order, onAction }: OrderRowProps) {
                 </InfoCard>
               )}
 
+              {/* Row 2.5: Invoice Details — visible once Start Handling succeeded */}
+              {order.startHandlingStatus === 'SUCCESS' && (
+                <InfoCard title="Invoice (Nota Fiscal)">
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-8 gap-y-4">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide">Status</span>
+                        <StatusBadge status={order.invoiceStatus} />
+                      </div>
+                      <Field label="Invoice Number" value={order.invoiceNumber} mono />
+                      <Field label="Issued At" value={order.invoiceIssuedAt ? fmt(order.invoiceIssuedAt) : undefined} />
+                      {order.invoiceTracking?.trackingNumber && (
+                        <Field label="Tracking #" value={order.invoiceTracking.trackingNumber} mono />
+                      )}
+                      {order.invoiceTracking?.courier && (
+                        <Field label="Carrier" value={order.invoiceTracking.courier} />
+                      )}
+                      {order.invoiceTracking?.trackingUrl && (
+                        <div className="flex flex-col gap-0.5 min-w-0">
+                          <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Tracking URL</span>
+                          <a
+                            href={order.invoiceTracking.trackingUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-primary hover:underline truncate"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {order.invoiceTracking.trackingUrl}
+                          </a>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Tracking update form */}
+                    {order.invoiceStatus === 'SUCCESS' && (
+                      <div className="border-t border-border pt-3">
+                        {!trackingFormOpen ? (
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); setTrackingFormOpen(true); }}
+                            className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+                          >
+                            <svg className="w-3 h-3" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M7 2v10M2 7h10" />
+                            </svg>
+                            Update Tracking
+                          </button>
+                        ) : (
+                          <form onSubmit={handleUpdateTracking} onClick={(e) => e.stopPropagation()} className="space-y-3">
+                            <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide">Update Tracking Info</p>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                              <div className="flex flex-col gap-1">
+                                <label className="text-[11px] text-muted-foreground">Carrier</label>
+                                <input
+                                  type="text"
+                                  placeholder="e.g. Correios"
+                                  value={trackingForm.courier}
+                                  onChange={(e) => setTrackingForm((f) => ({ ...f, courier: e.target.value }))}
+                                  className="rounded border border-input bg-background px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
+                                />
+                              </div>
+                              <div className="flex flex-col gap-1">
+                                <label className="text-[11px] text-muted-foreground">Tracking Number</label>
+                                <input
+                                  type="text"
+                                  placeholder="e.g. BR123456789BR"
+                                  value={trackingForm.trackingNumber}
+                                  onChange={(e) => setTrackingForm((f) => ({ ...f, trackingNumber: e.target.value }))}
+                                  className="rounded border border-input bg-background px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
+                                />
+                              </div>
+                              <div className="flex flex-col gap-1">
+                                <label className="text-[11px] text-muted-foreground">Tracking URL (optional)</label>
+                                <input
+                                  type="url"
+                                  placeholder="https://..."
+                                  value={trackingForm.trackingUrl}
+                                  onChange={(e) => setTrackingForm((f) => ({ ...f, trackingUrl: e.target.value }))}
+                                  className="rounded border border-input bg-background px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
+                                />
+                              </div>
+                            </div>
+                            <div className="flex gap-2">
+                              <button
+                                type="submit"
+                                disabled={trackingSubmitting}
+                                className="px-3 py-1.5 text-xs font-medium rounded-md border-transparent bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors"
+                              >
+                                {trackingSubmitting ? 'Saving…' : 'Save Tracking'}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); setTrackingFormOpen(false); }}
+                                className="px-3 py-1.5 text-xs font-medium rounded-md border border-border hover:bg-muted transition-colors"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </form>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </InfoCard>
+              )}
+
               {/* Row 3: Shipping Details + Payment + Shipping Label */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {order.erpPayload?.logisticsInfo != null && (
@@ -212,51 +345,64 @@ export function OrderRow({ order, onAction }: OrderRowProps) {
 
               {/* Actions */}
               <div className="rounded-lg border border-border bg-card px-4 py-3 flex flex-wrap gap-2" onClick={(e) => e.stopPropagation()}>
-                <ActionBtn onClick={() => onAction('reprocess', order.orderId)}>
-                  <BtnIcon d="M4 4v3h3M12 12v-3h-3M3.5 7a5.5 5.5 0 1 1 .7 4" />
-                  Reprocess
-                </ActionBtn>
-                <ActionBtn
-                  onClick={() => onAction('retry-start-handling', order.orderId)}
-                  disabled={order.startHandlingStatus === 'SUCCESS'}
-                >
-                  <BtnIcon d="M5 12h7M9 8l4 4-4 4" />
-                  Retry Start Handling
-                </ActionBtn>
-                <ActionBtn onClick={() => onAction('resolve', order.orderId)}>
-                  <BtnIcon d="M4 8l3 3 5-5" />
-                  Mark Resolved
-                </ActionBtn>
-                <div className="w-px self-stretch bg-border mx-1" />
-                <ActionBtn
-                  variant="ghost"
-                  onClick={() => {
-                    if (order.erpPayload) navigator.clipboard.writeText(JSON.stringify(order.erpPayload, null, 2)).catch(() => {});
-                  }}
-                >
-                  <BtnIcon d="M8 4H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-2M8 4h6l2 2v4M8 4v4h6" />
-                  Copy ERP
-                </ActionBtn>
-                <ActionBtn
-                  variant="ghost"
-                  onClick={() => {
-                    if (order.vtexOrderRaw != null) navigator.clipboard.writeText(JSON.stringify(order.vtexOrderRaw, null, 2)).catch(() => {});
-                  }}
-                >
-                  <BtnIcon d="M8 4H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-2M8 4h6l2 2v4M8 4v4h6" />
-                  Copy VTEX
-                </ActionBtn>
-                <div className="flex-1" />
-                <ActionBtn
-                  variant="danger"
-                  onClick={() => onAction('cancel', order.orderId)}
-                  disabled={order.erpStatus === 'CANCELLED'}
-                >
-                  Cancel
-                </ActionBtn>
-                <ActionBtn variant="danger" onClick={() => onAction('delete', order.orderId)}>
-                  Delete
-                </ActionBtn>
+                {isCancelled ? (
+                  /* Cancelled orders: only Delete is meaningful */
+                  <ActionBtn variant="danger" onClick={() => onAction('delete', order.orderId)}>
+                    <BtnIcon d="M3 6h10M8 6V4M5 6l.5 8h5l.5-8" />
+                    Delete Order
+                  </ActionBtn>
+                ) : (
+                  <>
+                    <ActionBtn onClick={() => onAction('reprocess', order.orderId)}>
+                      <BtnIcon d="M4 4v3h3M12 12v-3h-3M3.5 7a5.5 5.5 0 1 1 .7 4" />
+                      Reprocess
+                    </ActionBtn>
+                    <ActionBtn
+                      onClick={() => onAction('retry-start-handling', order.orderId)}
+                      disabled={order.startHandlingStatus === 'SUCCESS'}
+                    >
+                      <BtnIcon d="M5 12h7M9 8l4 4-4 4" />
+                      Retry Start Handling
+                    </ActionBtn>
+                    <ActionBtn
+                      onClick={() => onAction('send-invoice', order.orderId)}
+                      disabled={order.startHandlingStatus !== 'SUCCESS' || order.invoiceStatus === 'SUCCESS'}
+                    >
+                      <BtnIcon d="M2 4h10v6H2zM5 10v2m4-2v2M1 12h10" />
+                      {order.invoiceStatus === 'ERROR' ? 'Retry Invoice' : 'Send Invoice'}
+                    </ActionBtn>
+                    <ActionBtn onClick={() => onAction('resolve', order.orderId)}>
+                      <BtnIcon d="M4 8l3 3 5-5" />
+                      Mark Resolved
+                    </ActionBtn>
+                    <div className="w-px self-stretch bg-border mx-1" />
+                    <ActionBtn
+                      variant="ghost"
+                      onClick={() => {
+                        if (order.erpPayload) navigator.clipboard.writeText(JSON.stringify(order.erpPayload, null, 2)).catch(() => {});
+                      }}
+                    >
+                      <BtnIcon d="M8 4H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-2M8 4h6l2 2v4M8 4v4h6" />
+                      Copy ERP
+                    </ActionBtn>
+                    <ActionBtn
+                      variant="ghost"
+                      onClick={() => {
+                        if (order.vtexOrderRaw != null) navigator.clipboard.writeText(JSON.stringify(order.vtexOrderRaw, null, 2)).catch(() => {});
+                      }}
+                    >
+                      <BtnIcon d="M8 4H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-2M8 4h6l2 2v4M8 4v4h6" />
+                      Copy VTEX
+                    </ActionBtn>
+                    <div className="flex-1" />
+                    <ActionBtn variant="danger" onClick={() => onAction('cancel', order.orderId)}>
+                      Cancel
+                    </ActionBtn>
+                    <ActionBtn variant="danger" onClick={() => onAction('delete', order.orderId)}>
+                      Delete
+                    </ActionBtn>
+                  </>
+                )}
               </div>
 
             </div>

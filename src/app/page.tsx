@@ -102,11 +102,16 @@ export default function DashboardPage() {
       await fetchOrders();
       return;
     }
+    if (action === 'refresh') {
+      await fetchOrders();
+      return;
+    }
     const pathMap: Record<string, string> = {
       reprocess: `/api/erp/orders/${encodeURIComponent(orderId)}/reprocess`,
       'retry-start-handling': `/api/erp/orders/${encodeURIComponent(orderId)}/retry-start-handling`,
       resolve: `/api/erp/orders/${encodeURIComponent(orderId)}/resolve`,
       cancel: `/api/erp/orders/${encodeURIComponent(orderId)}/cancel`,
+      'send-invoice': `/api/erp/orders/${encodeURIComponent(orderId)}/send-invoice`,
     };
     const path = pathMap[action];
     if (!path) return;
@@ -329,6 +334,7 @@ export default function DashboardPage() {
                       <th className="px-3 py-2 font-medium">Shipping</th>
                       <th className="px-3 py-2 font-medium">Payment</th>
                       <th className="px-3 py-2 font-medium">SH Status</th>
+                      <th className="px-3 py-2 font-medium">Invoice</th>
                       <th className="px-3 py-2 font-medium">Received</th>
                       <th className="px-3 py-2 font-medium text-center">Tries</th>
                       <th className="px-3 py-2 font-medium">Error</th>

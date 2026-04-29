@@ -1,9 +1,9 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import type { ErpStatus, StartHandlingStatus } from '@/types';
+import type { ErpStatus, StartHandlingStatus, InvoiceStatus } from '@/types';
 
-type Status = ErpStatus | StartHandlingStatus;
+type Status = ErpStatus | StartHandlingStatus | InvoiceStatus;
 
 const COLOR_MAP: Record<string, string> = {
   RECEIVED:               'bg-slate-100 text-slate-700',
@@ -17,6 +17,9 @@ const COLOR_MAP: Record<string, string> = {
   CANCELLED:              'bg-orange-100 text-orange-700',
   NOT_STARTED:            'bg-slate-100 text-slate-500',
   SUCCESS:                'bg-green-100 text-green-700',
+  INVOICED:               'bg-emerald-100 text-emerald-700',
+  INVOICE_ERROR:          'bg-red-100 text-red-700',
+  NOT_SENT:               'bg-slate-100 text-slate-500',
 };
 
 const LABEL_MAP: Record<string, string> = {
@@ -31,6 +34,9 @@ const LABEL_MAP: Record<string, string> = {
   CANCELLED:              'Cancelled',
   NOT_STARTED:            'Not Started',
   SUCCESS:                'Success',
+  INVOICED:               'Invoiced',
+  INVOICE_ERROR:          'Invoice Error',
+  NOT_SENT:               'Not Sent',
 };
 
 export function StatusBadge({ status }: { status: Status }) {

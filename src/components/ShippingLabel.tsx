@@ -10,11 +10,13 @@ interface Props {
 export function ShippingLabel({ order }: Props) {
   const barcodeRef = useRef<SVGSVGElement>(null);
 
+  const barcodeValue = order.invoiceTracking?.trackingNumber ?? order.orderId;
+
   useEffect(() => {
-    if (!barcodeRef.current || !order.orderId) return;
+    if (!barcodeRef.current || !barcodeValue) return;
     import('jsbarcode').then(({ default: JsBarcode }) => {
       try {
-        JsBarcode(barcodeRef.current, order.orderId, {
+        JsBarcode(barcodeRef.current, barcodeValue, {
           format: 'CODE128',
           width: 2,
           height: 64,
@@ -27,7 +29,7 @@ export function ShippingLabel({ order }: Props) {
         // orderId may contain characters invalid for CODE128 — fail silently
       }
     });
-  }, [order.orderId]);
+  }, [barcodeValue]);
 
   function handlePrint() {
     const barcodeHtml = barcodeRef.current?.outerHTML ?? '';
@@ -108,7 +110,7 @@ export function ShippingLabel({ order }: Props) {
       {/* Barcode */}
       <div className="px-3 pt-3 pb-2 border-b border-gray-300 flex flex-col items-center">
         <svg ref={barcodeRef} className="w-full" />
-        <span className="text-[10px] font-mono mt-1 tracking-widest text-gray-700">{order.orderId}</span>
+        <span className="text-[10px] font-mono mt-1 tracking-widest text-gray-700">{barcodeValue}</span>
       </div>
 
       {/* Footer */}
