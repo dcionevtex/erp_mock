@@ -90,7 +90,7 @@ Greenfield Next.js app that simulates the full VTEX OMS-to-ERP handoff. The buil
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete    | 2026-04-28 |
-| 2. Core Library Modules | 0/TBD | Not started | - |
+| 2. Core Library Modules | 1/4 | In Progress|  |
 | 3. API Routes | 0/TBD | Not started | - |
 | 4. UI Dashboard | 0/TBD | Not started | - |
 | 5. Documentation | 0/TBD | Not started | - |

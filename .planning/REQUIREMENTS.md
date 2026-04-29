@@ -75,9 +75,9 @@
 
 ### Security & PII (SEC)
 
-- [ ] **SEC-01**: Customer email address is masked in all UI views (e.g., `d***@vtex.com`)
-- [ ] **SEC-02**: Customer document number (CPF/CNPJ) is masked in all UI views
-- [ ] **SEC-03**: PII masking is applied server-side at normalization time — raw VTEX payloads stored in the record do NOT contain unmasked PII
+- [x] **SEC-01**: Customer email address is masked in all UI views (e.g., `d***@vtex.com`)
+- [x] **SEC-02**: Customer document number (CPF/CNPJ) is masked in all UI views
+- [x] **SEC-03**: PII masking is applied server-side at normalization time — raw VTEX payloads stored in the record do NOT contain unmasked PII
 - [x] **SEC-04**: VTEX app token is never written to server logs
 - [x] **SEC-05**: `.env.example` file is committed with all required environment variable names and safe placeholder values
 
@@ -94,10 +94,10 @@
 ### Tests (TEST)
 
 - [ ] **TEST-01**: Unit tests for VTEX order normalization (maps required fields, handles optional/missing fields)
-- [ ] **TEST-02**: Unit tests for event deduplication (deduplicates by eventId, falls back to composite key, allows non-duplicates)
+- [x] **TEST-02**: Unit tests for event deduplication (deduplicates by eventId, falls back to composite key, allows non-duplicates)
 - [ ] **TEST-03**: Unit tests for Hook payload parsing (extracts orderId from multiple payload shapes)
 - [ ] **TEST-04**: Unit tests for ERP simulator (returns SUCCESS by default, returns FAILURE in simulate-failure mode)
-- [ ] **TEST-05**: Unit tests for PII masking utility (masks email, masks document, leaves non-PII fields unchanged)
+- [x] **TEST-05**: Unit tests for PII masking utility (masks email, masks document, leaves non-PII fields unchanged)
 - [ ] **TEST-06**: Unit tests for Start Handling guards (called after ERP success; not called after ERP failure; not called after Get Order failure; not called twice for same order)
 
 ### Documentation (DOCS)
@@ -213,9 +213,9 @@ Deferred to post-MVP. Not in current roadmap.
 | ERR-04 | Phase 3 (API Routes) | Pending |
 | ERR-05 | Phase 3 (API Routes) | Pending |
 | ERR-06 | Phase 3 (API Routes) | Pending |
-| SEC-01 | Phase 2 (Core Library Modules) | Pending |
-| SEC-02 | Phase 2 (Core Library Modules) | Pending |
-| SEC-03 | Phase 2 (Core Library Modules) | Pending |
+| SEC-01 | Phase 2 (Core Library Modules) | Complete |
+| SEC-02 | Phase 2 (Core Library Modules) | Complete |
+| SEC-03 | Phase 2 (Core Library Modules) | Complete |
 | SEC-04 | Phase 3 (API Routes) | Complete |
 | SEC-05 | Phase 1 (Foundation) | Complete |
 | API-01 | Phase 3 (API Routes) | Pending |
@@ -226,10 +226,10 @@ Deferred to post-MVP. Not in current roadmap.
 | API-06 | Phase 3 (API Routes) | Pending |
 | API-07 | Phase 3 (API Routes) | Pending |
 | TEST-01 | Phase 2 (Core Library Modules) | Pending |
-| TEST-02 | Phase 2 (Core Library Modules) | Pending |
+| TEST-02 | Phase 2 (Core Library Modules) | Complete |
 | TEST-03 | Phase 2 (Core Library Modules) | Pending |
 | TEST-04 | Phase 2 (Core Library Modules) | Pending |
-| TEST-05 | Phase 2 (Core Library Modules) | Pending |
+| TEST-05 | Phase 2 (Core Library Modules) | Complete |
 | TEST-06 | Phase 2 (Core Library Modules) | Pending |
 | DOCS-01 | Phase 5 (Documentation) | Pending |
 | DOCS-02 | Phase 5 (Documentation) | Pending |

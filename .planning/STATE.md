@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 01-03-PLAN.md — In-Memory Store, Constants, Env Config, and .env.example
-last_updated: "2026-04-28T15:00:59.446Z"
+stopped_at: Completed 02-01-PLAN.md — PII Masker and Deduplicator
+last_updated: "2026-04-29T00:24:25.320Z"
 progress:
   total_phases: 5
   completed_phases: 1
-  total_plans: 3
-  completed_plans: 3
+  total_plans: 7
+  completed_plans: 4
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-28)
 
 **Core value:** Show the complete end-to-end operational handoff from VTEX OMS to a simulated ERP — Feed or Hook → Get Order → ERP Acceptance → Start Handling — with every step visible in the UI.
-**Current focus:** Phase 1 — Foundation
+**Current focus:** Phase 2 — Core Library Modules
 
 ## Current Position
 
-Phase: 1 (Foundation) — EXECUTING
-Plan: 3 of 3
+Phase: 2 (Core Library Modules) — EXECUTING
+Plan: 1 of 4
 
 ## Performance Metrics
 
@@ -47,6 +47,7 @@ Plan: 3 of 3
 
 *Updated after each plan completion*
 | Phase 01-foundation P03 | 4min | 4 tasks | 7 files |
+| Phase 02-01 P01 | 8 | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -69,6 +70,10 @@ Recent decisions affecting current work:
 - [Phase 01-foundation]: globalThis guard for store singletons prevents Fast Refresh from resetting Map/Set/Array on each hot reload
 - [Phase 01-foundation]: ServerAppConfig internal type (not exported): appToken containment boundary — only getPublicConfig() crosses server/client surface
 - [Phase 01-foundation]: Persistence seam: all store mutations through typed function interface, enabling body-only swap to Vercel KV/Supabase without changing callers
+- [Phase 02-01]: maskDocument strips all non-digits then takes last 2: handles CPF and CNPJ uniformly
+- [Phase 02-01]: deduplicator delegates storage to store.processedKeys — no local Set, inherits bounded overflow pruning
+- [Phase 02-01]: buildDeduplicationKey checks eventId.length > 0 explicitly — guards empty string edge case
+- [Phase 02-01]: PII masking at ingestion time (SEC-03): maskOrderPayload called before store write, not at display time
 
 ### Pending Todos
 
@@ -80,6 +85,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-28T14:57:01.795Z
-Stopped at: Completed 01-03-PLAN.md — In-Memory Store, Constants, Env Config, and .env.example
+Last session: 2026-04-29T00:24:25.314Z
+Stopped at: Completed 02-01-PLAN.md — PII Masker and Deduplicator
 Resume file: None
