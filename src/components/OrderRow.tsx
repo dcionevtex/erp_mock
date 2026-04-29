@@ -18,7 +18,9 @@ export function OrderRow({ order, onAction }: OrderRowProps) {
 
   function fmt(iso?: string) {
     if (!iso) return '—';
-    return new Date(iso).toLocaleString();
+    const d = new Date(iso);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
   }
 
   function fmtCurrency(val?: number) {
@@ -56,7 +58,6 @@ export function OrderRow({ order, onAction }: OrderRowProps) {
         <td className="px-3 py-2 text-xs text-muted-foreground max-w-[100px] truncate">{order.paymentSummary ?? '—'}</td>
         <td className="px-3 py-2 whitespace-nowrap"><StatusBadge status={order.startHandlingStatus} /></td>
         <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">{fmt(order.receivedAt)}</td>
-        <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">{fmt(order.lastAttemptAt)}</td>
         <td className="px-3 py-2 text-xs text-center">{order.attempts}</td>
         <td className="px-3 py-2 text-xs text-destructive max-w-[140px] truncate" title={order.errorMessage}>{order.errorMessage ?? '—'}</td>
         <td className="px-3 py-2 text-xs text-center text-muted-foreground">
@@ -66,7 +67,7 @@ export function OrderRow({ order, onAction }: OrderRowProps) {
 
       {open && (
         <tr>
-          <td colSpan={18} className="border-b border-border bg-muted/10">
+          <td colSpan={17} className="border-b border-border bg-muted/10">
             <div className="px-5 py-5 space-y-3 max-w-6xl">
 
               {/* Row 1: Summary + Timeline */}

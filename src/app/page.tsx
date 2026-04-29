@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { ConfigPanel } from '@/components/ConfigPanel';
 import { OrderRow } from '@/components/OrderRow';
 import { Footer } from '@/components/Footer';
@@ -17,6 +17,7 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<Tab>('inbox');
   const [filterSource, setFilterSource] = useState('ALL');
   const [filterStatus, setFilterStatus] = useState('ALL');
+  const [filterAccounts, setFilterAccounts] = useState<string[]>([]);
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState<SortKey>('receivedAt_desc');
   const [polling, setPolling] = useState(false);
@@ -112,6 +113,23 @@ export default function DashboardPage() {
     await fetchOrders();
   }
 
+  const uniqueAccounts = useMemo(() => {
+    const seen = new Set<string>();
+    for (const o of orders) if (o.account) seen.add(o.account);
+    return Array.from(seen).sort();
+  }, [orders]);
+
+  const visibleOrders = useMemo(() =>
+    filterAccounts.length === 0 ? orders : orders.filter((o) => filterAccounts.includes(o.account ?? '')),
+    [orders, filterAccounts],
+  );
+
+  function toggleAccount(account: string) {
+    setFilterAccounts((prev) =>
+      prev.includes(account) ? prev.filter((a) => a !== account) : [...prev, account],
+    );
+  }
+
   const hookUrl =
     typeof window !== 'undefined'
       ? `${window.location.origin}/api/vtex/hook`
@@ -193,7 +211,7 @@ export default function DashboardPage() {
               onClick={() => setActiveTab(tab)}
               className={tabCls(activeTab === tab)}
             >
-              {tab === 'inbox' ? `ERP Orders (${orders.length})` : 'Event Log'}
+              {tab === 'inbox' ? `ERP Orders (${visibleOrders.length})` : 'Event Log'}
             </button>
           ))}
         </div>
@@ -241,6 +259,34 @@ export default function DashboardPage() {
                 <option value="receivedAt_asc">Oldest first</option>
               </select>
 
+              {uniqueAccounts.length > 0 && (
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-xs text-muted-foreground">Account:</span>
+                  {uniqueAccounts.map((account) => {
+                    const checked = filterAccounts.includes(account);
+                    return (
+                      <label
+                        key={account}
+                        className={[
+                          'flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-md border cursor-pointer transition-colors select-none',
+                          checked
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'border-border hover:bg-muted text-foreground',
+                        ].join(' ')}
+                      >
+                        <input
+                          type="checkbox"
+                          className="sr-only"
+                          checked={checked}
+                          onChange={() => toggleAccount(account)}
+                        />
+                        {account}
+                      </label>
+                    );
+                  })}
+                </div>
+              )}
+
               <button
                 onClick={() => { void fetchOrders(); }}
                 className="px-3 py-1.5 text-xs border border-border rounded hover:bg-muted transition-colors"
@@ -277,14 +323,13 @@ export default function DashboardPage() {
                       <th className="px-3 py-2 font-medium">Payment</th>
                       <th className="px-3 py-2 font-medium">SH Status</th>
                       <th className="px-3 py-2 font-medium">Received</th>
-                      <th className="px-3 py-2 font-medium">Last Attempt</th>
                       <th className="px-3 py-2 font-medium text-center">Tries</th>
                       <th className="px-3 py-2 font-medium">Error</th>
                       <th className="px-3 py-2"></th>
                     </tr>
                   </thead>
                   <tbody>
-                    {orders.map((order) => (
+                    {visibleOrders.map((order) => (
                       <OrderRow key={order.id} order={order} onAction={handleAction} />
                     ))}
                   </tbody>
