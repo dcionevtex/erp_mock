@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import Link from 'next/link';
 import { ConfigPanel } from '@/components/ConfigPanel';
 import { OrderRow } from '@/components/OrderRow';
 import { Footer } from '@/components/Footer';
@@ -158,6 +159,12 @@ export default function DashboardPage() {
               updated {lastFetch.toLocaleTimeString()}
             </span>
           )}
+          <Link
+            href="/about"
+            className="px-3 py-1.5 text-xs font-medium text-white/60 hover:text-white transition-colors rounded border border-white/10 hover:border-white/20"
+          >
+            Docs
+          </Link>
           {config?.integrationMode === 'FEED' && (
             <button
               onClick={handlePollFeed}
