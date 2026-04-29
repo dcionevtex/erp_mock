@@ -109,15 +109,21 @@ export type VtexOrder = {
 };
 
 // VTEX Feed item (the queue entry — see CLAUDE.MD §11, PITFALL M4).
-// `handle` is the commit identifier; `eventId`/`id` (if present) is the dedup identifier.
+// `handle` is the commit identifier; for dedup prefer composite of orderId+currentState+currentChangeDate.
+// VTEX Feed v3 confirmed fields: handle, orderId, currentState, lastState, currentChangeDate, lastChangeDate, domain.
 export type VtexFeedItem = {
-  handle: string;       // REQUIRED — used by commitFeedItems
-  eventId?: string;
-  id?: string;
+  handle: string;             // REQUIRED — used by commitFeedItems
+  eventId?: string;           // Forward compat — not always present in Feed v3
+  id?: string;                // Forward compat
   orderId?: string;
-  state?: string;
+  state?: string;             // Legacy field name (kept for backward compat)
+  currentState?: string;      // VTEX Feed v3 primary state field
+  lastState?: string;         // VTEX Feed v3 previous state
+  currentChangeDate?: string; // ISO 8601 — used as dedup timestamp
+  lastChangeDate?: string;    // ISO 8601
+  domain?: string;            // e.g., "Marketplace"
   parentAccountName?: string;
-  date?: string;
+  date?: string;              // Legacy field name (kept for backward compat)
 };
 
 // VTEX Hook payload — orderId may live at multiple paths (PITFALL C6).
