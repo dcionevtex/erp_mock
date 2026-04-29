@@ -17,7 +17,7 @@ export async function POST(
     return Response.json({ error: 'Order not found', orderId }, { status: 404 });
   }
 
-  const cfg = buildServerConfig();
+  const cfg = await buildServerConfig();
   const missing = getMissingCredentials(cfg as Parameters<typeof getMissingCredentials>[0]);
   if (missing.length > 0) {
     return Response.json({ error: 'VTEX credentials not configured', missing }, { status: 401 });

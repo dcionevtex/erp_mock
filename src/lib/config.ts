@@ -9,6 +9,7 @@
 import type { AppConfig, AppConfigPublic, IntegrationMode } from '@/types';
 import { VTEX_DEFAULT_ENVIRONMENT } from './constants';
 import { getConfigOverrides, getServerSecrets } from '@/lib/store';
+import { getSession } from '@/lib/session';
 
 // Internal-only: extends AppConfig with the secret token. NEVER export this type.
 type ServerAppConfig = AppConfig & {
@@ -84,19 +85,37 @@ export function getMissingCredentials(cfg: ServerAppConfig = getServerConfig()):
 
 /**
  * Build the full server config for use in API route handlers.
- * Merges: env defaults → in-memory config overrides → server-side secret overrides.
- * Routes must use this instead of getServerConfig() alone to support runtime credential updates from the UI.
+ * Merges: env vars → session cookie (persisted UI config) → in-memory overrides (current process).
+ * Priority: in-memory wins over cookie wins over env vars — so saves during a session still take
+ * immediate effect, and the cookie ensures they survive Vercel cold starts.
  * NEVER pass the result to a client or log it (it contains appToken).
  */
-export function buildServerConfig(): ReturnType<typeof getServerConfig> {
+export async function buildServerConfig(): Promise<ReturnType<typeof getServerConfig>> {
   const base = getServerConfig();
   const overrides = getConfigOverrides();
   const secrets = getServerSecrets();
+
+  // Read persisted config from the encrypted session cookie.
+  // Gracefully skipped if called outside a request context (e.g. unit tests).
+  let saved: Partial<ReturnType<typeof getServerConfig>> = {};
+  try {
+    const session = await getSession();
+    const { account, environment, appKey, appToken, integrationMode, autoCommitFeed, simulateErpFailure } = session;
+    saved = { account, environment, appKey, appToken, integrationMode, autoCommitFeed, simulateErpFailure };
+    // Remove undefined keys so they don't overwrite base values.
+    (Object.keys(saved) as Array<keyof typeof saved>).forEach((k) => {
+      if (saved[k] === undefined) delete saved[k];
+    });
+  } catch {
+    // Outside request context — ignore.
+  }
+
   return {
     ...base,
+    ...saved,
     ...overrides,
-    appToken: secrets.appToken ?? base.appToken,
-    appKey: secrets.appKey ?? base.appKey,
+    appToken: secrets.appToken ?? (saved.appToken as string | undefined) ?? base.appToken,
+    appKey: secrets.appKey ?? (saved.appKey as string | undefined) ?? base.appKey,
   };
 }
 

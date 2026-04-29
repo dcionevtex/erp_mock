@@ -26,7 +26,7 @@ export async function POST(request: Request): Promise<Response> {
     return Response.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const cfg = buildServerConfig();
+  const cfg = await buildServerConfig();
   const secret = request.headers.get('x-demo-hook-secret');
   if (!isHookSecretValid(secret, cfg as Parameters<typeof isHookSecretValid>[1])) {
     return Response.json({ error: 'Forbidden' }, { status: 403 });

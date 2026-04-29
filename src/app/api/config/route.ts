@@ -3,10 +3,11 @@ export const dynamic = 'force-dynamic';
 
 import { buildServerConfig, getPublicConfig } from '@/lib/config';
 import { setConfigOverrides, setServerSecrets } from '@/lib/store';
+import { getSession } from '@/lib/session';
 import type { IntegrationMode } from '@/types';
 
 export async function GET(_request: Request): Promise<Response> {
-  const publicConfig = getPublicConfig(buildServerConfig());
+  const publicConfig = getPublicConfig(await buildServerConfig());
   return Response.json({ config: publicConfig });
 }
 
@@ -19,23 +20,27 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   const b = body as Record<string, unknown>;
+  const session = await getSession();
 
-  // Save non-secret overrides
+  // Non-secret overrides — persisted to session cookie and in-memory store.
   const configUpdate: Record<string, unknown> = {};
-  if (typeof b.account === 'string') configUpdate.account = b.account;
-  if (typeof b.environment === 'string') configUpdate.environment = b.environment;
+  if (typeof b.account === 'string') { configUpdate.account = b.account; session.account = b.account; }
+  if (typeof b.environment === 'string') { configUpdate.environment = b.environment; session.environment = b.environment; }
   if (b.integrationMode === 'FEED' || b.integrationMode === 'HOOK') {
     configUpdate.integrationMode = b.integrationMode as IntegrationMode;
+    session.integrationMode = b.integrationMode as IntegrationMode;
   }
-  if (typeof b.autoCommitFeed === 'boolean') configUpdate.autoCommitFeed = b.autoCommitFeed;
-  if (typeof b.simulateErpFailure === 'boolean') configUpdate.simulateErpFailure = b.simulateErpFailure;
+  if (typeof b.autoCommitFeed === 'boolean') { configUpdate.autoCommitFeed = b.autoCommitFeed; session.autoCommitFeed = b.autoCommitFeed; }
+  if (typeof b.simulateErpFailure === 'boolean') { configUpdate.simulateErpFailure = b.simulateErpFailure; session.simulateErpFailure = b.simulateErpFailure; }
   setConfigOverrides(configUpdate as Parameters<typeof setConfigOverrides>[0]);
 
-  // Save secret overrides (server-only, never returned to client)
+  // Secrets — encrypted in the session cookie; never returned to client.
   const secrets: { appToken?: string; appKey?: string } = {};
-  if (typeof b.appToken === 'string' && b.appToken.length > 0) secrets.appToken = b.appToken;
-  if (typeof b.appKey === 'string' && b.appKey.length > 0) secrets.appKey = b.appKey;
+  if (typeof b.appToken === 'string' && b.appToken.length > 0) { secrets.appToken = b.appToken; session.appToken = b.appToken; }
+  if (typeof b.appKey === 'string' && b.appKey.length > 0) { secrets.appKey = b.appKey; session.appKey = b.appKey; }
   if (Object.keys(secrets).length > 0) setServerSecrets(secrets);
 
-  return Response.json({ ok: true, config: getPublicConfig(buildServerConfig()) });
+  await session.save();
+
+  return Response.json({ ok: true, config: getPublicConfig(await buildServerConfig()) });
 }

@@ -35,7 +35,7 @@ export async function POST(_request: Request): Promise<Response> {
 }
 
 async function runPoll(): Promise<Response> {
-  const cfg = buildServerConfig();
+  const cfg = await buildServerConfig();
   const missing = getMissingCredentials(cfg as Parameters<typeof getMissingCredentials>[0]);
   if (missing.length > 0) {
     return Response.json({ error: 'VTEX credentials not configured', missing }, { status: 401 });
