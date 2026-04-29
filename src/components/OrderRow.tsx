@@ -16,6 +16,7 @@ interface OrderRowProps {
 export function OrderRow({ order, onAction }: OrderRowProps) {
   const [open, setOpen] = useState(false);
   const [rawOpen, setRawOpen] = useState(false);
+  const [labelOpen, setLabelOpen] = useState(false);
 
   function fmt(iso?: string) {
     if (!iso) return '—';
@@ -125,10 +126,22 @@ export function OrderRow({ order, onAction }: OrderRowProps) {
                 </Section>
               )}
 
-              {/* 4. Shipping Label */}
-              <Section title="Shipping Label">
-                <ShippingLabel order={order} />
-              </Section>
+              {/* 4. Shipping Label — collapsible */}
+              <div>
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); setLabelOpen((v) => !v); }}
+                  className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase tracking-wide hover:text-foreground transition-colors w-full text-left"
+                >
+                  <span>Shipping Label</span>
+                  <span className="text-[10px]">{labelOpen ? '▲' : '▼'}</span>
+                </button>
+                {labelOpen && (
+                  <div className="mt-3 flex justify-center" onClick={(e) => e.stopPropagation()}>
+                    <ShippingLabel order={order} />
+                  </div>
+                )}
+              </div>
 
               {/* 5. Payment Details */}
               {order.erpPayload?.paymentSummary && (
