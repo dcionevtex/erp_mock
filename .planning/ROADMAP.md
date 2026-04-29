@@ -15,7 +15,7 @@ Greenfield Next.js app that simulates the full VTEX OMS-to-ERP handoff. The buil
 ## Phases
 
 - [x] **Phase 1: Foundation** - Project scaffold, TypeScript types, in-memory store, and environment configuration (completed 2026-04-28)
-- [ ] **Phase 2: Core Library Modules** - Processing pipeline, normalization, deduplication, ERP simulator, PII masking, and unit tests
+- [x] **Phase 2: Core Library Modules** - Processing pipeline, normalization, deduplication, ERP simulator, PII masking, and unit tests (completed 2026-04-29)
 - [ ] **Phase 3: API Routes** - All Next.js API endpoints wired to the library, Hook/Feed integration, and server-side security
 - [ ] **Phase 4: UI Dashboard** - Config panel, ERP Orders Inbox, accordion order detail, and client-side error states
 - [ ] **Phase 5: Documentation** - README and full documentation suite (SDD, API, DEPLOYMENT, SECURITY, VTEX_SETUP)
@@ -90,7 +90,7 @@ Greenfield Next.js app that simulates the full VTEX OMS-to-ERP handoff. The buil
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete    | 2026-04-28 |
-| 2. Core Library Modules | 3/4 | In Progress|  |
+| 2. Core Library Modules | 4/4 | Complete   | 2026-04-29 |
 | 3. API Routes | 0/TBD | Not started | - |
 | 4. UI Dashboard | 0/TBD | Not started | - |
 | 5. Documentation | 0/TBD | Not started | - |

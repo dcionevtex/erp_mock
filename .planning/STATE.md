@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 02-03-PLAN.md — ERP Simulator and Order Normalizer
-last_updated: "2026-04-28T04:37:00.000Z"
+stopped_at: Completed 02-04-PLAN.md — Order Processor with Pipeline Orchestration and Guards
+last_updated: "2026-04-29T00:39:02.108Z"
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 7
-  completed_plans: 5
+  completed_plans: 7
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-28)
 
 **Core value:** Show the complete end-to-end operational handoff from VTEX OMS to a simulated ERP — Feed or Hook → Get Order → ERP Acceptance → Start Handling — with every step visible in the UI.
-**Current focus:** Phase 2 — Core Library Modules
+**Current focus:** Phase 3 — API Routes (Phase 2 complete)
 
 ## Current Position
 
-Phase: 2 (Core Library Modules) — EXECUTING
-Plan: 3 of 4
+Phase: 2 (Core Library Modules) — COMPLETE
+Plan: 4 of 4 (ALL COMPLETE)
 
 ## Performance Metrics
 
@@ -50,6 +50,7 @@ Plan: 3 of 4
 | Phase 02-01 P01 | 8 | 3 tasks | 5 files |
 | Phase 02-02 P02 | 3 | 2 tasks | 4 files |
 | Phase 02-03 P03 | 6min | 2 tasks | 2 files |
+| Phase 02-core-library-modules P04 | 8min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -84,6 +85,9 @@ Recent decisions affecting current work:
 - [Phase 02-03]: simulateErpAcceptance accepts config as parameter — never calls getServerConfig() — enables direct test injection with { simulateErpFailure: true }
 - [Phase 02-03]: PII masking applied at normalization time — ErpOrderPayload always carries pre-masked customer fields (SEC-01, SEC-02, SEC-03)
 - [Phase 02-03]: item.total uses strict null check (quantity != null && sellingPrice != null) to handle 0-quantity edge cases correctly
+- [Phase 02-core-library-modules]: processOrder never calls getServerConfig() — config injected via ProcessOrderDeps.config at the API route call site
+- [Phase 02-core-library-modules]: PIPE-07 guard writes SKIPPED status on START_HANDLING_REQUESTED step — preserves full timeline for UI display
+- [Phase 02-core-library-modules]: Re-fetch record after async getOrder call to prevent overwriting concurrent mutations with stale spread
 
 ### Pending Todos
 
@@ -95,6 +99,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-28T04:37:00.000Z
-Stopped at: Completed 02-03-PLAN.md — ERP Simulator and Order Normalizer
+Last session: 2026-04-29T00:39:02.103Z
+Stopped at: Completed 02-04-PLAN.md — Order Processor with Pipeline Orchestration and Guards
 Resume file: None

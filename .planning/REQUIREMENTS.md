@@ -37,11 +37,11 @@
 - [ ] **PIPE-01**: App calls VTEX Get Order API for each received `orderId` after event receipt
 - [x] **PIPE-02**: App normalizes the full VTEX order response into a typed `ErpOrderPayload` structure
 - [x] **PIPE-03**: App simulates ERP acceptance (returns SUCCESS by default; returns FAILURE when simulate-failure toggle is on)
-- [ ] **PIPE-04**: App calls VTEX Start Handling automatically after ERP simulation returns SUCCESS
-- [ ] **PIPE-05**: App does NOT call VTEX Start Handling when ERP simulation returns FAILURE
-- [ ] **PIPE-06**: App does NOT call VTEX Start Handling when Get Order API call fails
-- [ ] **PIPE-07**: App does NOT call VTEX Start Handling a second time for an order already in `START_HANDLING_SUCCESS` status (guard against duplicate calls)
-- [ ] **PIPE-08**: Each pipeline step (event received, Get Order, normalize, ERP simulate, Start Handling) is recorded with timestamp and status in the order processing timeline
+- [x] **PIPE-04**: App calls VTEX Start Handling automatically after ERP simulation returns SUCCESS
+- [x] **PIPE-05**: App does NOT call VTEX Start Handling when ERP simulation returns FAILURE
+- [x] **PIPE-06**: App does NOT call VTEX Start Handling when Get Order API call fails
+- [x] **PIPE-07**: App does NOT call VTEX Start Handling a second time for an order already in `START_HANDLING_SUCCESS` status (guard against duplicate calls)
+- [x] **PIPE-08**: Each pipeline step (event received, Get Order, normalize, ERP simulate, Start Handling) is recorded with timestamp and status in the order processing timeline
 
 ### ERP Orders Inbox (INBOX)
 
@@ -98,7 +98,7 @@
 - [ ] **TEST-03**: Unit tests for Hook payload parsing (extracts orderId from multiple payload shapes)
 - [x] **TEST-04**: Unit tests for ERP simulator (returns SUCCESS by default, returns FAILURE in simulate-failure mode)
 - [x] **TEST-05**: Unit tests for PII masking utility (masks email, masks document, leaves non-PII fields unchanged)
-- [ ] **TEST-06**: Unit tests for Start Handling guards (called after ERP success; not called after ERP failure; not called after Get Order failure; not called twice for same order)
+- [x] **TEST-06**: Unit tests for Start Handling guards (called after ERP success; not called after ERP failure; not called after Get Order failure; not called twice for same order)
 
 ### Documentation (DOCS)
 
@@ -187,11 +187,11 @@ Deferred to post-MVP. Not in current roadmap.
 | PIPE-01 | Phase 2 (Core Library Modules) | Pending |
 | PIPE-02 | Phase 2 (Core Library Modules) | Complete |
 | PIPE-03 | Phase 2 (Core Library Modules) | Complete |
-| PIPE-04 | Phase 2 (Core Library Modules) | Pending |
-| PIPE-05 | Phase 2 (Core Library Modules) | Pending |
-| PIPE-06 | Phase 2 (Core Library Modules) | Pending |
-| PIPE-07 | Phase 2 (Core Library Modules) | Pending |
-| PIPE-08 | Phase 2 (Core Library Modules) | Pending |
+| PIPE-04 | Phase 2 (Core Library Modules) | Complete |
+| PIPE-05 | Phase 2 (Core Library Modules) | Complete |
+| PIPE-06 | Phase 2 (Core Library Modules) | Complete |
+| PIPE-07 | Phase 2 (Core Library Modules) | Complete |
+| PIPE-08 | Phase 2 (Core Library Modules) | Complete |
 | INBOX-01 | Phase 4 (UI Dashboard) | Pending |
 | INBOX-02 | Phase 4 (UI Dashboard) | Pending |
 | INBOX-03 | Phase 4 (UI Dashboard) | Pending |
@@ -230,7 +230,7 @@ Deferred to post-MVP. Not in current roadmap.
 | TEST-03 | Phase 2 (Core Library Modules) | Pending |
 | TEST-04 | Phase 2 (Core Library Modules) | Complete |
 | TEST-05 | Phase 2 (Core Library Modules) | Complete |
-| TEST-06 | Phase 2 (Core Library Modules) | Pending |
+| TEST-06 | Phase 2 (Core Library Modules) | Complete |
 | DOCS-01 | Phase 5 (Documentation) | Pending |
 | DOCS-02 | Phase 5 (Documentation) | Pending |
 | DOCS-03 | Phase 5 (Documentation) | Pending |
