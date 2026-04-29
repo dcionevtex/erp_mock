@@ -5,6 +5,11 @@
 - [ ] **Apply VTEX brand guidelines to the frontend**
   Apply the official VTEX brand design system (colors, typography, spacing, components) across the entire dashboard UI to make the demo feel native to the VTEX ecosystem.
 
+## Feed Polling
+
+- [ ] **Poll Feed modal with live status**
+  When the user clicks "Poll Feed Now", open a modal showing real-time progress of the polling run — items found, each orderId being processed, ERP result, Start Handling result, and a final summary (processed / skipped / errors). Modal closes manually or auto-closes on success.
+
 ## Configuration Panel
 
 - [ ] **App Key does not need to be masked**
