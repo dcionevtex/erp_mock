@@ -108,29 +108,35 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card px-4 py-3 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <h1 className="text-base font-semibold text-foreground">VTEX ERP Integration Console</h1>
+      {/* Header — VTEX brand: navy bg, pink accents */}
+      <header className="border-b border-border px-4 py-0 flex items-stretch justify-between gap-4" style={{ background: '#142032' }}>
+        <div className="flex items-center gap-4 py-3">
+          {/* VTEX wordmark */}
+          <span className="text-xl font-black tracking-tighter leading-none" style={{ color: '#F71963' }}>VTEX</span>
+          <span className="text-white/20 text-lg font-thin">|</span>
+          <h1 className="text-sm font-semibold text-white/90">ERP Integration Console</h1>
           {config && (
-            <span className="text-xs text-muted-foreground hidden sm:inline">
-              {config.account || 'no account'} · {config.integrationMode}
+            <span className="text-xs text-white/40 hidden sm:inline">
+              {config.account || 'no account set'} · {config.integrationMode}
             </span>
           )}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           {lastFetch && (
-            <span className="text-xs text-muted-foreground hidden sm:inline">
+            <span className="text-xs text-white/40 hidden sm:inline">
               updated {lastFetch.toLocaleTimeString()}
             </span>
           )}
-          <button
-            onClick={handlePollFeed}
-            disabled={polling}
-            className="px-3 py-1.5 text-xs font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 transition-colors"
-          >
-            {polling ? 'Polling…' : 'Poll Feed Now'}
-          </button>
+          {config?.integrationMode === 'FEED' && (
+            <button
+              onClick={handlePollFeed}
+              disabled={polling}
+              className="px-3 py-1.5 text-xs font-semibold rounded-md disabled:opacity-50 transition-colors"
+              style={{ background: '#F71963', color: '#fff' }}
+            >
+              {polling ? 'Polling…' : 'Poll Feed Now'}
+            </button>
+          )}
         </div>
       </header>
 
