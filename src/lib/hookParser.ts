@@ -15,6 +15,20 @@ import type { VtexHookPayload } from '@/types/vtex';
  *   payload.data?.OrderId
  * Returns undefined if none are non-empty strings.
  */
+export function extractVtexStatus(payload: VtexHookPayload | null | undefined): string | undefined {
+  if (!payload || typeof payload !== 'object') return undefined;
+  const candidates: Array<unknown> = [
+    payload.currentState,
+    payload.state,
+    payload.order?.state,
+    payload.data?.state,
+  ];
+  for (const c of candidates) {
+    if (typeof c === 'string' && c.length > 0) return c;
+  }
+  return undefined;
+}
+
 export function extractOrderId(payload: VtexHookPayload | null | undefined): string | undefined {
   if (!payload || typeof payload !== 'object') return undefined;
 

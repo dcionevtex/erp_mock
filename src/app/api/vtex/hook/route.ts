@@ -6,9 +6,9 @@
 export const runtime = 'nodejs';
 
 import { getMissingCredentials, isHookSecretValid, buildServerConfig } from '@/lib/config';
-import { upsertOrder, appendEventLog } from '@/lib/store';
+import { upsertOrder, getOrderByOrderId, appendEventLog, appendTimelineEntry } from '@/lib/store';
 import { createVtexClient } from '@/lib/vtexClient';
-import { extractOrderId } from '@/lib/hookParser';
+import { extractOrderId, extractVtexStatus } from '@/lib/hookParser';
 import { processOrder } from '@/lib/orderProcessor';
 import type { ErpOrderRecord } from '@/types';
 
@@ -47,31 +47,51 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   const now = new Date().toISOString();
-  const record: ErpOrderRecord = {
-    id: orderId,
-    orderId,
-    account: cfg.account || undefined,
-    source: 'HOOK',
-    erpStatus: 'RECEIVED',
-    startHandlingStatus: 'NOT_STARTED',
-    invoiceStatus: 'NOT_SENT',
-    receivedAt: now,
-    attempts: 0,
-    timeline: [{
+  const hookVtexStatus = extractVtexStatus(body as Record<string, unknown>);
+
+  const existing = await getOrderByOrderId(orderId);
+  if (existing) {
+    // Order already known — preserve all progress, just add a timeline entry and
+    // update vtexStatus from the hook payload if present. processOrder's PIPE-07
+    // guard will skip re-processing if startHandlingStatus is already SUCCESS.
+    if (hookVtexStatus && hookVtexStatus !== existing.vtexStatus) {
+      await upsertOrder({ ...existing, vtexStatus: hookVtexStatus });
+    }
+    await appendTimelineEntry(existing.id, {
       timestamp: now,
       step: 'EVENT_RECEIVED',
       status: 'INFO',
-      message: `Hook event received for orderId: ${orderId}`,
-    }],
-  };
-  await upsertOrder(record);
+      message: `Hook re-received for orderId: ${orderId}${hookVtexStatus ? ` — VTEX status: ${hookVtexStatus}` : ''}`,
+    });
+  } else {
+    // New order — create a fresh record
+    const record: ErpOrderRecord = {
+      id: orderId,
+      orderId,
+      account: cfg.account || undefined,
+      source: 'HOOK',
+      erpStatus: 'RECEIVED',
+      startHandlingStatus: 'NOT_STARTED',
+      invoiceStatus: 'NOT_SENT',
+      receivedAt: now,
+      attempts: 0,
+      timeline: [{
+        timestamp: now,
+        step: 'EVENT_RECEIVED',
+        status: 'INFO',
+        message: `Hook event received for orderId: ${orderId}${hookVtexStatus ? ` — VTEX status: ${hookVtexStatus}` : ''}`,
+      }],
+    };
+    await upsertOrder(record);
+  }
 
   await appendEventLog({
     timestamp: now,
     source: 'HOOK',
     level: 'INFO',
-    message: `Hook received orderId: ${orderId}`,
+    message: `Hook received orderId: ${orderId}${hookVtexStatus ? ` (${hookVtexStatus})` : ''}`,
     orderId,
+    payload: body,
   });
 
   const missing = getMissingCredentials(cfg as Parameters<typeof getMissingCredentials>[0]);
