@@ -112,18 +112,19 @@ export function ConfigPanel({ onSaved }: ConfigPanelProps) {
               label={
                 <span className="flex items-center gap-1.5">
                   App Key
-                  {current?.appTokenConfigured && (
-                    <span className="text-[10px] font-medium text-green-600 bg-green-50 px-1 rounded">configured</span>
+                  {current?.appKey && (
+                    <span className="text-[10px] font-medium text-green-600 bg-green-50 px-1 rounded">
+                      configured · {current.appKey}
+                    </span>
                   )}
                 </span>
               }
             >
               <input
-                type="password"
+                type="text"
                 placeholder="vtexappkey-..."
                 value={appKey}
                 onChange={(e) => setAppKey(e.target.value)}
-                autoComplete="new-password"
                 className={inputCls}
               />
             </Field>
