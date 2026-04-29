@@ -117,6 +117,9 @@
   Once a VTEX order reaches `CANCELLED` status it is terminal and irreversible. The UI must reflect this: when `erpStatus === 'CANCELLED'` the accordion Actions bar must show **only** the Delete button — all other actions (Reprocess, Retry Start Handling, Send Invoice, Update Tracking, Mark Resolved) must be hidden.
   *(Implemented in OrderRow.tsx `isCancelled` guard in the Actions bar.)*
 
+- [ ] `BL-010` **Disable Cancel action after invoice is sent**
+  VTEX does not accept order cancellations once a fiscal invoice has been received — the order advances to `verifying-invoice` and becomes non-cancellable. The UI must reflect this: when `invoiceStatus === 'SUCCESS'` the Cancel button in the accordion Actions bar must be disabled (greyed out) with a tooltip explaining the reason ("Order cannot be cancelled after invoice is sent"). The button should remain visible so the operator understands why cancellation is unavailable, but it must not be clickable.
+
 ---
 
 ## Feed Polling
