@@ -35,86 +35,89 @@
 
 ## Invoice Flow
 
-- [ ] `BL-008` **Invoice (Nota Fiscal) notification flow**
+> **Context:** After Start Handling succeeds the ERP must send a fiscal invoice (nota fiscal) back to VTEX OMS to advance the order to `invoiced` status. Mandatory order sequence: `handling → [Send Invoice] → verifying-invoice → invoiced`. An order becomes **non-cancellable** the moment VTEX receives the invoice. Same App Key / App Token auth as all other OMS calls.
+>
+> References: [ERP order processing guide](https://developers.vtex.com/docs/guides/erp-integration-set-up-order-processing) · [Invoice & tracking guide](https://developers.vtex.com/docs/guides/external-marketplace-integration-invoice-tracking) · [Order flow](https://help.vtex.com/tracks/orders--2xkTisx4SXOWXQel8Jg8sa/4811ExCe3WrEiRMV3sy9n8)
 
-  After Start Handling succeeds, the ERP must send a fiscal invoice back to VTEX OMS to advance the order to `invoiced` status. This is the natural next step after the current Start Handling implementation.
+- [ ] `BL-008-A` **Data model — invoice fields on ErpOrderRecord**
 
-  ### VTEX API
+  Extend the type layer so every subsequent task has a stable contract to build against.
 
-  | Method | Endpoint | Purpose |
-  |---|---|---|
-  | `POST` | `/api/oms/pvt/orders/{orderId}/invoice` | Send invoice notification |
-  | `PATCH` | `/api/oms/pvt/orders/{orderId}/invoice/{invoiceNumber}` | Update tracking on an existing invoice |
-  | `PUT` | `/api/oms/pvt/orders/{orderId}/invoice/{invoiceNumber}/tracking` | Push manual tracking events (non-integrated carriers) |
+  - Add `InvoiceStatus = 'NOT_SENT' | 'SUCCESS' | 'ERROR'` to `src/types/erp.ts`
+  - Add to `ErpOrderRecord`:
+    ```ts
+    invoiceStatus: InvoiceStatus;       // default 'NOT_SENT'
+    invoiceNumber?: string;             // generated NF number
+    invoiceIssuedAt?: string;           // ISO timestamp
+    invoiceTracking?: {
+      courier?: string;
+      trackingNumber?: string;
+      trackingUrl?: string;
+    };
+    ```
+  - Add `INVOICE_REQUESTED`, `INVOICE_SUCCESS`, `INVOICE_ERROR` to `PipelineStepName`
+  - Set `invoiceStatus: 'NOT_SENT'` as default in store upsert helpers
+  - **No UI changes in this task**
 
-  Same `X-VTEX-API-AppKey` / `X-VTEX-API-AppToken` auth as all other OMS calls.
+- [ ] `BL-008-B` **VTEX client — invoice & tracking methods**
 
-  ### Invoice POST payload
+  Add the three invoice-related VTEX API calls to `src/lib/vtexClient.ts` and extend `VTEX_API_PATHS` in `src/lib/constants.ts`.
 
-  ```json
-  {
-    "type": "Output",
-    "invoiceNumber": "NF-1628470500060-01-1746000000",
-    "invoiceValue": 7450,
-    "issuanceDate": "2026-04-29T19:05:00",
-    "invoiceKey": "35240312345678000195550010000001231000000123",
-    "invoiceUrl": "https://erp.example.com/nf/NF-000123.pdf",
-    "courier": "Correios",
-    "trackingNumber": "BR123456789BR",
-    "trackingUrl": "https://rastreamento.correios.com.br/...",
-    "items": [
-      { "id": "SKU-001", "price": 7450, "quantity": 1 }
-    ]
-  }
-  ```
+  - Add to `VTEX_API_PATHS`:
+    ```ts
+    sendInvoice:          (orderId) => `/api/oms/pvt/orders/${orderId}/invoice`
+    updateInvoiceTracking:(orderId, invoiceNumber) => `/api/oms/pvt/orders/${orderId}/invoice/${invoiceNumber}`
+    ```
+  - Add `sendInvoice(orderId, payload)` — `POST`, returns VTEX response or throws
+  - Add `updateInvoiceTracking(orderId, invoiceNumber, tracking)` — `PATCH`
+  - Invoice number generation helper: `NF-${orderId.replace(/\//g, '-')}-${Date.now()}` (strip slashes — known VTEX bug with `/` in invoiceNumber)
+  - `invoiceValue` comes from `ErpOrderRecord.totalValue` (already in cents)
+  - `items` array maps from `erpPayload.items` → `{ id: skuId, price, quantity }`
 
-  | Field | Required | Notes |
-  |---|---|---|
-  | `type` | Yes | `"Output"` (sale) or `"Input"` (return/devolution) |
-  | `invoiceNumber` | Yes | Unique per order. **Never use `/`** — causes 404 on tracking PATCH (known VTEX bug) |
-  | `invoiceValue` | Yes | Integer in cents. Maps directly from VTEX `totalValue` |
-  | `issuanceDate` | Yes | ISO 8601. Use current timestamp at ERP dispatch time |
-  | `invoiceKey` | No | 44-digit NF-e chave de acesso. Optional for demo, required for production Brazil |
-  | `invoiceUrl` | No | URL to invoice PDF |
-  | `courier` / `trackingNumber` / `trackingUrl` | No | Can be sent now or updated later via PATCH |
-  | `items[].id` | Yes | Maps to VTEX order item `id` (skuId) |
-  | `items[].price` | Yes | Integer in cents |
-  | `items[].quantity` | Yes | Integer |
+- [ ] `BL-008-C` **Pipeline integration — auto-send invoice after Start Handling**
 
-  ### Order lifecycle (mandatory sequence)
+  Wire the invoice call into the existing order processing pipeline so it fires automatically after a successful Start Handling.
 
-  ```
-  payment-approved
-    → ready-for-handling
-    → [Start Handling]       ← already implemented
-    → handling
-    → [Send Invoice]         ← this backlog item
-    → verifying-invoice      (VTEX validates totals)
-    → invoiced               (terminal — order cannot be cancelled after this)
-  ```
+  - In `src/lib/orderProcessor.ts` (or wherever Start Handling is called), add the invoice step after `startHandlingStatus === 'SUCCESS'`
+  - Sequence: append `INVOICE_REQUESTED` timeline entry → call `vtexClient.sendInvoice()` → append `INVOICE_SUCCESS` or `INVOICE_ERROR` → update `invoiceStatus` on the record
+  - If invoice fails: set `invoiceStatus = 'ERROR'`, do **not** throw — pipeline should complete with a partial success (Start Handling still succeeded)
+  - If Start Handling failed: skip invoice entirely (guard clause)
+  - Update `erpStatus`: consider adding `INVOICED` as a new terminal ERP status after invoice success, or keep `START_HANDLING_SUCCESS` and rely on `invoiceStatus` field — decide at implementation time
 
-  **Start Handling is a prerequisite** — invoicing an order not in `handling` state is rejected by VTEX.
+- [ ] `BL-008-D` **API endpoint — manual send & retry invoice**
 
-  ### Key constraints
-  - An order becomes **non-cancellable** the moment an invoice is received.
-  - **Partial invoices** are supported: send multiple POSTs with different `invoiceNumber`s; all invoice values must sum to the order total for the order to reach `invoiced`.
-  - Tracking fields can be included on the initial POST or added later via PATCH (two-step dispatch pattern).
+  Expose manual invoice actions so the operator can trigger/retry from the UI without reprocessing the whole pipeline.
 
-  ### Implementation scope (when ready)
-  - Add `invoiceFlow` step to the pipeline after Start Handling success
-  - Generate a simulated `invoiceNumber` (`NF-{orderId}` with slashes stripped)
-  - Add `invoiceStatus` field to `ErpOrderRecord` (`NOT_SENT | SUCCESS | ERROR`)
-  - Add timeline steps: `INVOICE_REQUESTED`, `INVOICE_SUCCESS`, `INVOICE_ERROR`
-  - Add "Send Invoice" and "Retry Invoice" actions to the order accordion
-  - Add simulated `courier` / `trackingNumber` for the demo
-  - New API endpoint: `POST /api/erp/orders/:orderId/send-invoice`
-  - Extend `VTEX_API_PATHS` constants with `sendInvoice` and `updateInvoiceTracking`
+  - `POST /api/erp/orders/:orderId/send-invoice` — calls `vtexClient.sendInvoice()`, updates record, returns `{ ok, invoiceNumber }`
+  - `POST /api/erp/orders/:orderId/update-tracking` — calls `vtexClient.updateInvoiceTracking()`, accepts `{ courier, trackingNumber, trackingUrl }` body
+  - Guard `send-invoice`: reject with `409` if `invoiceStatus === 'SUCCESS'` (already invoiced)
+  - Guard `send-invoice`: reject with `409` if `startHandlingStatus !== 'SUCCESS'` (Start Handling not done)
+  - Both endpoints require credentials — return `401` if missing
 
-  ### References
-  - https://developers.vtex.com/docs/guides/erp-integration-set-up-order-processing
-  - https://developers.vtex.com/docs/guides/external-marketplace-integration-invoice-tracking
-  - https://help.vtex.com/tracks/orders--2xkTisx4SXOWXQel8Jg8sa/4811ExCe3WrEiRMV3sy9n8
-  - https://help.vtex.com/en/docs/tracks/partial-invoices
+- [ ] `BL-008-E` **UI — invoice status in order row & accordion**
+
+  Surface invoice status and details to the operator.
+
+  - Add **Invoice Status** column to the orders table (after SH Status) using `StatusBadge`-style pill: `NOT_SENT` (gray) · `SUCCESS` (green) · `ERROR` (red)
+  - Add **Invoice Details** card to the order accordion (between Payment Details and ERP Payload):
+    - Invoice Number (mono)
+    - Issued At (formatted date)
+    - Courier / Tracking Number / Tracking URL (when present)
+    - Invoice Status badge
+  - Add action buttons to the accordion Actions bar:
+    - **Send Invoice** — enabled when `startHandlingStatus === 'SUCCESS'` and `invoiceStatus !== 'SUCCESS'`
+    - **Retry Invoice** — visible only when `invoiceStatus === 'ERROR'`
+    - **Update Tracking** — enabled when `invoiceStatus === 'SUCCESS'`; opens a small inline form for courier + trackingNumber + trackingUrl
+
+- [ ] `BL-008-F` **Update tracking flow (post-invoice)**
+
+  Two-step dispatch pattern: invoice first (without tracking), add tracking later once the carrier assigns a code.
+
+  - Inline tracking form in the accordion (revealed by "Update Tracking" button):
+    - Fields: Courier (text), Tracking Number (text), Tracking URL (text, optional)
+    - Submit calls `POST /api/erp/orders/:orderId/update-tracking`
+    - On success: update `invoiceTracking` fields on the record and show them in the Invoice Details card
+  - Update shipping label (`ShippingLabel.tsx`) to show `trackingNumber` when available (currently shows orderId as barcode — optionally switch to trackingNumber if present)
 
 ---
 
