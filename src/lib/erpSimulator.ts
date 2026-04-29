@@ -57,6 +57,7 @@ export function normalizeOrder(vtexOrder: VtexOrder): ErpOrderPayload {
         item.quantity != null && item.sellingPrice != null
           ? item.quantity * item.sellingPrice
           : undefined,
+      imageUrl: item.imageUrl,
     })),
     totals: vtexOrder.totals,
     paymentSummary: firstPayment?.paymentSystemName,

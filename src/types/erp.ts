@@ -57,6 +57,7 @@ export type ErpOrderItem = {
   price?: number;
   sellingPrice?: number;
   total?: number;
+  imageUrl?: string;
 };
 
 export type ErpOrderCustomer = {

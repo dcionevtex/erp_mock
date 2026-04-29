@@ -123,6 +123,7 @@ export function OrderRow({ order, onAction }: OrderRowProps) {
                   <table className="w-full text-xs">
                     <thead>
                       <tr className="text-left border-b border-border">
+                        <th className="pb-2 pr-3 font-semibold text-muted-foreground uppercase tracking-wide text-[10px] w-10"></th>
                         <th className="pb-2 pr-4 font-semibold text-muted-foreground uppercase tracking-wide text-[10px]">SKU</th>
                         <th className="pb-2 pr-4 font-semibold text-muted-foreground uppercase tracking-wide text-[10px]">Product ID</th>
                         <th className="pb-2 pr-4 font-semibold text-muted-foreground uppercase tracking-wide text-[10px]">Name</th>
@@ -135,13 +136,35 @@ export function OrderRow({ order, onAction }: OrderRowProps) {
                     <tbody>
                       {order.erpPayload.items.map((item, i) => (
                         <tr key={i} className="border-b border-border/40 last:border-0 hover:bg-muted/30 transition-colors">
-                          <td className="py-2.5 pr-4 font-mono text-foreground">{item.skuId ?? '—'}</td>
-                          <td className="py-2.5 pr-4 font-mono text-muted-foreground">{item.productId ?? '—'}</td>
-                          <td className="py-2.5 pr-4 text-foreground font-medium">{item.name ?? '—'}</td>
-                          <td className="py-2.5 pr-4 text-right tabular-nums">{item.quantity ?? '—'}</td>
-                          <td className="py-2.5 pr-4 text-right tabular-nums text-muted-foreground">{fmtCurrency(item.price)}</td>
-                          <td className="py-2.5 pr-4 text-right tabular-nums text-muted-foreground">{fmtCurrency(item.sellingPrice)}</td>
-                          <td className="py-2.5 text-right tabular-nums font-semibold">{fmtCurrency(item.total)}</td>
+                          <td className="py-2 pr-3">
+                            {item.imageUrl ? (
+                              <div className="w-8 h-8 rounded-md overflow-hidden border border-border bg-muted shrink-0">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={item.imageUrl}
+                                  alt={item.name ?? ''}
+                                  width={32}
+                                  height={32}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                                />
+                              </div>
+                            ) : (
+                              <div className="w-8 h-8 rounded-md border border-border bg-muted flex items-center justify-center shrink-0">
+                                <svg className="w-3.5 h-3.5 text-muted-foreground/40" viewBox="0 0 16 16" fill="currentColor">
+                                  <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                                  <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13zm0 1h13a.5.5 0 0 1 .5.5v6l-3.775-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12v.54A.505.505 0 0 1 1 12.5v-9a.5.5 0 0 1 .5-.5z"/>
+                                </svg>
+                              </div>
+                            )}
+                          </td>
+                          <td className="py-2 pr-4 font-mono text-foreground">{item.skuId ?? '—'}</td>
+                          <td className="py-2 pr-4 font-mono text-muted-foreground">{item.productId ?? '—'}</td>
+                          <td className="py-2 pr-4 text-foreground font-medium">{item.name ?? '—'}</td>
+                          <td className="py-2 pr-4 text-right tabular-nums">{item.quantity ?? '—'}</td>
+                          <td className="py-2 pr-4 text-right tabular-nums text-muted-foreground">{fmtCurrency(item.price)}</td>
+                          <td className="py-2 pr-4 text-right tabular-nums text-muted-foreground">{fmtCurrency(item.sellingPrice)}</td>
+                          <td className="py-2 text-right tabular-nums font-semibold">{fmtCurrency(item.total)}</td>
                         </tr>
                       ))}
                     </tbody>
