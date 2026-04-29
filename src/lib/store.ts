@@ -163,6 +163,15 @@ export async function getEventLog(): Promise<EventLogEntry[]> {
   );
 }
 
+export async function clearEventLog(): Promise<void> {
+  const sql = await db();
+  if (sql) {
+    await sql`TRUNCATE TABLE event_log RESTART IDENTITY`;
+    return;
+  }
+  eventLog.length = 0;
+}
+
 // ---- Idempotency / dedup keys (always in-memory — ephemeral is fine) --------
 
 export function hasProcessedKey(key: string): boolean {

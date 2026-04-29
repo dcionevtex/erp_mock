@@ -49,6 +49,12 @@ export default function DashboardPage() {
     } catch {}
   }, []);
 
+  async function handleClearEvents() {
+    if (!confirm('Clear all event log entries? This cannot be undone.')) return;
+    await fetch('/api/erp/events', { method: 'DELETE' }).catch(() => {});
+    setEvents([]);
+  }
+
   const fetchConfig = useCallback(async () => {
     try {
       const res = await fetch('/api/config');
@@ -285,12 +291,20 @@ export default function DashboardPage() {
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <p className="text-xs text-muted-foreground">{events.length} entries (newest first)</p>
-              <button
-                onClick={() => { void fetchEvents(); }}
-                className="px-3 py-1.5 text-xs border border-border rounded hover:bg-muted transition-colors"
-              >
-                Refresh
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => { void fetchEvents(); }}
+                  className="px-3 py-1.5 text-xs border border-border rounded hover:bg-muted transition-colors"
+                >
+                  Refresh
+                </button>
+                <button
+                  onClick={() => { void handleClearEvents(); }}
+                  className="px-3 py-1.5 text-xs border border-destructive/40 text-destructive rounded hover:bg-destructive/10 transition-colors"
+                >
+                  Clear Log
+                </button>
+              </div>
             </div>
             {events.length === 0 ? (
               <div className="text-center py-12 text-muted-foreground text-sm">No events yet.</div>
