@@ -56,7 +56,7 @@ export default function AboutPage() {
           <div className="px-6 py-4 bg-muted/30 border-t border-border grid grid-cols-2 sm:grid-cols-4 gap-4">
             <Stat label="Integration modes" value="Feed + Hook" />
             <Stat label="VTEX APIs used" value="5" />
-            <Stat label="API endpoints" value="18" />
+            <Stat label="API endpoints" value="24" />
             <Stat label="Persistence" value="Neon Postgres" />
           </div>
         </div>
@@ -165,6 +165,20 @@ export default function AboutPage() {
           </div>
         </Section>
 
+        {/* Access */}
+        <Section title="Access &amp; Login">
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            The app is protected by a shared demo password set via the <code className="font-mono text-xs bg-muted px-1 rounded">DEMO_PASSWORD</code> environment variable (defaults to <code className="font-mono text-xs bg-muted px-1 rounded">vtex2024</code> if not set). On first visit, users are redirected to the login page where they must:
+          </p>
+          <ul className="mt-3 space-y-1.5 text-sm text-muted-foreground pl-5 list-disc">
+            <li>Enter the demo password.</li>
+            <li>Read and explicitly agree to the Terms &amp; Conditions — the Sign in button is disabled until the checkbox is checked.</li>
+          </ul>
+          <p className="text-xs text-muted-foreground mt-3">
+            Credentials (VTEX App Key / App Token) are stored in an encrypted HttpOnly session cookie isolated to each browser session — one session cannot see another&apos;s credentials. Sign out destroys the cookie immediately.
+          </p>
+        </Section>
+
         {/* Configuration */}
         <Section title="Configuration">
           <p className="text-sm text-muted-foreground leading-relaxed mb-4">
@@ -188,6 +202,10 @@ export default function AboutPage() {
                   ['Integration Mode', '—', 'FEED or HOOK — determines active integration path'],
                   ['Auto Commit Feed', 'AUTO_COMMIT_FEED', 'Acknowledge feed handles after processing (true/false)'],
                   ['Simulate ERP Failure', 'SIMULATE_ERP_FAILURE', 'Force ERP simulation to fail for testing error flows'],
+                  ['Demo Password', 'DEMO_PASSWORD', 'Password for the login page. Defaults to vtex2024 if not set'],
+                  ['Session Secret', 'SESSION_SECRET', 'Min 32-char secret used to encrypt the credential cookie. Generate with: openssl rand -base64 32'],
+                  ['Cron Secret', 'CRON_SECRET', 'Bearer token Vercel injects when invoking the weekly cleanup cron. Leave blank to allow open access (demo only)'],
+                  ['App URL', 'NEXT_PUBLIC_APP_URL', 'Public URL of the deployment — used to render the full Hook URL in the UI (e.g. https://your-app.vercel.app)'],
                 ].map(([field, env, desc]) => (
                   <tr key={field} className="hover:bg-muted/20 transition-colors">
                     <td className="px-4 py-2.5 font-medium text-foreground">{field}</td>
@@ -265,6 +283,8 @@ export default function AboutPage() {
               { method: 'POST', path: '/api/vtex/config/feed', desc: 'Save VTEX Feed configuration (overwrites immediately)' },
               { method: 'GET',  path: '/api/cron/cleanup', desc: 'Weekly cron — delete all orders and clear event log (protected by CRON_SECRET)' },
               { method: 'GET',  path: '/api/health', desc: 'DB connectivity check + row counts' },
+              { method: 'POST', path: '/api/auth/login', desc: 'Verify demo password and create an authenticated session cookie' },
+              { method: 'POST', path: '/api/auth/logout', desc: 'Destroy the session cookie and redirect to login' },
             ].map(({ method, path, desc }) => (
               <div key={path} className="flex items-start gap-3 px-4 py-3 rounded-lg border border-border bg-card hover:bg-muted/20 transition-colors">
                 <span className={`shrink-0 text-[10px] font-bold font-mono px-1.5 py-0.5 rounded ${methodColor(method)}`}>
@@ -356,6 +376,9 @@ export default function AboutPage() {
               <p className="text-xs text-muted-foreground">
                 Endpoint: <code className="font-mono text-[10px] bg-muted px-1 rounded">GET /api/cron/cleanup</code>.
                 Protected by <code className="font-mono text-[10px] bg-muted px-1 rounded">CRON_SECRET</code> env var when set.
+              </p>
+              <p className="text-xs text-muted-foreground">
+                A live countdown to the next purge is displayed in the app footer.
               </p>
             </div>
             <div className="rounded-lg border border-border bg-card px-5 py-4 space-y-2">
