@@ -5,7 +5,7 @@
 
 export const runtime = 'nodejs';
 
-import { getMissingCredentials, isHookSecretValid, buildServerConfig } from '@/lib/config';
+import { getMissingCredentials, isHookSecretValid, buildServerConfig, buildConfigForAccount } from '@/lib/config';
 import { upsertOrder, getOrderByOrderId, appendEventLog, appendTimelineEntry, hasProcessedKey, markProcessedKey } from '@/lib/store';
 import { createVtexClient } from '@/lib/vtexClient';
 import { extractOrderId, extractVtexStatus } from '@/lib/hookParser';
@@ -26,7 +26,10 @@ export async function POST(request: Request): Promise<Response> {
     return Response.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const cfg = await buildServerConfig();
+  const accountParam = new URL(request.url).searchParams.get('account');
+  const cfg = accountParam
+    ? (await buildConfigForAccount(accountParam)) ?? (await buildServerConfig())
+    : await buildServerConfig();
   const secret = request.headers.get('x-demo-hook-secret');
   if (!isHookSecretValid(secret, cfg as Parameters<typeof isHookSecretValid>[1])) {
     return Response.json({ error: 'Forbidden' }, { status: 403 });
@@ -68,7 +71,7 @@ export async function POST(request: Request): Promise<Response> {
     const record: ErpOrderRecord = {
       id: orderId,
       orderId,
-      account: cfg.account || undefined,
+      account: cfg.account || accountParam || undefined,
       source: 'HOOK',
       erpStatus: 'RECEIVED',
       startHandlingStatus: 'NOT_STARTED',

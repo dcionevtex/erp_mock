@@ -136,10 +136,11 @@ export default function DashboardPage() {
     );
   }
 
+  const hookAccountSuffix = config?.account ? `?account=${encodeURIComponent(config.account)}` : '';
   const hookUrl =
     typeof window !== 'undefined'
-      ? `${window.location.origin}/api/vtex/hook`
-      : '/api/vtex/hook';
+      ? `${window.location.origin}/api/vtex/hook${hookAccountSuffix}`
+      : `/api/vtex/hook${hookAccountSuffix}`;
 
   const credsMissing = config !== null && !config.appTokenConfigured;
 

@@ -134,6 +134,28 @@ export async function buildServerConfig(): Promise<ReturnType<typeof getServerCo
 }
 
 /**
+ * Build a full server config for a specific account from the registry.
+ * Used by the hook endpoint when ?account= param is present.
+ * Returns null if no config is found for the given account.
+ */
+export async function buildConfigForAccount(account: string): Promise<ReturnType<typeof getServerConfig> | null> {
+  const { getAccountConfig } = await import('@/lib/accountRegistry');
+  const acct = await getAccountConfig(account);
+  if (!acct) return null;
+  const base = getServerConfig();
+  return {
+    ...base,
+    account: acct.account,
+    environment: acct.environment || base.environment,
+    appKey: acct.appKey,
+    appToken: acct.appToken,
+    integrationMode: (acct.integrationMode as ReturnType<typeof getServerConfig>['integrationMode']) ?? base.integrationMode,
+    autoCommitFeed: acct.autoCommitFeed ?? base.autoCommitFeed,
+    simulateErpFailure: acct.simulateErpFailure ?? base.simulateErpFailure,
+  };
+}
+
+/**
  * Demo-hook-secret check.
  * - If DEMO_HOOK_SECRET is unset (empty string), validation is disabled — return `true`.
  * - If set, the provided header value must match exactly.

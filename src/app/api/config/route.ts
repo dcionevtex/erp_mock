@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 
 import { buildServerConfig, getPublicConfig } from '@/lib/config';
 import { setConfigOverrides, setServerSecrets, savePersistedConfig } from '@/lib/store';
+import { saveAccountConfig } from '@/lib/accountRegistry';
 import { getSession } from '@/lib/session';
 import type { IntegrationMode } from '@/types';
 
@@ -48,6 +49,21 @@ export async function POST(request: Request): Promise<Response> {
   if (secrets.appKey) dbFields.appKey = secrets.appKey;
   if (secrets.appToken) dbFields.appToken = secrets.appToken;
   await savePersistedConfig(dbFields);
+
+  // Also save to per-account registry so the hook endpoint can look up
+  // credentials by account name (multi-tenant hook routing).
+  const finalCfg = await buildServerConfig();
+  if (finalCfg.account && finalCfg.appToken && finalCfg.appKey) {
+    await saveAccountConfig({
+      account: finalCfg.account,
+      environment: finalCfg.environment,
+      appKey: finalCfg.appKey,
+      appToken: finalCfg.appToken,
+      integrationMode: finalCfg.integrationMode,
+      autoCommitFeed: finalCfg.autoCommitFeed,
+      simulateErpFailure: finalCfg.simulateErpFailure,
+    });
+  }
 
   return Response.json({ ok: true, config: getPublicConfig(await buildServerConfig()) });
 }
