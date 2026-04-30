@@ -56,10 +56,21 @@ function BrazilianEngineeringLogo() {
 export function Footer() {
   return (
     <footer
-      className="border-t mt-auto px-4 py-4"
+      className="border-t mt-auto"
       style={{ background: '#142032', borderColor: 'rgba(255,255,255,0.08)' }}
     >
-      <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-4 flex-wrap">
+      {/* Demo disclaimer bar */}
+      <div className="border-b px-4 py-2.5" style={{ borderColor: 'rgba(255,255,255,0.06)', background: 'rgba(220,38,38,0.12)' }}>
+        <p className="max-w-[1600px] mx-auto text-center text-[11px] leading-relaxed" style={{ color: 'rgba(252,165,165,0.9)' }}>
+          <svg className="inline-block w-3 h-3 mr-1 mb-0.5 shrink-0" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
+            <path fillRule="evenodd" d="M6.39 1.56a.45.45 0 0 0-.78 0L1.05 9a.45.45 0 0 0 .39.69h9.12a.45.45 0 0 0 .39-.69L6.39 1.56zM6 4.5a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5zm.5 4.75a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0z" clipRule="evenodd" />
+          </svg>
+          <strong>Demo &amp; Test Use Only</strong> — Never use real production credentials or real customer data.
+          The authors and VTEX bear no responsibility for any misuse, data loss, or unintended API calls made against live environments.
+        </p>
+      </div>
+
+      <div className="max-w-[1600px] mx-auto px-4 py-4 flex items-center justify-between gap-4 flex-wrap">
         <a
           href="https://github.com/dcionevtex"
           target="_blank"
