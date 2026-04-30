@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import type { AppConfigPublic } from '@/types';
 
 interface Props {
@@ -19,14 +19,8 @@ interface PanelState {
 
 const HOOK_TEMPLATE = JSON.stringify(
   {
-    filter: {
-      type: 'FromWorkflow',
-      status: ['order-completed', 'on-order-completed'],
-    },
-    hook: {
-      headers: {},
-      url: '',
-    },
+    filter: { type: 'FromWorkflow', status: ['order-completed', 'on-order-completed'] },
+    hook: { headers: {}, url: '' },
   },
   null,
   2,
@@ -34,20 +28,19 @@ const HOOK_TEMPLATE = JSON.stringify(
 
 const FEED_TEMPLATE = JSON.stringify(
   {
-    filter: {
-      type: 'FromWorkflow',
-      status: ['order-completed'],
-    },
-    queue: {
-      visibilityTimeoutInSeconds: 240,
-      messageRetentionPeriodInSeconds: 345600,
-    },
+    filter: { type: 'FromWorkflow', status: ['order-completed'] },
+    queue: { visibilityTimeoutInSeconds: 240, messageRetentionPeriodInSeconds: 345600 },
   },
   null,
   2,
 );
 
-function usePanel(type: ConfigType, account: string | null | undefined, hookUrl: string) {
+function usePanel(
+  type: ConfigType,
+  account: string | null | undefined,
+  hookUrl: string,
+  credentialsAvailable: boolean,
+) {
   const [state, setState] = useState<PanelState>({
     json: type === 'hook' ? HOOK_TEMPLATE : FEED_TEMPLATE,
     loading: false,
@@ -58,15 +51,25 @@ function usePanel(type: ConfigType, account: string | null | undefined, hookUrl:
 
   const accountParam = account ? `?account=${encodeURIComponent(account)}` : '';
   const endpoint = `/api/vtex/config/${type}${accountParam}`;
+  const autoLoadedRef = useRef(false);
 
-  async function load() {
+  const load = useCallback(async (options?: { silent?: boolean }) => {
     setState((s) => ({ ...s, loading: true, response: null }));
     try {
       const res = await fetch(endpoint);
+
+      // 404 = not configured yet — leave blank, no error
+      if (res.status === 404) {
+        setState((s) => ({ ...s, loading: false, json: type === 'hook' ? HOOK_TEMPLATE : FEED_TEMPLATE }));
+        return;
+      }
+
       const data = await res.json() as { ok?: boolean; data?: unknown; error?: string };
+
       if (res.ok && data.ok) {
-        // Auto-populate hook URL when loading hook config
         let parsed = data.data;
+
+        // Auto-populate hook URL when the field is absent or empty
         if (type === 'hook' && hookUrl && parsed && typeof parsed === 'object') {
           const p = parsed as Record<string, unknown>;
           if (!p.hook || typeof p.hook !== 'object') {
@@ -77,27 +80,51 @@ function usePanel(type: ConfigType, account: string | null | undefined, hookUrl:
           }
           parsed = p;
         }
+
+        // Empty / null response — treat as not configured
+        if (parsed == null) {
+          setState((s) => ({ ...s, loading: false, json: type === 'hook' ? HOOK_TEMPLATE : FEED_TEMPLATE }));
+          return;
+        }
+
         setState((s) => ({
           ...s,
           loading: false,
           json: JSON.stringify(parsed, null, 2),
-          response: 'Loaded current config from VTEX.',
+          response: options?.silent ? null : 'Loaded current config from VTEX.',
           responseOk: true,
         }));
       } else {
-        setState((s) => ({
-          ...s,
-          loading: false,
-          response: data.error ?? 'Failed to load config.',
-          responseOk: false,
-        }));
+        // On silent auto-load, swallow the error and keep blank template
+        if (options?.silent) {
+          setState((s) => ({ ...s, loading: false }));
+        } else {
+          setState((s) => ({
+            ...s,
+            loading: false,
+            response: data.error ?? 'Failed to load config.',
+            responseOk: false,
+          }));
+        }
       }
     } catch {
-      setState((s) => ({ ...s, loading: false, response: 'Network error.', responseOk: false }));
+      if (options?.silent) {
+        setState((s) => ({ ...s, loading: false }));
+      } else {
+        setState((s) => ({ ...s, loading: false, response: 'Network error.', responseOk: false }));
+      }
     }
-  }
+  }, [endpoint, type, hookUrl]);
 
-  async function save() {
+  // Auto-load once on mount when credentials are available
+  useEffect(() => {
+    if (credentialsAvailable && !autoLoadedRef.current) {
+      autoLoadedRef.current = true;
+      void load({ silent: true });
+    }
+  }, [credentialsAvailable, load]);
+
+  const save = useCallback(async () => {
     let parsed: unknown;
     try {
       parsed = JSON.parse(state.json);
@@ -126,12 +153,14 @@ function usePanel(type: ConfigType, account: string | null | undefined, hookUrl:
     } catch {
       setState((s) => ({ ...s, saving: false, response: 'Network error.', responseOk: false }));
     }
-  }
+  }, [endpoint, state.json]);
 
-  return { state, setState, load, save };
+  return { state, setState, load: () => load(), save };
 }
 
 export function IntegrationSetup({ config }: Props) {
+  const credentialsAvailable = !!(config?.appTokenConfigured && config?.account);
+
   const hookUrl =
     typeof window !== 'undefined' && config?.account
       ? `${window.location.origin}/api/vtex/hook?account=${encodeURIComponent(config.account)}`
@@ -139,14 +168,15 @@ export function IntegrationSetup({ config }: Props) {
         ? `/api/vtex/hook?account=${encodeURIComponent(config.account)}`
         : '/api/vtex/hook';
 
-  const hook = usePanel('hook', config?.account, hookUrl);
-  const feed = usePanel('feed', config?.account, hookUrl);
+  const hook = usePanel('hook', config?.account, hookUrl, credentialsAvailable);
+  const feed = usePanel('feed', config?.account, hookUrl, credentialsAvailable);
 
-  const credsMissing = !config?.appTokenConfigured;
+  const acc = config?.account ?? '{account}';
+  const env = config?.environment ?? 'vtexcommercestable.com.br';
 
   return (
     <div className="space-y-6">
-      {credsMissing && (
+      {!credentialsAvailable && (
         <div className="flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
           <span>⚠</span>
           <span>VTEX credentials must be configured before loading or saving integration config.</span>
@@ -162,37 +192,35 @@ export function IntegrationSetup({ config }: Props) {
         <ConfigPanel
           title="Hook Configuration"
           description="Register a webhook URL that VTEX calls when order status changes."
-          type="hook"
           panelState={hook.state}
           onLoad={hook.load}
           onSave={hook.save}
           onJsonChange={(v) => hook.setState((s) => ({ ...s, json: v }))}
-          curlGet={`curl -X GET "https://${config?.account ?? '{account}'}.${config?.environment ?? 'vtexcommercestable.com.br'}/api/orders/hook/config" \\
+          curlGet={`curl -X GET "https://${acc}.${env}/api/orders/hook/config" \\
   -H "X-VTEX-API-AppKey: {appKey}" \\
   -H "X-VTEX-API-AppToken: {appToken}"`}
-          curlPost={`curl -X POST "https://${config?.account ?? '{account}'}.${config?.environment ?? 'vtexcommercestable.com.br'}/api/orders/hook/config" \\
+          curlPost={`curl -X POST "https://${acc}.${env}/api/orders/hook/config" \\
   -H "X-VTEX-API-AppKey: {appKey}" \\
   -H "X-VTEX-API-AppToken: {appToken}" \\
   -H "Content-Type: application/json" \\
-  -d '${JSON.stringify({ filter: { type: 'FromWorkflow', status: ['order-completed'] }, hook: { headers: {}, url: hookUrl } })}'`}
+  -d '{"filter":{"type":"FromWorkflow","status":["order-completed"]},"hook":{"headers":{},"url":"${hookUrl}"}}'`}
         />
 
         <ConfigPanel
           title="Feed Configuration"
           description="Configure the order event queue that your app polls periodically."
-          type="feed"
           panelState={feed.state}
           onLoad={feed.load}
           onSave={feed.save}
           onJsonChange={(v) => feed.setState((s) => ({ ...s, json: v }))}
-          curlGet={`curl -X GET "https://${config?.account ?? '{account}'}.${config?.environment ?? 'vtexcommercestable.com.br'}/api/orders/feed/config" \\
+          curlGet={`curl -X GET "https://${acc}.${env}/api/orders/feed/config" \\
   -H "X-VTEX-API-AppKey: {appKey}" \\
   -H "X-VTEX-API-AppToken: {appToken}"`}
-          curlPost={`curl -X POST "https://${config?.account ?? '{account}'}.${config?.environment ?? 'vtexcommercestable.com.br'}/api/orders/feed/config" \\
+          curlPost={`curl -X POST "https://${acc}.${env}/api/orders/feed/config" \\
   -H "X-VTEX-API-AppKey: {appKey}" \\
   -H "X-VTEX-API-AppToken: {appToken}" \\
   -H "Content-Type: application/json" \\
-  -d '${JSON.stringify({ filter: { type: 'FromWorkflow', status: ['order-completed'] }, queue: { visibilityTimeoutInSeconds: 240, messageRetentionPeriodInSeconds: 345600 } })}'`}
+  -d '{"filter":{"type":"FromWorkflow","status":["order-completed"]},"queue":{"visibilityTimeoutInSeconds":240,"messageRetentionPeriodInSeconds":345600}}'`}
         />
       </div>
     </div>
@@ -202,7 +230,6 @@ export function IntegrationSetup({ config }: Props) {
 interface ConfigPanelProps {
   title: string;
   description: string;
-  type: ConfigType;
   panelState: PanelState;
   onLoad: () => void;
   onSave: () => void;
@@ -244,7 +271,7 @@ function ConfigPanel({
           disabled={panelState.loading}
           className="px-3 py-1.5 text-xs font-medium rounded border border-border hover:bg-muted transition-colors disabled:opacity-50"
         >
-          {panelState.loading ? 'Loading…' : 'Load Current Config'}
+          {panelState.loading ? 'Loading…' : 'Reload Config'}
         </button>
         <button
           onClick={onSave}
@@ -268,6 +295,7 @@ function ConfigPanel({
         rows={14}
         spellCheck={false}
         className="w-full font-mono text-[11px] rounded-md border border-input bg-background px-3 py-2 focus:outline-none focus:ring-1 focus:ring-ring resize-y leading-relaxed"
+        placeholder={panelState.loading ? 'Loading from VTEX…' : undefined}
       />
 
       {panelState.response && (
