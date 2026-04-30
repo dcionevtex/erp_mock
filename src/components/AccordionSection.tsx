@@ -5,7 +5,7 @@ import { useState } from 'react';
 export function AccordionSection({
   title,
   children,
-  defaultOpen = true,
+  defaultOpen = false,
 }: {
   title: string;
   children: React.ReactNode;
