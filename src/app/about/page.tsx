@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { Footer } from '@/components/Footer';
 
 export const metadata = {
-  title: 'About — VTEX ERP Connect',
+  title: 'About — VTEX A Simple ERP Simulator',
 };
 
 export default function AboutPage() {
@@ -14,7 +14,7 @@ export default function AboutPage() {
         <div className="flex items-center gap-4 py-3">
           <span className="text-xl font-black tracking-tighter leading-none" style={{ color: '#F71963' }}>VTEX</span>
           <span className="text-white/20 text-lg font-thin">|</span>
-          <span className="text-sm font-semibold text-white/90">ERP Connect</span>
+          <span className="text-sm font-semibold text-white/90">A Simple ERP Simulator</span>
           <span className="text-white/20 text-lg font-thin hidden sm:block">|</span>
           <span className="text-sm text-white/50 hidden sm:block">Documentation</span>
         </div>
@@ -40,7 +40,7 @@ export default function AboutPage() {
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-2xl font-black tracking-tighter" style={{ color: '#F71963' }}>VTEX</span>
-                  <span className="text-xl font-semibold text-white">ERP Connect</span>
+                  <span className="text-xl font-semibold text-white">A Simple ERP Simulator</span>
                 </div>
                 <p className="text-white/60 text-sm max-w-xl leading-relaxed">
                   A demo-grade middleware that simulates the operational handoff between VTEX OMS and an external ERP system — using the official VTEX Feed and Hook integration patterns.
@@ -61,10 +61,50 @@ export default function AboutPage() {
           </div>
         </div>
 
+        {/* Seller account notice */}
+        <div className="rounded-xl overflow-hidden border" style={{ borderColor: '#f59e0b' }}>
+          <div className="flex items-center gap-2.5 px-4 py-2.5" style={{ background: '#f59e0b' }}>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M8 1.5L14.5 13H1.5L8 1.5z" fill="rgba(0,0,0,0.15)" stroke="white" strokeWidth="1.4" strokeLinejoin="round" />
+              <path d="M8 6v3.5" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
+              <circle cx="8" cy="11.5" r="0.85" fill="white" />
+            </svg>
+            <span className="text-white font-bold text-xs tracking-wide uppercase">Seller Account Required</span>
+          </div>
+          <div className="px-5 py-4 space-y-3 bg-amber-50 dark:bg-amber-950/20">
+            <p className="text-sm font-semibold text-amber-900 dark:text-amber-200">
+              This app is designed for <strong>seller accounts only</strong>. It will not work correctly with a marketplace account.
+            </p>
+            <div className="grid sm:grid-cols-2 gap-3 text-xs text-amber-800 dark:text-amber-300">
+              <div className="rounded-lg bg-white/70 dark:bg-white/5 border border-amber-200 dark:border-amber-800 px-4 py-3 space-y-1">
+                <div className="font-bold text-amber-900 dark:text-amber-100 flex items-center gap-1.5">
+                  <span className="inline-block w-2 h-2 rounded-full bg-green-500" />
+                  Seller Account ✓
+                </div>
+                <p className="leading-relaxed">
+                  The account that <strong>owns and fulfills the orders</strong>. When an order is placed, VTEX routes it to the seller. The seller must call <strong>Start Handling</strong> to confirm it has taken responsibility for fulfillment — that's exactly what this app demonstrates.
+                </p>
+              </div>
+              <div className="rounded-lg bg-white/70 dark:bg-white/5 border border-amber-200 dark:border-amber-800 px-4 py-3 space-y-1">
+                <div className="font-bold text-amber-900 dark:text-amber-100 flex items-center gap-1.5">
+                  <span className="inline-block w-2 h-2 rounded-full bg-red-400" />
+                  Marketplace Account ✗
+                </div>
+                <p className="leading-relaxed">
+                  The account that <strong>lists products and collects the sale</strong>, but delegates fulfillment to sellers. Marketplace accounts use a different API flow to sync orders with their sellers — <strong>Start Handling is not called by the marketplace</strong>, so this app's pipeline won't behave as expected.
+                </p>
+              </div>
+            </div>
+            <p className="text-xs text-amber-700 dark:text-amber-400">
+              Not sure which type you have? If your VTEX account has its own warehouse and ships orders directly to customers, it&apos;s a seller account. If it sells products from third-party stores, it&apos;s a marketplace.
+            </p>
+          </div>
+        </div>
+
         {/* What it does */}
         <Section title="What It Does">
           <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-            ERP Connect simulates the external ERP side of a VTEX order integration. When an order is placed in VTEX, this app receives the event (via Hook or Feed), fetches the full order from VTEX OMS, normalizes it into an ERP payload, simulates ERP acceptance, and calls VTEX Start Handling to confirm the handoff.
+            A Simple ERP Simulator simulates the external ERP side of a VTEX order integration. When an order is placed in VTEX, this app receives the event (via Hook or Feed), fetches the full order from VTEX OMS, normalizes it into an ERP payload, simulates ERP acceptance, and calls VTEX Start Handling to confirm the handoff.
           </p>
           <div className="grid sm:grid-cols-3 gap-3">
             <FeatureCard
