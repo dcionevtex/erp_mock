@@ -202,21 +202,7 @@ export default function DashboardPage() {
 
       <main className="px-4 py-4 space-y-4 max-w-[1600px] mx-auto">
         {/* Hook URL display */}
-        <div className="space-y-1">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span className="font-medium text-foreground">Hook URL:</span>
-            <code className="bg-muted px-2 py-0.5 rounded font-mono">{hookUrl}</code>
-            <button
-              onClick={() => navigator.clipboard.writeText(hookUrl).catch(() => {})}
-              className="px-2 py-0.5 text-xs border border-border rounded hover:bg-muted transition-colors"
-            >
-              Copy
-            </button>
-          </div>
-          <p className="text-xs text-muted-foreground">
-            Register this URL in VTEX using your App Key (<code className="font-mono">PUT /api/orders/hook/config</code>). Each App Key supports one Hook — if you change the App Key, re-register the Hook in VTEX.
-          </p>
-        </div>
+        <HookUrlCard hookUrl={hookUrl} />
 
         {/* Credentials warning (ERR-01) */}
         {credsMissing && (
@@ -416,6 +402,81 @@ export default function DashboardPage() {
         config={config}
         onSaved={(cfg) => setConfig(cfg)}
       />
+    </div>
+  );
+}
+
+function HookUrlCard({ hookUrl }: { hookUrl: string }) {
+  const [copied, setCopied] = useState(false);
+
+  function copy() {
+    navigator.clipboard.writeText(hookUrl).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  return (
+    <div className="rounded-xl border border-border bg-card overflow-hidden">
+      <div className="flex items-center gap-2.5 px-4 py-2.5 border-b border-border/60" style={{ background: 'linear-gradient(to right, #142032 0%, #1e2f44 100%)' }}>
+        {/* Webhook icon */}
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#F71963" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="5" cy="12" r="2" />
+          <circle cx="11" cy="4" r="2" />
+          <path d="M7 12h3a3 3 0 0 0 0-6H8" />
+          <path d="M9 4H6a3 3 0 0 0 0 6h1" />
+        </svg>
+        <span className="text-xs font-semibold text-white/90">Webhook Endpoint</span>
+        <span className="ml-auto text-[10px] text-white/30 font-mono uppercase tracking-wide">POST</span>
+      </div>
+
+      <div className="px-4 py-3 space-y-3">
+        {/* URL row */}
+        <div className="flex items-center gap-2">
+          <code className="flex-1 min-w-0 font-mono text-[12px] text-foreground bg-muted/60 border border-border rounded-lg px-3 py-2 truncate select-all">
+            {hookUrl}
+          </code>
+          <button
+            onClick={copy}
+            className={[
+              'shrink-0 flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg border transition-all duration-150',
+              copied
+                ? 'border-green-400/60 bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400'
+                : 'border-border hover:border-[#F71963]/40 hover:bg-[#F71963]/5 text-foreground',
+            ].join(' ')}
+          >
+            {copied ? (
+              <>
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M2 6l3 3 5-5" />
+                </svg>
+                Copied
+              </>
+            ) : (
+              <>
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="4" y="4" width="7" height="7" rx="1.5" />
+                  <path d="M8 4V2.5A1.5 1.5 0 0 0 6.5 1h-4A1.5 1.5 0 0 0 1 2.5v4A1.5 1.5 0 0 0 2.5 8H4" />
+                </svg>
+                Copy
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Info row */}
+        <div className="flex items-start gap-2 text-[11px] text-muted-foreground">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" className="mt-0.5 shrink-0 text-[#F71963]/70">
+            <circle cx="6" cy="6" r="5" />
+            <path d="M6 5.5v3M6 4h.01" />
+          </svg>
+          <span>
+            Register this URL in VTEX with your App Key via{' '}
+            <code className="font-mono text-[10px] bg-muted px-1 py-0.5 rounded">Setup → Hook &amp; Feed Configuration</code>
+            {' '}or directly with <code className="font-mono text-[10px] bg-muted px-1 py-0.5 rounded">POST /api/orders/hook/config</code>.
+            Each App Key supports one Hook — re-register if you change keys.
+          </span>
+        </div>
+      </div>
     </div>
   );
 }
