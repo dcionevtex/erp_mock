@@ -59,9 +59,23 @@ export function Footer() {
       className="border-t mt-auto"
       style={{ background: '#142032', borderColor: 'rgba(255,255,255,0.08)' }}
     >
+      {/* Vision strip */}
+      <div className="border-b px-4 py-3" style={{ borderColor: 'rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.03)' }}>
+        <div className="max-w-[1600px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+          <p className="text-[11px] text-center sm:text-left leading-relaxed" style={{ color: 'rgba(255,255,255,0.45)' }}>
+            <span className="font-semibold" style={{ color: 'rgba(255,255,255,0.7)' }}>VTEX ERP Connect</span>
+            {' '}— A reference implementation of the official VTEX OMS → ERP integration pattern.
+            Demonstrates Feed &amp; Hook consumption, order normalization, Start Handling, invoice flow, and multi-account routing in a single deployable demo.
+          </p>
+          <p className="text-[10px] whitespace-nowrap" style={{ color: 'rgba(255,255,255,0.25)' }}>
+            All data auto-purged every 7 days
+          </p>
+        </div>
+      </div>
+
       {/* Demo disclaimer bar */}
-      <div className="border-b px-4 py-2.5" style={{ borderColor: 'rgba(255,255,255,0.06)', background: 'rgba(220,38,38,0.12)' }}>
-        <p className="max-w-[1600px] mx-auto text-center text-[11px] leading-relaxed" style={{ color: 'rgba(252,165,165,0.9)' }}>
+      <div className="border-b px-4 py-2" style={{ borderColor: 'rgba(255,255,255,0.06)', background: 'rgba(220,38,38,0.10)' }}>
+        <p className="max-w-[1600px] mx-auto text-center text-[10px] leading-relaxed" style={{ color: 'rgba(252,165,165,0.8)' }}>
           <svg className="inline-block w-3 h-3 mr-1 mb-0.5 shrink-0" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
             <path fillRule="evenodd" d="M6.39 1.56a.45.45 0 0 0-.78 0L1.05 9a.45.45 0 0 0 .39.69h9.12a.45.45 0 0 0 .39-.69L6.39 1.56zM6 4.5a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5zm.5 4.75a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0z" clipRule="evenodd" />
           </svg>

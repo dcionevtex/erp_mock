@@ -172,6 +172,19 @@ export async function clearEventLog(): Promise<void> {
   eventLog.length = 0;
 }
 
+export async function clearAllOrders(): Promise<number> {
+  const sql = await db();
+  if (sql) {
+    const result = await sql`SELECT COUNT(*) AS n FROM erp_orders` as { n: string }[];
+    const count = parseInt(result[0]?.n ?? '0', 10);
+    await sql`TRUNCATE TABLE erp_orders RESTART IDENTITY`;
+    return count;
+  }
+  const count = orders.size;
+  orders.clear();
+  return count;
+}
+
 // ---- Idempotency / dedup keys (always in-memory — ephemeral is fine) --------
 
 export function hasProcessedKey(key: string): boolean {

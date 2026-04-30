@@ -55,8 +55,8 @@ export default function AboutPage() {
           </div>
           <div className="px-6 py-4 bg-muted/30 border-t border-border grid grid-cols-2 sm:grid-cols-4 gap-4">
             <Stat label="Integration modes" value="Feed + Hook" />
-            <Stat label="VTEX APIs used" value="3" />
-            <Stat label="API endpoints" value="11" />
+            <Stat label="VTEX APIs used" value="5" />
+            <Stat label="API endpoints" value="18" />
             <Stat label="Persistence" value="Neon Postgres" />
           </div>
         </div>
@@ -70,17 +70,17 @@ export default function AboutPage() {
             <FeatureCard
               icon={<HookIcon />}
               title="Hook Mode"
-              description="VTEX pushes order events to the app's webhook endpoint in real time. Ideal for low-latency ERP handoffs."
+              description="VTEX pushes order events to the app's webhook endpoint in real time. Supports multi-account routing via ?account= — each App Key gets its own hook URL."
             />
             <FeatureCard
               icon={<FeedIcon />}
               title="Feed Mode"
-              description="The operator manually polls the VTEX Feed queue. The app reads up to 5 pending events and processes each one."
+              description="The operator manually polls the VTEX Feed queue. The app reads up to 5 pending events, deduplicates them, and processes each one end-to-end."
             />
             <FeatureCard
               icon={<InboxIcon />}
               title="ERP Inbox"
-              description="Every processed order lands in a unified inbox with status tracking, timeline, payload viewer, and manual actions."
+              description="Every processed order lands in a unified inbox with status tracking, processing timeline, payload viewer, invoice flow, shipping label, and manual actions."
             />
           </div>
         </Section>
@@ -109,6 +109,18 @@ export default function AboutPage() {
                 { label: 'ERP Simulate', sub: 'normalize + accept' },
                 { label: 'Start Handling', sub: 'VTEX API' },
               ]} />
+            </div>
+            <div>
+              <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Invoice Flow (post-handling)</h3>
+              <Flow steps={[
+                { label: 'Start Handling', sub: 'SUCCESS' },
+                { label: 'Send Invoice', sub: 'operator action' },
+                { label: 'POST /invoice', sub: 'VTEX API' },
+                { label: 'verifying-invoice', sub: 'VTEX status' },
+                { label: 'Update Tracking', sub: 'optional' },
+                { label: 'invoiced', sub: 'terminal' },
+              ]} />
+              <p className="text-xs text-muted-foreground mt-2">Once an invoice is sent the order becomes non-cancellable in VTEX.</p>
             </div>
           </div>
         </Section>
@@ -147,7 +159,7 @@ export default function AboutPage() {
             </table>
           </div>
           <p className="text-xs text-muted-foreground mt-3">
-            Credentials are persisted to Neon Postgres so webhook calls work across serverless cold starts. Re-save credentials once after each Vercel deployment.
+            Credentials are stored in an encrypted HttpOnly session cookie — one set per browser session. The hook endpoint resolves credentials from the per-account registry via <code className="font-mono">?account=</code> in the URL, so each VTEX account has its own isolated hook.
           </p>
         </Section>
 
@@ -172,7 +184,9 @@ export default function AboutPage() {
                   ['ERROR', 'Pipeline failed (Get Order or ERP simulation)', 'Use Reprocess action after fixing credentials'],
                   ['DUPLICATE_IGNORED', 'Event already processed — skipped', 'No action needed'],
                   ['MANUALLY_RESOLVED', 'Marked resolved by operator — terminal', 'No action needed'],
-                  ['CANCELLED', 'Order was cancelled in VTEX', 'No action needed'],
+                  ['INVOICED', 'Invoice sent — order advancing to invoiced in VTEX', 'Optionally add tracking number'],
+                  ['INVOICE_ERROR', 'Invoice POST failed', 'Retry via Send Invoice button'],
+                  ['CANCELLED', 'Order was cancelled in VTEX', 'No action needed — Delete to remove from inbox'],
                 ].map(([status, meaning, next]) => (
                   <tr key={status} className="hover:bg-muted/20 transition-colors">
                     <td className="px-4 py-2.5 font-mono font-medium text-foreground">{status}</td>
@@ -202,6 +216,14 @@ export default function AboutPage() {
               { method: 'POST', path: '/api/config', desc: 'Update runtime configuration and credentials' },
               { method: 'GET',  path: '/api/erp/events', desc: 'Read the technical event log (newest first)' },
               { method: 'DELETE', path: '/api/erp/events', desc: 'Clear the entire event log' },
+              { method: 'POST', path: '/api/erp/orders/:orderId/send-invoice', desc: 'Send fiscal invoice to VTEX OMS (requires Start Handling SUCCESS)' },
+              { method: 'POST', path: '/api/erp/orders/:orderId/update-tracking', desc: 'Add courier + tracking number to an already-invoiced order' },
+              { method: 'POST', path: '/api/erp/orders/:orderId/cancel', desc: 'Cancel an order in VTEX (blocked once invoice is sent)' },
+              { method: 'GET',  path: '/api/vtex/config/hook', desc: 'Read current VTEX Hook configuration for the account' },
+              { method: 'POST', path: '/api/vtex/config/hook', desc: 'Save VTEX Hook configuration (overwrites immediately)' },
+              { method: 'GET',  path: '/api/vtex/config/feed', desc: 'Read current VTEX Feed configuration for the account' },
+              { method: 'POST', path: '/api/vtex/config/feed', desc: 'Save VTEX Feed configuration (overwrites immediately)' },
+              { method: 'GET',  path: '/api/cron/cleanup', desc: 'Weekly cron — delete all orders and clear event log (protected by CRON_SECRET)' },
               { method: 'GET',  path: '/api/health', desc: 'DB connectivity check + row counts' },
             ].map(({ method, path, desc }) => (
               <div key={path} className="flex items-start gap-3 px-4 py-3 rounded-lg border border-border bg-card hover:bg-muted/20 transition-colors">
@@ -212,6 +234,44 @@ export default function AboutPage() {
                 <span className="text-xs text-muted-foreground pt-0.5 leading-relaxed">{desc}</span>
               </div>
             ))}
+          </div>
+        </Section>
+
+        {/* Data & Cleanup */}
+        <Section title="Data &amp; Cleanup">
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div className="rounded-lg border border-border bg-card px-5 py-4 space-y-2">
+              <div className="flex items-center gap-2">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#F71963" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="7" cy="7" r="5.5" />
+                  <path d="M7 4v3.5l2 1.5" />
+                </svg>
+                <span className="text-sm font-semibold text-foreground">Weekly Auto-Purge</span>
+              </div>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                A Vercel Cron job runs every <strong>Sunday at 00:00 UTC</strong> and deletes all ERP orders and event log entries. This keeps the demo environment clean for the next week of testing.
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Endpoint: <code className="font-mono text-[10px] bg-muted px-1 rounded">GET /api/cron/cleanup</code>.
+                Protected by <code className="font-mono text-[10px] bg-muted px-1 rounded">CRON_SECRET</code> env var when set.
+              </p>
+            </div>
+            <div className="rounded-lg border border-border bg-card px-5 py-4 space-y-2">
+              <div className="flex items-center gap-2">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#F71963" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M2 4h10M5 4V2.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5V4M12 4l-.8 7.2A1 1 0 0 1 10.2 12H3.8a1 1 0 0 1-1-.8L2 4" />
+                </svg>
+                <span className="text-sm font-semibold text-foreground">What Gets Cleared</span>
+              </div>
+              <ul className="text-xs text-muted-foreground space-y-1 pl-4 list-disc leading-relaxed">
+                <li>All records in the <code className="font-mono text-[10px] bg-muted px-1 rounded">erp_orders</code> table</li>
+                <li>All entries in the <code className="font-mono text-[10px] bg-muted px-1 rounded">event_log</code> table</li>
+                <li>In-memory fallback stores (on the same instance)</li>
+              </ul>
+              <p className="text-xs text-muted-foreground mt-1">
+                Account credentials in <code className="font-mono text-[10px] bg-muted px-1 rounded">account_configs</code> are <strong>not</strong> cleared — hook routing continues to work after the purge.
+              </p>
+            </div>
           </div>
         </Section>
 
