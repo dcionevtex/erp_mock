@@ -32,6 +32,10 @@ export const VTEX_API_PATHS = {
   /** Update tracking on an existing invoice. NOTE: invoiceNumber must not contain '/' (VTEX bug). */
   updateInvoiceTracking: (orderId: string, invoiceNumber: string) =>
     `/api/oms/pvt/orders/${encodeURIComponent(orderId)}/invoice/${encodeURIComponent(invoiceNumber)}`,
+  /** Get or update the Hook configuration for this account. */
+  hookConfig: () => '/api/orders/hook/config',
+  /** Get or update the Feed configuration for this account. */
+  feedConfig: () => '/api/orders/feed/config',
 } as const;
 
 /** VTEX-required headers (token MUST come from server config — never hard-coded). */

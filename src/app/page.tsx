@@ -5,10 +5,11 @@ import Link from 'next/link';
 import { ConfigPanel } from '@/components/ConfigPanel';
 import { OrderRow } from '@/components/OrderRow';
 import { Footer } from '@/components/Footer';
+import { IntegrationSetup } from '@/components/IntegrationSetup';
 import { DASHBOARD_POLL_INTERVAL_MS, ERP_STATUS_VALUES } from '@/lib/constants';
 import type { ErpOrderRecord, AppConfigPublic, EventLogEntry } from '@/types';
 
-type Tab = 'inbox' | 'events';
+type Tab = 'inbox' | 'events' | 'setup';
 type SortKey = 'receivedAt_desc' | 'receivedAt_asc';
 
 export default function DashboardPage() {
@@ -227,15 +228,15 @@ export default function DashboardPage() {
 
         {/* Tabs */}
         <div className="flex gap-1 border-b border-border">
-          {(['inbox', 'events'] as Tab[]).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={tabCls(activeTab === tab)}
-            >
-              {tab === 'inbox' ? `ERP Orders (${visibleOrders.length})` : 'Event Log'}
-            </button>
-          ))}
+          <button onClick={() => setActiveTab('inbox')} className={tabCls(activeTab === 'inbox')}>
+            ERP Orders ({visibleOrders.length})
+          </button>
+          <button onClick={() => setActiveTab('events')} className={tabCls(activeTab === 'events')}>
+            Event Log
+          </button>
+          <button onClick={() => setActiveTab('setup')} className={tabCls(activeTab === 'setup')}>
+            Integration Setup
+          </button>
         </div>
 
         {/* Inbox */}
@@ -407,6 +408,11 @@ export default function DashboardPage() {
             )}
           </div>
         )}
+        {/* Integration Setup */}
+        {activeTab === 'setup' && (
+          <IntegrationSetup config={config} />
+        )}
+
       </main>
       <Footer />
     </div>

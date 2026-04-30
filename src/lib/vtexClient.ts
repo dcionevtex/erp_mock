@@ -71,6 +71,10 @@ export interface VtexClient {
   cancelOrder(orderId: string): Promise<void>;
   sendInvoice(orderId: string, payload: VtexInvoicePayload): Promise<void>;
   updateInvoiceTracking(orderId: string, invoiceNumber: string, tracking: VtexInvoiceTrackingUpdate): Promise<void>;
+  getHookConfig(): Promise<unknown>;
+  saveHookConfig(payload: unknown): Promise<unknown>;
+  getFeedConfig(): Promise<unknown>;
+  saveFeedConfig(payload: unknown): Promise<unknown>;
 }
 
 /**
@@ -157,6 +161,18 @@ export function createVtexClient(
     },
     async updateInvoiceTracking(orderId, invoiceNumber, tracking) {
       await request<void>('PATCH', VTEX_API_PATHS.updateInvoiceTracking(orderId, invoiceNumber), tracking);
+    },
+    async getHookConfig() {
+      return request<unknown>('GET', VTEX_API_PATHS.hookConfig());
+    },
+    async saveHookConfig(payload) {
+      return request<unknown>('POST', VTEX_API_PATHS.hookConfig(), payload);
+    },
+    async getFeedConfig() {
+      return request<unknown>('GET', VTEX_API_PATHS.feedConfig());
+    },
+    async saveFeedConfig(payload) {
+      return request<unknown>('POST', VTEX_API_PATHS.feedConfig(), payload);
     },
   };
 }
