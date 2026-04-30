@@ -170,6 +170,15 @@ export default function DashboardPage() {
           >
             Docs
           </Link>
+          <button
+            onClick={async () => {
+              await fetch('/api/auth/logout', { method: 'POST' });
+              window.location.href = '/login';
+            }}
+            className="px-3 py-1.5 text-xs font-medium text-white/60 hover:text-white transition-colors rounded border border-white/10 hover:border-white/20"
+          >
+            Sign out
+          </button>
           {config?.integrationMode === 'FEED' && (
             <button
               onClick={handlePollFeed}
