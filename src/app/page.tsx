@@ -194,22 +194,33 @@ export default function DashboardPage() {
       </header>
 
       <main className="px-4 py-4 space-y-4 max-w-[1600px] mx-auto">
+        {/* Credentials warning — shown at the very top when creds are missing */}
+        {credsMissing && (
+          <div
+            className="flex items-start gap-3 rounded-xl px-5 py-4"
+            style={{ background: 'rgba(247,25,99,0.08)', border: '2px solid #F71963' }}
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="shrink-0 mt-0.5" aria-hidden="true">
+              <path d="M10 2L18 17H2L10 2z" fill="rgba(247,25,99,0.15)" stroke="#F71963" strokeWidth="1.6" strokeLinejoin="round" />
+              <path d="M10 8v4" stroke="#F71963" strokeWidth="2" strokeLinecap="round" />
+              <circle cx="10" cy="14.5" r="1" fill="#F71963" />
+            </svg>
+            <div>
+              <p className="text-sm font-bold" style={{ color: '#F71963' }}>
+                VTEX credentials are not configured.
+              </p>
+              <p className="text-sm mt-0.5" style={{ color: '#c0134f' }}>
+                Open <strong>Configuration</strong> below and enter your App Key and App Token, or set them as environment variables.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Inline Setup — Account + Hook/Feed config */}
         <InlineSetup config={config} onSaved={(cfg) => setConfig(cfg)} />
 
         {/* Hook URL display */}
         <HookUrlCard hookUrl={hookUrl} />
-
-        {/* Credentials warning (ERR-01) */}
-        {credsMissing && (
-          <div className="flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
-            <span>⚠</span>
-            <span>
-              VTEX credentials are not configured. Open Configuration above and enter your App Key
-              and App Token, or set them as environment variables.
-            </span>
-          </div>
-        )}
 
         {/* Tabs */}
         <div className="flex gap-1 border-b border-border">
