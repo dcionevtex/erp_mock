@@ -2,14 +2,13 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
-import { ConfigPanel } from '@/components/ConfigPanel';
 import { OrderRow } from '@/components/OrderRow';
 import { Footer } from '@/components/Footer';
-import { IntegrationSetup } from '@/components/IntegrationSetup';
+import { SetupPanel } from '@/components/SetupPanel';
 import { DASHBOARD_POLL_INTERVAL_MS, ERP_STATUS_VALUES } from '@/lib/constants';
 import type { ErpOrderRecord, AppConfigPublic, EventLogEntry } from '@/types';
 
-type Tab = 'inbox' | 'events' | 'setup';
+type Tab = 'inbox' | 'events';
 type SortKey = 'receivedAt_desc' | 'receivedAt_asc';
 
 export default function DashboardPage() {
@@ -17,6 +16,7 @@ export default function DashboardPage() {
   const [events, setEvents] = useState<EventLogEntry[]>([]);
   const [config, setConfig] = useState<AppConfigPublic | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>('inbox');
+  const [setupOpen, setSetupOpen] = useState(false);
   const [filterSource, setFilterSource] = useState('ALL');
   const [filterStatus, setFilterStatus] = useState('ALL');
   const [filterAccounts, setFilterAccounts] = useState<string[]>([]);
@@ -166,6 +166,12 @@ export default function DashboardPage() {
               updated {lastFetch.toLocaleTimeString()}
             </span>
           )}
+          <button
+            onClick={() => setSetupOpen(true)}
+            className="px-3 py-1.5 text-xs font-medium text-white/60 hover:text-white transition-colors rounded border border-white/10 hover:border-white/20"
+          >
+            Setup
+          </button>
           <Link
             href="/about"
             className="px-3 py-1.5 text-xs font-medium text-white/60 hover:text-white transition-colors rounded border border-white/10 hover:border-white/20"
@@ -195,9 +201,6 @@ export default function DashboardPage() {
       </header>
 
       <main className="px-4 py-4 space-y-4 max-w-[1600px] mx-auto">
-        {/* Config Panel */}
-        <ConfigPanel onSaved={(cfg) => setConfig(cfg)} />
-
         {/* Hook URL display */}
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -233,9 +236,6 @@ export default function DashboardPage() {
           </button>
           <button onClick={() => setActiveTab('events')} className={tabCls(activeTab === 'events')}>
             Event Log
-          </button>
-          <button onClick={() => setActiveTab('setup')} className={tabCls(activeTab === 'setup')}>
-            Integration Setup
           </button>
         </div>
 
@@ -408,13 +408,14 @@ export default function DashboardPage() {
             )}
           </div>
         )}
-        {/* Integration Setup */}
-        {activeTab === 'setup' && (
-          <IntegrationSetup config={config} />
-        )}
-
       </main>
       <Footer />
+      <SetupPanel
+        open={setupOpen}
+        onClose={() => setSetupOpen(false)}
+        config={config}
+        onSaved={(cfg) => setConfig(cfg)}
+      />
     </div>
   );
 }
