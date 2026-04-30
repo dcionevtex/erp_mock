@@ -9,10 +9,11 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [acknowledged, setAcknowledged] = useState(false);
+  const [agreed, setAgreed] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!agreed) return;
     setError('');
     setLoading(true);
     try {
@@ -36,9 +37,9 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: '#f5f5f5' }}>
+    <div className="min-h-screen flex flex-col" style={{ background: '#f0f2f5' }}>
       <main className="flex-1 flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-md space-y-6">
+        <div className="w-full max-w-lg space-y-5">
 
           {/* Logo + title */}
           <div className="text-center space-y-2">
@@ -53,62 +54,30 @@ export default function LoginPage() {
             <p className="text-sm text-gray-500">VTEX OMS Integration Demo</p>
           </div>
 
-          {/* Hard-stop warning */}
-          <div className="rounded-xl border-2 border-red-500 bg-white overflow-hidden shadow-md">
-            {/* Red header bar */}
-            <div className="flex items-center gap-2.5 px-4 py-3 bg-red-600">
+          {/* Warning header */}
+          <div className="rounded-xl overflow-hidden shadow-sm" style={{ border: '2px solid #dc2626' }}>
+            <div className="flex items-center gap-2.5 px-4 py-3" style={{ background: '#dc2626' }}>
               <svg className="w-5 h-5 text-white shrink-0" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 10 5zm0 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" clipRule="evenodd" />
               </svg>
-              <span className="text-white font-bold text-sm tracking-wide uppercase">
+              <span className="text-white font-bold text-sm tracking-widest uppercase">
                 Demo &amp; Testing Environment Only
               </span>
             </div>
-
-            {/* Body */}
-            <div className="px-4 py-4 space-y-3">
-              <p className="text-sm font-semibold text-gray-900">
-                This tool is strictly for demonstration and integration testing.
-              </p>
-
-              <div className="space-y-2">
-                <WarningRow icon="block">
-                  <strong>Never use real production App Keys or App Tokens.</strong> Configure test or sandbox credentials only.
-                </WarningRow>
-                <WarningRow icon="block">
-                  <strong>Never process real customer orders</strong> or personal data through this application.
-                </WarningRow>
-                <WarningRow icon="block">
-                  <strong>Real transactional data must never be used.</strong> This app may trigger actual VTEX OMS API calls including Start Handling and invoice notifications.
-                </WarningRow>
-                <WarningRow icon="info">
-                  The authors and VTEX are <strong>not responsible</strong> for any data loss, order disruption, or misuse resulting from operating this tool against live environments.
-                </WarningRow>
-              </div>
-
-              {/* Acknowledgement checkbox */}
-              <label className="flex items-start gap-2.5 cursor-pointer pt-1 select-none">
-                <input
-                  type="checkbox"
-                  checked={acknowledged}
-                  onChange={(e) => setAcknowledged(e.target.checked)}
-                  className="mt-0.5 h-4 w-4 rounded border-gray-300 accent-red-600 shrink-0"
-                />
-                <span className="text-xs text-gray-700 leading-relaxed">
-                  I understand this is a <strong>demo tool</strong>. I will only use test credentials and I will not process real customer data.
-                </span>
-              </label>
+            <div className="px-5 py-4 space-y-2.5 bg-white">
+              <WarningRow icon="block"><strong>Never use real production App Keys or App Tokens.</strong> Configure test or sandbox credentials only.</WarningRow>
+              <WarningRow icon="block"><strong>Never process real customer orders</strong> or personal data through this application.</WarningRow>
+              <WarningRow icon="block"><strong>Real transactional data must never be used.</strong> This app may trigger actual VTEX OMS API calls including Start Handling and invoice notifications.</WarningRow>
+              <WarningRow icon="info">The authors and VTEX are <strong>not responsible</strong> for any data loss, order disruption, or misuse resulting from operating this tool against live environments.</WarningRow>
             </div>
           </div>
 
           {/* Login card */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 px-8 py-8 space-y-5">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 px-8 py-7 space-y-5">
             <h2 className="text-base font-semibold text-gray-800">Sign in to continue</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-1.5">
-                <label className="block text-sm font-medium text-gray-700">
-                  Password
-                </label>
+                <label className="block text-sm font-medium text-gray-700">Password</label>
                 <input
                   type="password"
                   value={password}
@@ -117,7 +86,6 @@ export default function LoginPage() {
                   required
                   autoFocus
                   className="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:border-transparent transition-shadow"
-                  style={{ '--tw-ring-color': '#F71963' } as React.CSSProperties}
                   onFocus={(e) => { e.currentTarget.style.boxShadow = '0 0 0 2px #F71963'; }}
                   onBlur={(e) => { e.currentTarget.style.boxShadow = ''; }}
                 />
@@ -134,18 +102,74 @@ export default function LoginPage() {
 
               <button
                 type="submit"
-                disabled={loading || !password || !acknowledged}
-                className="w-full rounded-lg px-4 py-2.5 text-sm font-semibold text-white transition-opacity disabled:opacity-50"
+                disabled={loading || !password || !agreed}
+                className="w-full rounded-lg px-4 py-2.5 text-sm font-semibold text-white transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
                 style={{ background: '#F71963' }}
               >
                 {loading ? 'Signing in…' : 'Sign in'}
               </button>
-              {!acknowledged && (
-                <p className="text-center text-xs text-gray-400">
-                  Acknowledge the warning above to continue.
-                </p>
-              )}
             </form>
+          </div>
+
+          {/* T&C block */}
+          <div className="rounded-xl overflow-hidden shadow-sm border border-gray-200 bg-white">
+            {/* T&C header */}
+            <div className="px-5 py-3 border-b border-gray-100" style={{ background: '#fafafa' }}>
+              <p className="text-[11px] font-bold uppercase tracking-widest text-gray-500">
+                Terms &amp; Conditions of Use
+              </p>
+            </div>
+
+            {/* Full disclaimer text */}
+            <div className="px-5 py-4 space-y-3 text-xs text-gray-600 leading-relaxed">
+              <p>
+                <strong className="text-gray-800">Demo &amp; Test Use Only — Do not use with real production data.</strong>
+              </p>
+              <p>
+                Never configure real App Keys or App Tokens. Never process real customer orders or personal
+                data through this application. This tool may trigger actual VTEX OMS API calls including
+                Start Handling and invoice notifications.
+              </p>
+              <p>
+                The authors and VTEX bear <strong className="text-gray-800">no responsibility</strong> for any data loss,
+                order disruption, or misuse resulting from operating this tool against live environments.
+                All data entered is stored per browser session only and is not shared with third parties.
+                Order records are automatically purged every 7 days.
+              </p>
+            </div>
+
+            {/* Agreement checkbox */}
+            <div className="px-5 py-4 border-t" style={{ borderColor: agreed ? '#bbf7d0' : '#fee2e2', background: agreed ? '#f0fdf4' : '#fff7f7' }}>
+              <label className="flex items-center gap-3 cursor-pointer select-none group">
+                <div className={[
+                  'w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-all',
+                  agreed ? 'border-green-500 bg-green-500' : 'border-red-300 bg-white group-hover:border-red-400',
+                ].join(' ')}>
+                  {agreed && (
+                    <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M2 6l3 3 5-5" />
+                    </svg>
+                  )}
+                  <input
+                    type="checkbox"
+                    checked={agreed}
+                    onChange={(e) => setAgreed(e.target.checked)}
+                    className="sr-only"
+                  />
+                </div>
+                <div>
+                  <span className={['text-sm font-bold tracking-wide uppercase transition-colors', agreed ? 'text-green-700' : 'text-red-600'].join(' ')}>
+                    I Agree to the Terms &amp; Conditions
+                  </span>
+                  {!agreed && (
+                    <p className="text-[11px] text-red-400 mt-0.5">Required — you must agree before signing in.</p>
+                  )}
+                  {agreed && (
+                    <p className="text-[11px] text-green-600 mt-0.5">You have agreed to the terms above.</p>
+                  )}
+                </div>
+              </label>
+            </div>
           </div>
 
         </div>
