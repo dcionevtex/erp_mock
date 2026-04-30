@@ -235,6 +235,68 @@ export default function AboutPage() {
               </div>
             ))}
           </div>
+
+          {/* VTEX Developer References */}
+          <div className="mt-6 space-y-3">
+            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-2">
+              <span className="w-3 h-px bg-border inline-block" />
+              VTEX Developer References
+              <span className="w-3 h-px bg-border inline-block" />
+            </h3>
+            <div className="grid sm:grid-cols-2 gap-2">
+              {[
+                {
+                  title: 'ERP Integration Guide',
+                  desc: 'Official end-to-end guide for setting up Feed/Hook order integration',
+                  url: 'https://developers.vtex.com/docs/guides/erp-integration-set-up-order-integration',
+                },
+                {
+                  title: 'Order Processing Guide',
+                  desc: 'How to process orders in the ERP after receiving events from VTEX',
+                  url: 'https://developers.vtex.com/docs/guides/erp-integration-set-up-order-processing',
+                },
+                {
+                  title: 'Orders API Reference',
+                  desc: 'Full VTEX OMS REST API — Get Order, Start Handling, Cancel, Feed, Hook',
+                  url: 'https://developers.vtex.com/docs/api-reference/orders-api',
+                },
+                {
+                  title: 'Invoice & Tracking Guide',
+                  desc: 'How to send fiscal invoice (nota fiscal) and add tracking after dispatch',
+                  url: 'https://developers.vtex.com/docs/guides/external-marketplace-integration-invoice-tracking',
+                },
+                {
+                  title: 'Feed v3 Configuration',
+                  desc: 'Set up and configure the VTEX Order Feed queue for your integration',
+                  url: 'https://developers.vtex.com/docs/guides/orders-feed',
+                },
+                {
+                  title: 'Order Flow & Statuses',
+                  desc: 'VTEX order lifecycle — status transitions, cancellation rules, terminal states',
+                  url: 'https://help.vtex.com/tracks/orders--2xkTisx4SXOWXQel8Jg8sa/4811ExCe3WrEiRMV3sy9n8',
+                },
+              ].map(({ title, desc, url }) => (
+                <a
+                  key={url}
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-start gap-3 px-4 py-3 rounded-lg border border-border bg-card hover:bg-muted/20 hover:border-[#F71963]/30 transition-colors group"
+                >
+                  <svg className="w-3.5 h-3.5 mt-0.5 shrink-0 text-[#F71963] opacity-70 group-hover:opacity-100 transition-opacity" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M2.5 7h9M8 3.5l3.5 3.5L8 10.5" />
+                  </svg>
+                  <div className="min-w-0">
+                    <div className="text-xs font-semibold text-foreground group-hover:text-[#F71963] transition-colors">{title}</div>
+                    <div className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">{desc}</div>
+                  </div>
+                  <svg className="w-3 h-3 mt-0.5 shrink-0 text-muted-foreground/40 group-hover:text-[#F71963]/60 transition-colors ml-auto" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M2.5 9.5l7-7M4 2.5h5.5v5.5" />
+                  </svg>
+                </a>
+              ))}
+            </div>
+          </div>
         </Section>
 
         {/* Data & Cleanup */}
