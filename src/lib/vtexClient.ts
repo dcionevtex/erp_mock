@@ -128,7 +128,10 @@ export function createVtexClient(
     }
 
     if (res.status === 204) return undefined as T;
-    return (await res.json()) as T;
+    // Some VTEX endpoints return 200 with an empty body — guard before parsing.
+    const text = await res.text();
+    if (!text.trim()) return undefined as T;
+    return JSON.parse(text) as T;
   }
 
   return {
