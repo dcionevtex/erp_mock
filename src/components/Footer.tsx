@@ -1,5 +1,65 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+
+function getNextSundayMidnightUTC(): Date {
+  const now = new Date();
+  const day = now.getUTCDay(); // 0 = Sunday
+  const daysUntilSunday = day === 0 ? 7 : 7 - day;
+  const next = new Date(Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth(),
+    now.getUTCDate() + daysUntilSunday,
+    0, 0, 0, 0,
+  ));
+  return next;
+}
+
+function formatCountdown(ms: number): string {
+  if (ms <= 0) return '00:00:00';
+  const totalSeconds = Math.floor(ms / 1000);
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  const hh = String(hours).padStart(2, '0');
+  const mm = String(minutes).padStart(2, '0');
+  const ss = String(seconds).padStart(2, '0');
+  return days > 0 ? `${days}d ${hh}:${mm}:${ss}` : `${hh}:${mm}:${ss}`;
+}
+
+function PurgeCountdown() {
+  const [remaining, setRemaining] = useState<string | null>(null);
+
+  useEffect(() => {
+    function tick() {
+      const diff = getNextSundayMidnightUTC().getTime() - Date.now();
+      setRemaining(formatCountdown(diff));
+    }
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  if (remaining === null) return null;
+
+  return (
+    <div className="flex items-center gap-2">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#F71963" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+        <circle cx="6" cy="6" r="5" />
+        <path d="M6 3v3.5l2 1.5" />
+      </svg>
+      <span className="text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>
+        Next purge in{' '}
+        <span className="font-mono font-semibold tabular-nums" style={{ color: '#F71963' }}>
+          {remaining}
+        </span>
+        <span style={{ color: 'rgba(255,255,255,0.25)' }}> · every Sunday 00:00 UTC</span>
+      </span>
+    </div>
+  );
+}
+
 function BrazilianEngineeringLogo() {
   return (
     <div className="flex flex-col items-center select-none">
@@ -33,7 +93,7 @@ export function Footer() {
           <div className="md:col-span-2 space-y-2">
             <div className="flex items-center gap-2 mb-3">
               <span className="text-base font-black tracking-tighter" style={{ color: '#F71963' }}>VTEX</span>
-              <span className="text-sm font-semibold text-white">ERP Connect</span>
+              <span className="text-sm font-semibold text-white">A Simple ERP Simulator</span>
               <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: 'rgba(247,25,99,0.15)', color: '#F71963' }}>
                 Demo
               </span>
@@ -62,6 +122,7 @@ export function Footer() {
               <p className="text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>
                 All orders and event logs are <strong style={{ color: 'rgba(255,255,255,0.65)' }}>auto-purged every Sunday</strong> at midnight UTC to keep the demo environment clean.
               </p>
+              <PurgeCountdown />
               <p className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
                 Account credentials are retained so hook routing continues to work after each purge.
               </p>
