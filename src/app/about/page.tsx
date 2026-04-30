@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Footer } from '@/components/Footer';
+import { AccordionSection } from '@/components/AccordionSection';
 
 export const metadata = {
   title: 'About — VTEX A Simple ERP Simulator',
@@ -102,7 +103,7 @@ export default function AboutPage() {
         </div>
 
         {/* What it does */}
-        <Section title="What It Does">
+        <AccordionSection title="What It Does">
           <p className="text-sm text-muted-foreground leading-relaxed mb-4">
             A Simple ERP Simulator simulates the external ERP side of a VTEX order integration. When an order is placed in VTEX, this app receives the event (via Hook or Feed), fetches the full order from VTEX OMS, normalizes it into an ERP payload, simulates ERP acceptance, and calls VTEX Start Handling to confirm the handoff.
           </p>
@@ -123,10 +124,10 @@ export default function AboutPage() {
               description="Every processed order lands in a unified inbox with status tracking, processing timeline, payload viewer, invoice flow, shipping label, and manual actions."
             />
           </div>
-        </Section>
+        </AccordionSection>
 
         {/* Integration flows */}
-        <Section title="Integration Flows">
+        <AccordionSection title="Integration Flows">
           <div className="space-y-6">
             <div>
               <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Hook Flow</h3>
@@ -163,10 +164,10 @@ export default function AboutPage() {
               <p className="text-xs text-muted-foreground mt-2">Once an invoice is sent the order becomes non-cancellable in VTEX.</p>
             </div>
           </div>
-        </Section>
+        </AccordionSection>
 
         {/* Access */}
-        <Section title="Access &amp; Login">
+        <AccordionSection title="Access &amp; Login">
           <p className="text-sm text-muted-foreground leading-relaxed">
             The app is protected by a shared demo password set via the <code className="font-mono text-xs bg-muted px-1 rounded">DEMO_PASSWORD</code> environment variable (defaults to <code className="font-mono text-xs bg-muted px-1 rounded">vtex2024</code> if not set). On first visit, users are redirected to the login page where they must:
           </p>
@@ -177,10 +178,10 @@ export default function AboutPage() {
           <p className="text-xs text-muted-foreground mt-3">
             Credentials (VTEX App Key / App Token) are stored in an encrypted HttpOnly session cookie isolated to each browser session — one session cannot see another&apos;s credentials. Sign out destroys the cookie immediately.
           </p>
-        </Section>
+        </AccordionSection>
 
         {/* Configuration */}
-        <Section title="Configuration">
+        <AccordionSection title="Configuration">
           <p className="text-sm text-muted-foreground leading-relaxed mb-4">
             Open the Configuration panel on the main console. All fields are optional if the equivalent environment variables are set.
           </p>
@@ -219,10 +220,10 @@ export default function AboutPage() {
           <p className="text-xs text-muted-foreground mt-3">
             Credentials are stored in an encrypted HttpOnly session cookie — one set per browser session. The hook endpoint resolves credentials from the per-account registry via <code className="font-mono">?account=</code> in the URL, so each VTEX account has its own isolated hook.
           </p>
-        </Section>
+        </AccordionSection>
 
         {/* Order status reference */}
-        <Section title="Order Status Reference">
+        <AccordionSection title="Order Status Reference">
           <div className="rounded-lg border border-border overflow-hidden">
             <table className="w-full text-xs">
               <thead className="bg-muted/40">
@@ -255,10 +256,10 @@ export default function AboutPage() {
               </tbody>
             </table>
           </div>
-        </Section>
+        </AccordionSection>
 
         {/* API Reference */}
-        <Section title="API Reference">
+        <AccordionSection title="API Reference">
           <div className="space-y-2">
             {[
               { method: 'POST', path: '/api/vtex/hook', desc: 'Receive a VTEX order event — runs the full pipeline' },
@@ -357,10 +358,10 @@ export default function AboutPage() {
               ))}
             </div>
           </div>
-        </Section>
+        </AccordionSection>
 
         {/* Data & Cleanup */}
-        <Section title="Data &amp; Cleanup">
+        <AccordionSection title="Data &amp; Cleanup">
           <div className="grid sm:grid-cols-2 gap-4">
             <div className="rounded-lg border border-border bg-card px-5 py-4 space-y-2">
               <div className="flex items-center gap-2">
@@ -398,10 +399,10 @@ export default function AboutPage() {
               </p>
             </div>
           </div>
-        </Section>
+        </AccordionSection>
 
         {/* Tech Stack */}
-        <Section title="Tech Stack">
+        <AccordionSection title="Tech Stack">
           <div className="grid sm:grid-cols-2 gap-3">
             {[
               { name: 'Next.js 16', role: 'App framework — App Router, serverless API routes' },
@@ -421,7 +422,7 @@ export default function AboutPage() {
               </div>
             ))}
           </div>
-        </Section>
+        </AccordionSection>
 
         {/* Built by */}
         <div className="rounded-xl border border-border bg-card px-6 py-5 flex items-center justify-between gap-4 flex-wrap">
@@ -458,17 +459,6 @@ export default function AboutPage() {
 
 /* ─── Local components ─────────────────────────────────────────── */
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <section className="space-y-4">
-      <h2 className="text-base font-semibold text-foreground flex items-center gap-3">
-        <span className="w-1 h-5 rounded-full shrink-0" style={{ background: '#F71963' }} />
-        {title}
-      </h2>
-      {children}
-    </section>
-  );
-}
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
