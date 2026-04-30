@@ -127,6 +127,78 @@
 - [ ] `BL-002` **Poll Feed modal with live status**
   When the user clicks "Poll Feed Now", open a modal showing real-time progress of the polling run — items found, each orderId being processed, ERP result, Start Handling result, and a final summary (processed / skipped / errors). Modal closes manually or auto-closes on success.
 
+## Hook & Feed Configuration
+
+- [ ] `BL-011` **In-app Hook and Feed configuration editor**
+
+  Allow operators to read and write their VTEX Hook and Feed configurations directly from the dashboard, using the credentials already saved for their account.
+
+  ### Hook Configuration
+
+  VTEX endpoints (use saved account + environment):
+  ```
+  GET  https://{account}.{environment}/api/orders/hook/config
+  POST https://{account}.{environment}/api/orders/hook/config
+  ```
+
+  **Server-side proxy routes** (so credentials never go to the browser):
+  - `GET  /api/vtex/config/hook` — fetches current hook config from VTEX, returns JSON
+  - `POST /api/vtex/config/hook` — sends updated config to VTEX, returns VTEX response
+
+  **UI panel** inside the Config tab (or a new "Integration Setup" tab):
+  - "Load Current Hook Config" button → calls GET proxy → populates a textarea / JSON editor
+  - Editable JSON textarea (pre-populated with current config)
+  - "Save Hook Config" button → calls POST proxy with edited payload
+  - Response area shows VTEX API response (success or error message)
+  - Typical hook payload shape:
+    ```json
+    {
+      "filter": {
+        "type": "FromWorkflow",
+        "status": ["order-completed", "on-order-completed"]
+      },
+      "hook": {
+        "headers": { "key": "value" },
+        "url": "https://your-app.vercel.app/api/vtex/hook?account=myaccount"
+      }
+    }
+    ```
+
+  ### Feed Configuration
+
+  VTEX endpoints:
+  ```
+  GET  https://{account}.{environment}/api/orders/feed/config
+  POST https://{account}.{environment}/api/orders/feed/config
+  ```
+
+  **Server-side proxy routes**:
+  - `GET  /api/vtex/config/feed` — fetches current feed config from VTEX
+  - `POST /api/vtex/config/feed` — saves updated feed config to VTEX
+
+  **UI panel** (same tab/section as hook config):
+  - Same pattern: Load → Edit JSON → Save → Show response
+  - Typical feed payload shape:
+    ```json
+    {
+      "filter": {
+        "type": "FromWorkflow",
+        "status": ["order-completed"]
+      },
+      "queue": {
+        "visibilityTimeoutInSeconds": 240,
+        "messageRetentionPeriodInSeconds": 345600
+      }
+    }
+    ```
+
+  ### Implementation notes
+  - Both panels use the per-account credentials from the registry (`buildConfigForAccount`)
+  - Auto-populate the `hook.url` field with the correct `?account=` URL from the current session
+  - Show a disclaimer: "Saving will overwrite the current VTEX configuration for this account"
+  - Validate JSON before sending (catch `JSON.parse` errors client-side)
+  - VTEX returns `204 No Content` on success for POST — show a success toast accordingly
+
 ## Configuration Panel
 
 - [x] `BL-005` **Persist configuration across Vercel cold starts using an encrypted cookie**
