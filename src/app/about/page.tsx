@@ -401,6 +401,64 @@ export default function AboutPage() {
           </div>
         </AccordionSection>
 
+        {/* Known Issues */}
+        <AccordionSection title="Known Issues &amp; Limitations">
+          <div className="space-y-3">
+            {[
+              {
+                tag: 'HOOK',
+                title: 'Same order processed twice (VTEX hook retry)',
+                body: `VTEX expects the hook endpoint to respond 200 within ~3 seconds. Earlier versions of this app processed orders synchronously inside the request (Get Order + ERP simulation + Start Handling could take 3–8 s), causing VTEX to time out and re-deliver the event. The app now responds 200 immediately and processes the order in the background. An in-flight dedup lock prevents concurrent runs for the same order. `,
+                fix: 'Fixed in current version — hook now acks immediately and processes async.',
+                fixed: true,
+              },
+              {
+                tag: 'FEED',
+                title: 'Feed polling is manual only',
+                body: 'The app does not poll VTEX Feed automatically. The operator must click "Poll Feed Now". A Vercel Cron-based background poller is listed in the v0 improvement backlog.',
+                fix: 'Workaround: poll manually or set up an external cron to call POST /api/vtex/feed/poll.',
+                fixed: false,
+              },
+              {
+                tag: 'AUTH',
+                title: 'Shared demo password — not production-grade',
+                body: 'Access is controlled by a single shared password (DEMO_PASSWORD env var). There is no per-user authentication, session expiry, or rate limiting on the login endpoint.',
+                fix: 'Acceptable for demo use. Replace with OAuth or an identity provider before any production deployment.',
+                fixed: false,
+              },
+              {
+                tag: 'STORAGE',
+                title: 'In-memory fallback loses data on cold start',
+                body: 'When DATABASE_URL is not set, orders and events are stored in-memory and lost when the Vercel function cold-starts. With Neon Postgres configured, data persists across restarts.',
+                fix: 'Set DATABASE_URL to a Neon (or compatible Postgres) connection string.',
+                fixed: false,
+              },
+            ].map(({ tag, title, body, fix, fixed }) => (
+              <div key={title} className={`rounded-lg border px-5 py-4 space-y-2 ${fixed ? 'border-green-200 bg-green-50/50 dark:border-green-900 dark:bg-green-950/20' : 'border-border bg-card'}`}>
+                <div className="flex items-start gap-3">
+                  <span className={`shrink-0 text-[10px] font-bold font-mono px-1.5 py-0.5 rounded mt-0.5 ${fixed ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400' : 'bg-muted text-muted-foreground'}`}>
+                    {tag}
+                  </span>
+                  <div className="space-y-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm font-semibold text-foreground">{title}</span>
+                      {fixed && (
+                        <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400">
+                          ✓ Fixed
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{body}</p>
+                    <p className="text-xs leading-relaxed" style={{ color: fixed ? '#15803d' : undefined }}>
+                      <strong>{fixed ? 'Status:' : 'Workaround:'}</strong> {fix}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </AccordionSection>
+
         {/* Tech Stack */}
         <AccordionSection title="Tech Stack">
           <div className="grid sm:grid-cols-2 gap-3">

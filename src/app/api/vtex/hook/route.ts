@@ -6,7 +6,7 @@
 export const runtime = 'nodejs';
 
 import { getMissingCredentials, isHookSecretValid, buildServerConfig, buildConfigForAccount } from '@/lib/config';
-import { upsertOrder, getOrderByOrderId, appendEventLog, appendTimelineEntry, hasProcessedKey, markProcessedKey } from '@/lib/store';
+import { upsertOrder, getOrderByOrderId, appendEventLog, appendTimelineEntry, hasProcessedKey, markProcessedKey, clearProcessedKey } from '@/lib/store';
 import { createVtexClient } from '@/lib/vtexClient';
 import { extractOrderId, extractVtexStatus } from '@/lib/hookParser';
 import { processOrder } from '@/lib/orderProcessor';
@@ -115,17 +115,22 @@ export async function POST(request: Request): Promise<Response> {
     return Response.json({ received: true, orderId, skipped: 'already_handled' });
   }
 
-  // Dedup: mark orderId as in-flight before the delay so a second concurrent hook
-  // for the same order (VTEX delivers at-least-once) cannot race into processOrder.
+  // Dedup: mark orderId as in-flight so a concurrent retry from VTEX cannot race
+  // into processOrder while the first run is still executing.
   const processingKey = `hook-processing:${orderId}`;
   if (hasProcessedKey(processingKey)) {
     return Response.json({ received: true, orderId, skipped: 'already_processing' });
   }
   markProcessedKey(processingKey);
 
+  // Respond 200 immediately — VTEX requires a fast ack (< 3s) or it retries delivery.
+  // Processing runs in the background after the response is sent.
   const vtexClient = createVtexClient(cfg as Parameters<typeof createVtexClient>[0]);
-  await new Promise((r) => setTimeout(r, 5000));
-  await processOrder(orderId, 'HOOK', { vtexClient, config: cfg });
+  void processOrder(orderId, 'HOOK', { vtexClient, config: cfg }).finally(() => {
+    // Release the in-flight lock so VTEX retries can reprocess failed orders.
+    // Successfully handled orders are already guarded by the startHandlingStatus === 'SUCCESS' check above.
+    clearProcessedKey(processingKey);
+  });
 
-  return Response.json({ received: true, orderId });
+  return Response.json({ received: true, orderId, processing: 'async' });
 }

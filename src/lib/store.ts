@@ -200,6 +200,10 @@ export function markProcessedKey(key: string): void {
   }
 }
 
+export function clearProcessedKey(key: string): void {
+  processedKeys.delete(key);
+}
+
 // ---- In-memory config overrides (covered by iron-session cookie) ------------
 
 export function getConfigOverrides(): Partial<AppConfig> {
