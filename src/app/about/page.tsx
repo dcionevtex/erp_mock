@@ -220,6 +220,33 @@ export default function AboutPage() {
           <p className="text-xs text-muted-foreground mt-3">
             Credentials are stored in an encrypted HttpOnly session cookie — one set per browser session. The hook endpoint resolves credentials from the per-account registry via <code className="font-mono">?account=</code> in the URL, so each VTEX account has its own isolated hook.
           </p>
+
+          {/* Account mismatch guard */}
+          <div className="mt-4 rounded-lg border border-amber-300 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/20 overflow-hidden">
+            <div className="flex items-center gap-2 px-4 py-2.5 border-b border-amber-200 dark:border-amber-800 bg-amber-100/60 dark:bg-amber-900/20">
+              <svg className="w-3.5 h-3.5 text-amber-600 shrink-0" viewBox="0 0 16 16" fill="currentColor">
+                <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 10 5zm0 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" clipRule="evenodd" />
+              </svg>
+              <span className="text-xs font-bold text-amber-800 dark:text-amber-200 uppercase tracking-wide">Account Mismatch — VTEX API Actions Blocked</span>
+            </div>
+            <div className="px-4 py-3 space-y-2 text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
+              <p>
+                Your session holds credentials for <strong>one VTEX account at a time</strong>. When the console receives orders from multiple accounts (via Hook URL routing with <code className="font-mono text-[10px] bg-amber-100 dark:bg-amber-900/40 px-1 rounded">?account=</code>), each order is tagged with the account it came from.
+              </p>
+              <p>
+                If an order&apos;s account does not match the account in your current Configuration, the app will <strong>block all VTEX API actions</strong> for that order — Reprocess, Retry Start Handling, Send Invoice, and Cancel — and display a warning in the order detail modal.
+              </p>
+              <p>
+                <strong>Why:</strong> calling the VTEX API with credentials from the wrong account would result in authentication errors or, worse, silently affect the wrong account&apos;s data.
+              </p>
+              <p>
+                <strong>To act on an order from a different account:</strong> open Configuration, switch to the matching account credentials, then retry the action.
+              </p>
+              <p className="text-amber-600 dark:text-amber-400">
+                Actions that are ERP-only — <strong>Delete</strong>, <strong>Mark Resolved</strong>, <strong>Copy ERP payload</strong>, <strong>Copy VTEX payload</strong> — are never blocked, as they do not call the VTEX API.
+              </p>
+            </div>
+          </div>
         </AccordionSection>
 
         {/* Order status reference */}
