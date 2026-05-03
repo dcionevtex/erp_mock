@@ -249,6 +249,106 @@ export default function AboutPage() {
           </div>
         </AccordionSection>
 
+        {/* Hook & Feed payload reference */}
+        <AccordionSection title="Hook &amp; Feed — Recommended Payload">
+          <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+            Use the payloads below when registering your Hook URL or configuring the Feed queue in VTEX. The <code className="font-mono text-xs bg-muted px-1 rounded">status</code> filter tells VTEX which order lifecycle events to deliver.
+          </p>
+
+          <div className="grid sm:grid-cols-2 gap-4">
+            {/* Hook payload */}
+            <div className="rounded-lg border border-border overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-2.5 bg-muted/40 border-b border-border">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold font-mono px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-600">POST</span>
+                  <span className="text-xs font-semibold text-foreground">Hook Configuration</span>
+                </div>
+                <code className="text-[10px] font-mono text-muted-foreground">/api/orders/hook/config</code>
+              </div>
+              <pre className="text-[11px] font-mono leading-relaxed p-4 overflow-x-auto bg-muted/20">{`{
+  "filter": {
+    "type": "FromWorkflow",
+    "status": [
+      "ready-for-handling",
+      "handling",
+      "invoice",
+      "invoiced",
+      "cancel",
+      "canceled"
+    ]
+  },
+  "hook": {
+    "headers": {},
+    "url": "https://your-app.vercel.app
+      /api/vtex/hook?account=yourstore"
+  }
+}`}</pre>
+            </div>
+
+            {/* Feed payload */}
+            <div className="rounded-lg border border-border overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-2.5 bg-muted/40 border-b border-border">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold font-mono px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-600">POST</span>
+                  <span className="text-xs font-semibold text-foreground">Feed Configuration</span>
+                </div>
+                <code className="text-[10px] font-mono text-muted-foreground">/api/orders/feed/config</code>
+              </div>
+              <pre className="text-[11px] font-mono leading-relaxed p-4 overflow-x-auto bg-muted/20">{`{
+  "filter": {
+    "type": "FromWorkflow",
+    "status": [
+      "ready-for-handling",
+      "handling",
+      "invoice",
+      "invoiced",
+      "cancel",
+      "canceled"
+    ]
+  },
+  "queue": {
+    "visibilityTimeoutInSeconds": 240,
+    "messageRetentionPeriodInSeconds": 345600
+  }
+}`}</pre>
+            </div>
+          </div>
+
+          {/* Status explanation table */}
+          <div className="rounded-lg border border-border overflow-hidden mt-2">
+            <div className="px-4 py-2.5 bg-muted/40 border-b border-border">
+              <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Why these statuses?</span>
+            </div>
+            <table className="w-full text-xs">
+              <thead className="bg-muted/20">
+                <tr className="text-left text-muted-foreground uppercase tracking-wide text-[10px]">
+                  <th className="px-4 py-2 font-semibold">VTEX Status</th>
+                  <th className="px-4 py-2 font-semibold">What it means for the ERP</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/50">
+                {[
+                  ['ready-for-handling', 'Order approved and waiting for ERP to accept — the main trigger for Start Handling'],
+                  ['handling', 'ERP has called Start Handling — confirms the order is in processing'],
+                  ['invoice', 'VTEX is waiting for the fiscal invoice (nota fiscal) from the ERP'],
+                  ['invoiced', 'Invoice accepted — order is dispatched or in transit'],
+                  ['cancel', 'Cancellation requested — ERP should stop processing if possible'],
+                  ['canceled', 'Order fully cancelled — ERP should clean up any reservation'],
+                ].map(([status, meaning]) => (
+                  <tr key={status} className="hover:bg-muted/20 transition-colors">
+                    <td className="px-4 py-2.5 font-mono font-medium text-foreground">{status}</td>
+                    <td className="px-4 py-2.5 text-muted-foreground">{meaning}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <p className="text-xs text-muted-foreground mt-1">
+            These statuses are pre-loaded as defaults in the <strong>Setup → Hook &amp; Feed Configuration</strong> editor. The <code className="font-mono text-[10px] bg-muted px-1 rounded">visibilityTimeoutInSeconds</code> (240 s) gives the ERP 4 minutes to process each Feed message before it becomes visible again for retry.
+          </p>
+        </AccordionSection>
+
         {/* Order status reference */}
         <AccordionSection title="Order Status Reference">
           <div className="rounded-lg border border-border overflow-hidden">

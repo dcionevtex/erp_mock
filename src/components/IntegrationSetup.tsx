@@ -17,9 +17,18 @@ interface PanelState {
   responseOk: boolean;
 }
 
+const RECOMMENDED_STATUSES = [
+  'ready-for-handling',
+  'handling',
+  'invoice',
+  'invoiced',
+  'cancel',
+  'canceled',
+];
+
 const HOOK_TEMPLATE = JSON.stringify(
   {
-    filter: { type: 'FromWorkflow', status: ['order-completed', 'on-order-completed'] },
+    filter: { type: 'FromWorkflow', status: RECOMMENDED_STATUSES },
     hook: { headers: {}, url: '' },
   },
   null,
@@ -28,7 +37,7 @@ const HOOK_TEMPLATE = JSON.stringify(
 
 const FEED_TEMPLATE = JSON.stringify(
   {
-    filter: { type: 'FromWorkflow', status: ['order-completed'] },
+    filter: { type: 'FromWorkflow', status: RECOMMENDED_STATUSES },
     queue: { visibilityTimeoutInSeconds: 240, messageRetentionPeriodInSeconds: 345600 },
   },
   null,
@@ -203,7 +212,7 @@ export function IntegrationSetup({ config }: Props) {
   -H "X-VTEX-API-AppKey: {appKey}" \\
   -H "X-VTEX-API-AppToken: {appToken}" \\
   -H "Content-Type: application/json" \\
-  -d '{"filter":{"type":"FromWorkflow","status":["order-completed"]},"hook":{"headers":{},"url":"${hookUrl}"}}'`}
+  -d '{"filter":{"type":"FromWorkflow","status":["ready-for-handling","handling","invoice","invoiced","cancel","canceled"]},"hook":{"headers":{},"url":"${hookUrl}"}}'`}
         />
 
         <ConfigPanel
@@ -220,7 +229,7 @@ export function IntegrationSetup({ config }: Props) {
   -H "X-VTEX-API-AppKey: {appKey}" \\
   -H "X-VTEX-API-AppToken: {appToken}" \\
   -H "Content-Type: application/json" \\
-  -d '{"filter":{"type":"FromWorkflow","status":["order-completed"]},"queue":{"visibilityTimeoutInSeconds":240,"messageRetentionPeriodInSeconds":345600}}'`}
+  -d '{"filter":{"type":"FromWorkflow","status":["ready-for-handling","handling","invoice","invoiced","cancel","canceled"]},"queue":{"visibilityTimeoutInSeconds":240,"messageRetentionPeriodInSeconds":345600}}'`}
         />
       </div>
     </div>
