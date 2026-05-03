@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { StatusBadge } from './StatusBadge';
 import { ShippingLabel } from './ShippingLabel';
 import { cn } from '@/lib/utils';
@@ -14,29 +15,7 @@ interface OrderRowProps {
 }
 
 export function OrderRow({ order, onAction }: OrderRowProps) {
-  const [open, setOpen] = useState(false);
-  const [trackingFormOpen, setTrackingFormOpen] = useState(false);
-  const [trackingForm, setTrackingForm] = useState({ courier: '', trackingNumber: '', trackingUrl: '' });
-  const [trackingSubmitting, setTrackingSubmitting] = useState(false);
-
-  async function handleUpdateTracking(e: React.FormEvent) {
-    e.preventDefault();
-    e.stopPropagation();
-    setTrackingSubmitting(true);
-    try {
-      await fetch(`/api/erp/orders/${encodeURIComponent(order.orderId)}/update-tracking`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(trackingForm),
-      });
-      setTrackingFormOpen(false);
-      onAction('refresh', order.orderId);
-    } finally {
-      setTrackingSubmitting(false);
-    }
-  }
-
-  const isCancelled = order.erpStatus === 'CANCELLED';
+  const [modalOpen, setModalOpen] = useState(false);
 
   function fmt(iso?: string) {
     if (!iso) return '—';
@@ -53,11 +32,8 @@ export function OrderRow({ order, onAction }: OrderRowProps) {
   return (
     <>
       <tr
-        className={cn(
-          'border-b border-border text-sm cursor-pointer hover:bg-muted/40 transition-colors',
-          open && 'bg-muted/30',
-        )}
-        onClick={() => setOpen((v) => !v)}
+        className="border-b border-border text-sm cursor-pointer hover:bg-muted/40 transition-colors"
+        onClick={() => setModalOpen(true)}
       >
         <td className="px-3 py-2 whitespace-nowrap"><StatusBadge status={order.erpStatus} /></td>
         <td className="px-3 py-2 text-xs font-medium text-muted-foreground whitespace-nowrap">{order.account ?? '—'}</td>
@@ -83,356 +59,382 @@ export function OrderRow({ order, onAction }: OrderRowProps) {
         <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">{fmt(order.receivedAt)}</td>
         <td className="px-3 py-2 text-xs text-center">{order.attempts}</td>
         <td className="px-3 py-2 text-xs text-destructive max-w-[140px] truncate" title={order.errorMessage}>{order.errorMessage ?? '—'}</td>
-        <td className="px-3 py-2 text-xs text-center text-muted-foreground">
-          <Chevron open={open} />
+        <td className="px-3 py-2 text-center">
+          {/* open icon */}
+          <svg className="w-3.5 h-3.5 text-muted-foreground inline-block" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M6 2H3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V8M9 2h3v3M6 8l5-5" />
+          </svg>
         </td>
       </tr>
 
-      {open && (
-        <tr>
-          <td colSpan={18} className="border-b border-border bg-muted/10">
-            <div className="px-5 py-5 space-y-3 max-w-6xl">
-
-              {/* Row 1: Summary + Timeline */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-
-                {/* Order Summary */}
-                <InfoCard title="Order Summary" className="lg:col-span-2">
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-4">
-                    <Field label="Account" value={order.account} mono />
-                    <Field label="Order ID" value={order.orderId} mono />
-                    <Field label="Sequence" value={order.sequence} />
-                    <Field label="Customer" value={order.customerName} />
-                    <Field label="Email" value={order.customerEmailMasked} />
-                    <Field label="Total" value={fmtCurrency(order.totalValue)} />
-                    <Field label="Payment" value={order.paymentSummary} />
-                    <Field label="Shipping" value={order.shippingSummary} />
-                    <div className="flex flex-col gap-1">
-                      <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide">ERP Status</span>
-                      <StatusBadge status={order.erpStatus} />
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide">SH Status</span>
-                      <StatusBadge status={order.startHandlingStatus} />
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide">Invoice</span>
-                      <StatusBadge status={order.invoiceStatus} />
-                    </div>
-                  </div>
-                  {order.errorMessage && (
-                    <div className="mt-4 flex items-start gap-2 rounded-md border border-destructive/20 bg-destructive/5 px-3 py-2">
-                      <svg className="w-3.5 h-3.5 text-destructive mt-0.5 shrink-0" viewBox="0 0 16 16" fill="currentColor">
-                        <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm.75 3.5v4a.75.75 0 0 1-1.5 0v-4a.75.75 0 0 1 1.5 0zm0 6.5a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0z"/>
-                      </svg>
-                      <span className="text-xs text-destructive leading-relaxed">{order.errorMessage}</span>
-                    </div>
-                  )}
-                </InfoCard>
-
-                {/* Processing Timeline */}
-                <InfoCard title="Processing Timeline">
-                  {order.timeline.length === 0 ? (
-                    <p className="text-xs text-muted-foreground py-6 text-center">No entries yet.</p>
-                  ) : (
-                    <ol className="relative space-y-0">
-                      {order.timeline.map((entry, i) => (
-                        <TimelineEntry key={i} entry={entry} last={i === order.timeline.length - 1} />
-                      ))}
-                    </ol>
-                  )}
-                </InfoCard>
-              </div>
-
-              {/* Row 2: Order Items */}
-              {order.erpPayload?.items && order.erpPayload.items.length > 0 && (
-                <InfoCard title="Order Items">
-                  <table className="w-full text-xs">
-                    <thead>
-                      <tr className="text-left border-b border-border">
-                        <th className="pb-2 pr-3 font-semibold text-muted-foreground uppercase tracking-wide text-[10px] w-10"></th>
-                        <th className="pb-2 pr-4 font-semibold text-muted-foreground uppercase tracking-wide text-[10px]">SKU</th>
-                        <th className="pb-2 pr-4 font-semibold text-muted-foreground uppercase tracking-wide text-[10px]">Product ID</th>
-                        <th className="pb-2 pr-4 font-semibold text-muted-foreground uppercase tracking-wide text-[10px]">Name</th>
-                        <th className="pb-2 pr-4 font-semibold text-muted-foreground uppercase tracking-wide text-[10px] text-right">Qty</th>
-                        <th className="pb-2 pr-4 font-semibold text-muted-foreground uppercase tracking-wide text-[10px] text-right">Unit Price</th>
-                        <th className="pb-2 pr-4 font-semibold text-muted-foreground uppercase tracking-wide text-[10px] text-right">Selling Price</th>
-                        <th className="pb-2 font-semibold text-muted-foreground uppercase tracking-wide text-[10px] text-right">Total</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {order.erpPayload.items.map((item, i) => (
-                        <tr key={i} className="border-b border-border/40 last:border-0 hover:bg-muted/30 transition-colors">
-                          <td className="py-2 pr-3">
-                            {item.imageUrl ? (
-                              <div className="w-8 h-8 rounded-md overflow-hidden border border-border bg-muted shrink-0">
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img
-                                  src={item.imageUrl}
-                                  alt={item.name ?? ''}
-                                  width={32}
-                                  height={32}
-                                  className="w-full h-full object-cover"
-                                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
-                                />
-                              </div>
-                            ) : (
-                              <div className="w-8 h-8 rounded-md border border-border bg-muted flex items-center justify-center shrink-0">
-                                <svg className="w-3.5 h-3.5 text-muted-foreground/40" viewBox="0 0 16 16" fill="currentColor">
-                                  <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
-                                  <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13zm0 1h13a.5.5 0 0 1 .5.5v6l-3.775-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12v.54A.505.505 0 0 1 1 12.5v-9a.5.5 0 0 1 .5-.5z"/>
-                                </svg>
-                              </div>
-                            )}
-                          </td>
-                          <td className="py-2 pr-4 font-mono text-foreground">{item.skuId ?? '—'}</td>
-                          <td className="py-2 pr-4 font-mono text-muted-foreground">{item.productId ?? '—'}</td>
-                          <td className="py-2 pr-4 text-foreground font-medium">{item.name ?? '—'}</td>
-                          <td className="py-2 pr-4 text-right tabular-nums">{item.quantity ?? '—'}</td>
-                          <td className="py-2 pr-4 text-right tabular-nums text-muted-foreground">{fmtCurrency(item.price)}</td>
-                          <td className="py-2 pr-4 text-right tabular-nums text-muted-foreground">{fmtCurrency(item.sellingPrice)}</td>
-                          <td className="py-2 text-right tabular-nums font-semibold">{fmtCurrency(item.total)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </InfoCard>
-              )}
-
-              {/* Row 2.5: Invoice Details — visible once Start Handling succeeded */}
-              {order.startHandlingStatus === 'SUCCESS' && (
-                <InfoCard title="Invoice (Nota Fiscal)">
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-8 gap-y-4">
-                      <div className="flex flex-col gap-1">
-                        <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide">Status</span>
-                        <StatusBadge status={order.invoiceStatus} />
-                      </div>
-                      <Field label="Invoice Number" value={order.invoiceNumber} mono />
-                      <Field label="Issued At" value={order.invoiceIssuedAt ? fmt(order.invoiceIssuedAt) : undefined} />
-                      {order.invoiceTracking?.trackingNumber && (
-                        <Field label="Tracking #" value={order.invoiceTracking.trackingNumber} mono />
-                      )}
-                      {order.invoiceTracking?.courier && (
-                        <Field label="Carrier" value={order.invoiceTracking.courier} />
-                      )}
-                      {order.invoiceTracking?.trackingUrl && (
-                        <div className="flex flex-col gap-0.5 min-w-0">
-                          <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Tracking URL</span>
-                          <a
-                            href={order.invoiceTracking.trackingUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs text-primary hover:underline truncate"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            {order.invoiceTracking.trackingUrl}
-                          </a>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Tracking update form */}
-                    {order.invoiceStatus === 'SUCCESS' && (
-                      <div className="border-t border-border pt-3">
-                        {!trackingFormOpen ? (
-                          <button
-                            type="button"
-                            onClick={(e) => { e.stopPropagation(); setTrackingFormOpen(true); }}
-                            className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
-                          >
-                            <svg className="w-3 h-3" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                              <path d="M7 2v10M2 7h10" />
-                            </svg>
-                            Update Tracking
-                          </button>
-                        ) : (
-                          <form onSubmit={handleUpdateTracking} onClick={(e) => e.stopPropagation()} className="space-y-3">
-                            <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide">Update Tracking Info</p>
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                              <div className="flex flex-col gap-1">
-                                <label className="text-[11px] text-muted-foreground">Carrier</label>
-                                <input
-                                  type="text"
-                                  placeholder="e.g. Correios"
-                                  value={trackingForm.courier}
-                                  onChange={(e) => setTrackingForm((f) => ({ ...f, courier: e.target.value }))}
-                                  className="rounded border border-input bg-background px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
-                                />
-                              </div>
-                              <div className="flex flex-col gap-1">
-                                <label className="text-[11px] text-muted-foreground">Tracking Number</label>
-                                <input
-                                  type="text"
-                                  placeholder="e.g. BR123456789BR"
-                                  value={trackingForm.trackingNumber}
-                                  onChange={(e) => setTrackingForm((f) => ({ ...f, trackingNumber: e.target.value }))}
-                                  className="rounded border border-input bg-background px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
-                                />
-                              </div>
-                              <div className="flex flex-col gap-1">
-                                <label className="text-[11px] text-muted-foreground">Tracking URL (optional)</label>
-                                <input
-                                  type="url"
-                                  placeholder="https://..."
-                                  value={trackingForm.trackingUrl}
-                                  onChange={(e) => setTrackingForm((f) => ({ ...f, trackingUrl: e.target.value }))}
-                                  className="rounded border border-input bg-background px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
-                                />
-                              </div>
-                            </div>
-                            <div className="flex gap-2">
-                              <button
-                                type="submit"
-                                disabled={trackingSubmitting}
-                                className="px-3 py-1.5 text-xs font-medium rounded-md border-transparent bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors"
-                              >
-                                {trackingSubmitting ? 'Saving…' : 'Save Tracking'}
-                              </button>
-                              <button
-                                type="button"
-                                onClick={(e) => { e.stopPropagation(); setTrackingFormOpen(false); }}
-                                className="px-3 py-1.5 text-xs font-medium rounded-md border border-border hover:bg-muted transition-colors"
-                              >
-                                Cancel
-                              </button>
-                            </div>
-                          </form>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </InfoCard>
-              )}
-
-              {/* Row 3: Shipping Details + Payment + Shipping Label */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {order.erpPayload?.logisticsInfo != null && (
-                  <CollapsibleCard title="Shipping Details">
-                    <JsonViewer data={order.erpPayload.logisticsInfo} maxHeight="max-h-56" />
-                  </CollapsibleCard>
-                )}
-
-                {order.erpPayload?.paymentSummary && (
-                  <CollapsibleCard title="Payment Details">
-                    <div className="space-y-3 py-1">
-                      <Field label="Method" value={order.erpPayload.paymentSummary} />
-                      <Field label="Total charged" value={fmtCurrency(order.totalValue)} />
-                    </div>
-                  </CollapsibleCard>
-                )}
-
-                <CollapsibleCard title="Shipping Label">
-                  <div className="flex justify-center py-2" onClick={(e) => e.stopPropagation()}>
-                    <ShippingLabel order={order} />
-                  </div>
-                </CollapsibleCard>
-              </div>
-
-              {/* Row 4: JSON payloads side by side */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {order.erpPayload && (
-                  <CollapsibleCard title="ERP Normalized Payload" tag="JSON">
-                    <JsonViewer data={order.erpPayload} maxHeight="max-h-72" />
-                  </CollapsibleCard>
-                )}
-                {order.vtexOrderRaw != null && (
-                  <CollapsibleCard title="Raw VTEX Payload" tag="JSON">
-                    <JsonViewer data={order.vtexOrderRaw} maxHeight="max-h-72" />
-                  </CollapsibleCard>
-                )}
-              </div>
-
-              {/* Actions */}
-              <div className="rounded-lg border border-border bg-card px-4 py-3 flex flex-wrap gap-2" onClick={(e) => e.stopPropagation()}>
-                {isCancelled ? (
-                  /* Cancelled orders: only Delete is meaningful */
-                  <ActionBtn variant="danger" onClick={() => onAction('delete', order.orderId)}>
-                    <BtnIcon d="M3 6h10M8 6V4M5 6l.5 8h5l.5-8" />
-                    Delete Order
-                  </ActionBtn>
-                ) : (
-                  <>
-                    <ActionBtn onClick={() => onAction('reprocess', order.orderId)}>
-                      <BtnIcon d="M4 4v3h3M12 12v-3h-3M3.5 7a5.5 5.5 0 1 1 .7 4" />
-                      Reprocess
-                    </ActionBtn>
-                    <ActionBtn
-                      onClick={() => onAction('retry-start-handling', order.orderId)}
-                      disabled={order.startHandlingStatus === 'SUCCESS'}
-                    >
-                      <BtnIcon d="M5 12h7M9 8l4 4-4 4" />
-                      Retry Start Handling
-                    </ActionBtn>
-                    <ActionBtn
-                      onClick={() => onAction('send-invoice', order.orderId)}
-                      disabled={order.startHandlingStatus !== 'SUCCESS' || order.invoiceStatus === 'SUCCESS'}
-                    >
-                      <BtnIcon d="M2 4h10v6H2zM5 10v2m4-2v2M1 12h10" />
-                      {order.invoiceStatus === 'ERROR' ? 'Retry Invoice' : 'Send Invoice'}
-                    </ActionBtn>
-                    <ActionBtn onClick={() => onAction('resolve', order.orderId)}>
-                      <BtnIcon d="M4 8l3 3 5-5" />
-                      Mark Resolved
-                    </ActionBtn>
-                    <div className="w-px self-stretch bg-border mx-1" />
-                    <ActionBtn
-                      variant="ghost"
-                      onClick={() => {
-                        if (order.erpPayload) navigator.clipboard.writeText(JSON.stringify(order.erpPayload, null, 2)).catch(() => {});
-                      }}
-                    >
-                      <BtnIcon d="M8 4H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-2M8 4h6l2 2v4M8 4v4h6" />
-                      Copy ERP
-                    </ActionBtn>
-                    <ActionBtn
-                      variant="ghost"
-                      onClick={() => {
-                        if (order.vtexOrderRaw != null) navigator.clipboard.writeText(JSON.stringify(order.vtexOrderRaw, null, 2)).catch(() => {});
-                      }}
-                    >
-                      <BtnIcon d="M8 4H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-2M8 4h6l2 2v4M8 4v4h6" />
-                      Copy VTEX
-                    </ActionBtn>
-                    <div className="flex-1" />
-                    {order.invoiceStatus === 'SUCCESS' ? (
-                      <span title="Order cannot be cancelled after invoice is sent">
-                        <ActionBtn variant="danger" onClick={() => {}} disabled>
-                          Cancel
-                        </ActionBtn>
-                      </span>
-                    ) : (
-                      <ActionBtn variant="danger" onClick={() => onAction('cancel', order.orderId)}>
-                        Cancel
-                      </ActionBtn>
-                    )}
-                    <ActionBtn variant="danger" onClick={() => onAction('delete', order.orderId)}>
-                      Delete
-                    </ActionBtn>
-                  </>
-                )}
-              </div>
-
-            </div>
-          </td>
-        </tr>
+      {modalOpen && (
+        <OrderDetailModal
+          order={order}
+          onClose={() => setModalOpen(false)}
+          onAction={(action, orderId) => {
+            if (action === 'delete') setModalOpen(false);
+            onAction(action, orderId);
+          }}
+        />
       )}
     </>
   );
 }
 
-/* ─── Sub-components ──────────────────────────────────────────── */
+/* ─── Modal ───────────────────────────────────────────────────── */
 
-function Chevron({ open, className }: { open: boolean; className?: string }) {
-  return (
-    <svg
-      className={cn('w-3.5 h-3.5 text-muted-foreground transition-transform duration-150', open && 'rotate-180', className)}
-      viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+function OrderDetailModal({
+  order,
+  onClose,
+  onAction,
+}: {
+  order: ErpOrderRecord;
+  onClose: () => void;
+  onAction: (action: ActionType, orderId: string) => void;
+}) {
+  const [trackingFormOpen, setTrackingFormOpen] = useState(false);
+  const [trackingForm, setTrackingForm] = useState({ courier: '', trackingNumber: '', trackingUrl: '' });
+  const [trackingSubmitting, setTrackingSubmitting] = useState(false);
+
+  const isCancelled = order.erpStatus === 'CANCELLED';
+
+  // Close on Escape
+  const handleKey = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') onClose();
+  }, [onClose]);
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKey);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', handleKey);
+      document.body.style.overflow = '';
+    };
+  }, [handleKey]);
+
+  async function handleUpdateTracking(e: React.FormEvent) {
+    e.preventDefault();
+    setTrackingSubmitting(true);
+    try {
+      await fetch(`/api/erp/orders/${encodeURIComponent(order.orderId)}/update-tracking`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(trackingForm),
+      });
+      setTrackingFormOpen(false);
+      onAction('refresh', order.orderId);
+    } finally {
+      setTrackingSubmitting(false);
+    }
+  }
+
+  function fmt(iso?: string) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  function fmtCurrency(val?: number) {
+    if (val == null) return '—';
+    return `R$ ${(val / 100).toFixed(2)}`;
+  }
+
+  const modal = (
+    /* Backdrop */
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: 'rgba(0,0,0,0.55)' }}
+      onClick={onClose}
     >
-      <path d="M3 5l4 4 4-4" />
-    </svg>
+      {/* Panel */}
+      <div
+        className="relative w-full max-w-5xl max-h-[92vh] flex flex-col rounded-2xl overflow-hidden shadow-2xl border border-border"
+        style={{ background: 'var(--background)' }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Modal header */}
+        <div
+          className="flex items-center justify-between gap-4 px-6 py-4 shrink-0 border-b border-border"
+          style={{ background: '#142032' }}
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="text-xs font-black tracking-tighter" style={{ color: '#F71963' }}>VTEX</span>
+            <span className="text-white/20 font-thin">|</span>
+            <span className="font-mono text-sm font-semibold text-white truncate">{order.orderId}</span>
+            {order.sequence && (
+              <span className="text-xs text-white/40 hidden sm:inline">#{order.sequence}</span>
+            )}
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <StatusBadge status={order.erpStatus} />
+            <StatusBadge status={order.startHandlingStatus} />
+            <button
+              type="button"
+              onClick={onClose}
+              className="ml-2 flex items-center justify-center w-7 h-7 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-colors"
+              aria-label="Close"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <path d="M3 3l10 10M13 3L3 13" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Scrollable body */}
+        <div className="overflow-y-auto flex-1 px-6 py-5 space-y-4">
+
+          {/* Row 1: Summary + Timeline */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <InfoCard title="Order Summary" className="lg:col-span-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-8 gap-y-4">
+                <Field label="Account" value={order.account} mono />
+                <Field label="Order ID" value={order.orderId} mono />
+                <Field label="Sequence" value={order.sequence} />
+                <Field label="Customer" value={order.customerName} />
+                <Field label="Email" value={order.customerEmailMasked} />
+                <Field label="Total" value={fmtCurrency(order.totalValue)} />
+                <Field label="Payment" value={order.paymentSummary} />
+                <Field label="Shipping" value={order.shippingSummary} />
+                <div className="flex flex-col gap-1">
+                  <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide">ERP Status</span>
+                  <StatusBadge status={order.erpStatus} />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide">SH Status</span>
+                  <StatusBadge status={order.startHandlingStatus} />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide">Invoice</span>
+                  <StatusBadge status={order.invoiceStatus} />
+                </div>
+              </div>
+              {order.errorMessage && (
+                <div className="mt-4 flex items-start gap-2 rounded-md border border-destructive/20 bg-destructive/5 px-3 py-2">
+                  <svg className="w-3.5 h-3.5 text-destructive mt-0.5 shrink-0" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm.75 3.5v4a.75.75 0 0 1-1.5 0v-4a.75.75 0 0 1 1.5 0zm0 6.5a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0z" />
+                  </svg>
+                  <span className="text-xs text-destructive leading-relaxed">{order.errorMessage}</span>
+                </div>
+              )}
+            </InfoCard>
+
+            <InfoCard title="Processing Timeline">
+              {order.timeline.length === 0 ? (
+                <p className="text-xs text-muted-foreground py-6 text-center">No entries yet.</p>
+              ) : (
+                <ol className="relative space-y-0">
+                  {order.timeline.map((entry, i) => (
+                    <TimelineEntry key={i} entry={entry} last={i === order.timeline.length - 1} />
+                  ))}
+                </ol>
+              )}
+            </InfoCard>
+          </div>
+
+          {/* Order Items */}
+          {order.erpPayload?.items && order.erpPayload.items.length > 0 && (
+            <InfoCard title="Order Items">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="text-left border-b border-border">
+                    <th className="pb-2 pr-3 font-semibold text-muted-foreground uppercase tracking-wide text-[10px] w-10" />
+                    <th className="pb-2 pr-4 font-semibold text-muted-foreground uppercase tracking-wide text-[10px]">SKU</th>
+                    <th className="pb-2 pr-4 font-semibold text-muted-foreground uppercase tracking-wide text-[10px]">Product ID</th>
+                    <th className="pb-2 pr-4 font-semibold text-muted-foreground uppercase tracking-wide text-[10px]">Name</th>
+                    <th className="pb-2 pr-4 font-semibold text-muted-foreground uppercase tracking-wide text-[10px] text-right">Qty</th>
+                    <th className="pb-2 pr-4 font-semibold text-muted-foreground uppercase tracking-wide text-[10px] text-right">Unit Price</th>
+                    <th className="pb-2 pr-4 font-semibold text-muted-foreground uppercase tracking-wide text-[10px] text-right">Selling Price</th>
+                    <th className="pb-2 font-semibold text-muted-foreground uppercase tracking-wide text-[10px] text-right">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {order.erpPayload.items.map((item, i) => (
+                    <tr key={i} className="border-b border-border/40 last:border-0 hover:bg-muted/30 transition-colors">
+                      <td className="py-2 pr-3">
+                        {item.imageUrl ? (
+                          <div className="w-8 h-8 rounded-md overflow-hidden border border-border bg-muted shrink-0">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={item.imageUrl} alt={item.name ?? ''} width={32} height={32} className="w-full h-full object-cover" onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
+                          </div>
+                        ) : (
+                          <div className="w-8 h-8 rounded-md border border-border bg-muted flex items-center justify-center shrink-0">
+                            <svg className="w-3.5 h-3.5 text-muted-foreground/40" viewBox="0 0 16 16" fill="currentColor">
+                              <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
+                              <path d="M1.5 2A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13zm0 1h13a.5.5 0 0 1 .5.5v6l-3.775-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12v.54A.505.505 0 0 1 1 12.5v-9a.5.5 0 0 1 .5-.5z" />
+                            </svg>
+                          </div>
+                        )}
+                      </td>
+                      <td className="py-2 pr-4 font-mono text-foreground">{item.skuId ?? '—'}</td>
+                      <td className="py-2 pr-4 font-mono text-muted-foreground">{item.productId ?? '—'}</td>
+                      <td className="py-2 pr-4 text-foreground font-medium">{item.name ?? '—'}</td>
+                      <td className="py-2 pr-4 text-right tabular-nums">{item.quantity ?? '—'}</td>
+                      <td className="py-2 pr-4 text-right tabular-nums text-muted-foreground">{fmtCurrency(item.price)}</td>
+                      <td className="py-2 pr-4 text-right tabular-nums text-muted-foreground">{fmtCurrency(item.sellingPrice)}</td>
+                      <td className="py-2 text-right tabular-nums font-semibold">{fmtCurrency(item.total)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </InfoCard>
+          )}
+
+          {/* Invoice Details */}
+          {order.startHandlingStatus === 'SUCCESS' && (
+            <InfoCard title="Invoice (Nota Fiscal)">
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-8 gap-y-4">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide">Status</span>
+                    <StatusBadge status={order.invoiceStatus} />
+                  </div>
+                  <Field label="Invoice Number" value={order.invoiceNumber} mono />
+                  <Field label="Issued At" value={order.invoiceIssuedAt ? fmt(order.invoiceIssuedAt) : undefined} />
+                  {order.invoiceTracking?.trackingNumber && <Field label="Tracking #" value={order.invoiceTracking.trackingNumber} mono />}
+                  {order.invoiceTracking?.courier && <Field label="Carrier" value={order.invoiceTracking.courier} />}
+                  {order.invoiceTracking?.trackingUrl && (
+                    <div className="flex flex-col gap-0.5 min-w-0">
+                      <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Tracking URL</span>
+                      <a href={order.invoiceTracking.trackingUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline truncate">
+                        {order.invoiceTracking.trackingUrl}
+                      </a>
+                    </div>
+                  )}
+                </div>
+                {order.invoiceStatus === 'SUCCESS' && (
+                  <div className="border-t border-border pt-3">
+                    {!trackingFormOpen ? (
+                      <button type="button" onClick={() => setTrackingFormOpen(true)} className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors">
+                        <svg className="w-3 h-3" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M7 2v10M2 7h10" /></svg>
+                        Update Tracking
+                      </button>
+                    ) : (
+                      <form onSubmit={handleUpdateTracking} className="space-y-3">
+                        <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide">Update Tracking Info</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[11px] text-muted-foreground">Carrier</label>
+                            <input type="text" placeholder="e.g. Correios" value={trackingForm.courier} onChange={(e) => setTrackingForm((f) => ({ ...f, courier: e.target.value }))} className="rounded border border-input bg-background px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring" />
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[11px] text-muted-foreground">Tracking Number</label>
+                            <input type="text" placeholder="e.g. BR123456789BR" value={trackingForm.trackingNumber} onChange={(e) => setTrackingForm((f) => ({ ...f, trackingNumber: e.target.value }))} className="rounded border border-input bg-background px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring" />
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[11px] text-muted-foreground">Tracking URL (optional)</label>
+                            <input type="url" placeholder="https://..." value={trackingForm.trackingUrl} onChange={(e) => setTrackingForm((f) => ({ ...f, trackingUrl: e.target.value }))} className="rounded border border-input bg-background px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring" />
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <button type="submit" disabled={trackingSubmitting} className="px-3 py-1.5 text-xs font-medium rounded-md bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors">
+                            {trackingSubmitting ? 'Saving…' : 'Save Tracking'}
+                          </button>
+                          <button type="button" onClick={() => setTrackingFormOpen(false)} className="px-3 py-1.5 text-xs font-medium rounded-md border border-border hover:bg-muted transition-colors">
+                            Cancel
+                          </button>
+                        </div>
+                      </form>
+                    )}
+                  </div>
+                )}
+              </div>
+            </InfoCard>
+          )}
+
+          {/* Shipping + Payment + Label */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {order.erpPayload?.logisticsInfo != null && (
+              <CollapsibleCard title="Shipping Details">
+                <JsonViewer data={order.erpPayload.logisticsInfo} maxHeight="max-h-56" />
+              </CollapsibleCard>
+            )}
+            {order.erpPayload?.paymentSummary && (
+              <CollapsibleCard title="Payment Details">
+                <div className="space-y-3 py-1">
+                  <Field label="Method" value={order.erpPayload.paymentSummary} />
+                  <Field label="Total charged" value={fmtCurrency(order.totalValue)} />
+                </div>
+              </CollapsibleCard>
+            )}
+            <CollapsibleCard title="Shipping Label">
+              <div className="flex justify-center py-2">
+                <ShippingLabel order={order} />
+              </div>
+            </CollapsibleCard>
+          </div>
+
+          {/* JSON payloads */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {order.erpPayload && (
+              <CollapsibleCard title="ERP Normalized Payload" tag="JSON">
+                <JsonViewer data={order.erpPayload} maxHeight="max-h-72" />
+              </CollapsibleCard>
+            )}
+            {order.vtexOrderRaw != null && (
+              <CollapsibleCard title="Raw VTEX Payload" tag="JSON">
+                <JsonViewer data={order.vtexOrderRaw} maxHeight="max-h-72" />
+              </CollapsibleCard>
+            )}
+          </div>
+
+          {/* Actions */}
+          <div className="rounded-lg border border-border bg-card px-4 py-3 flex flex-wrap gap-2">
+            {isCancelled ? (
+              <ActionBtn variant="danger" onClick={() => onAction('delete', order.orderId)}>
+                <BtnIcon d="M3 6h10M8 6V4M5 6l.5 8h5l.5-8" />
+                Delete Order
+              </ActionBtn>
+            ) : (
+              <>
+                <ActionBtn onClick={() => onAction('reprocess', order.orderId)}>
+                  <BtnIcon d="M4 4v3h3M12 12v-3h-3M3.5 7a5.5 5.5 0 1 1 .7 4" />
+                  Reprocess
+                </ActionBtn>
+                <ActionBtn onClick={() => onAction('retry-start-handling', order.orderId)} disabled={order.startHandlingStatus === 'SUCCESS'}>
+                  <BtnIcon d="M5 12h7M9 8l4 4-4 4" />
+                  Retry Start Handling
+                </ActionBtn>
+                <ActionBtn onClick={() => onAction('send-invoice', order.orderId)} disabled={order.startHandlingStatus !== 'SUCCESS' || order.invoiceStatus === 'SUCCESS'}>
+                  <BtnIcon d="M2 4h10v6H2zM5 10v2m4-2v2M1 12h10" />
+                  {order.invoiceStatus === 'ERROR' ? 'Retry Invoice' : 'Send Invoice'}
+                </ActionBtn>
+                <ActionBtn onClick={() => onAction('resolve', order.orderId)}>
+                  <BtnIcon d="M4 8l3 3 5-5" />
+                  Mark Resolved
+                </ActionBtn>
+                <div className="w-px self-stretch bg-border mx-1" />
+                <ActionBtn variant="ghost" onClick={() => { if (order.erpPayload) navigator.clipboard.writeText(JSON.stringify(order.erpPayload, null, 2)).catch(() => {}); }}>
+                  <BtnIcon d="M8 4H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-2M8 4h6l2 2v4M8 4v4h6" />
+                  Copy ERP
+                </ActionBtn>
+                <ActionBtn variant="ghost" onClick={() => { if (order.vtexOrderRaw != null) navigator.clipboard.writeText(JSON.stringify(order.vtexOrderRaw, null, 2)).catch(() => {}); }}>
+                  <BtnIcon d="M8 4H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2-2v-2M8 4h6l2 2v4M8 4v4h6" />
+                  Copy VTEX
+                </ActionBtn>
+                <div className="flex-1" />
+                {order.invoiceStatus === 'SUCCESS' ? (
+                  <span title="Order cannot be cancelled after invoice is sent">
+                    <ActionBtn variant="danger" onClick={() => {}} disabled>Cancel</ActionBtn>
+                  </span>
+                ) : (
+                  <ActionBtn variant="danger" onClick={() => onAction('cancel', order.orderId)}>Cancel</ActionBtn>
+                )}
+                <ActionBtn variant="danger" onClick={() => onAction('delete', order.orderId)}>Delete</ActionBtn>
+              </>
+            )}
+          </div>
+
+        </div>
+      </div>
+    </div>
   );
+
+  return createPortal(modal, document.body);
 }
+
+/* ─── Sub-components ──────────────────────────────────────────── */
 
 function InfoCard({ title, children, className }: { title: string; children: React.ReactNode; className?: string }) {
   return (
@@ -451,7 +453,7 @@ function CollapsibleCard({ title, tag, children }: { title: string; tag?: string
     <div className="rounded-lg border border-border bg-card overflow-hidden">
       <button
         type="button"
-        onClick={(e) => { e.stopPropagation(); setOpen((v) => !v); }}
+        onClick={() => setOpen((v) => !v)}
         className="w-full flex items-center justify-between px-4 py-2.5 bg-muted/30 border-b border-border hover:bg-muted/50 transition-colors text-left gap-2"
       >
         <div className="flex items-center gap-2">
@@ -462,7 +464,12 @@ function CollapsibleCard({ title, tag, children }: { title: string; tag?: string
             </span>
           )}
         </div>
-        <Chevron open={open} />
+        <svg
+          className={cn('w-3.5 h-3.5 text-muted-foreground transition-transform duration-150', open && 'rotate-180')}
+          viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+        >
+          <path d="M3 5l4 4 4-4" />
+        </svg>
       </button>
       {open && <div className="p-4">{children}</div>}
     </div>
@@ -499,9 +506,7 @@ function TimelineEntry({ entry, last }: { entry: ErpTimelineEntry; last: boolean
   const style = TIMELINE_STYLES[entry.status] ?? TIMELINE_STYLES.SKIPPED;
   return (
     <li className="relative flex gap-3 pb-3 last:pb-0">
-      {/* Connecting line */}
       {!last && <div className="absolute left-[5px] top-[14px] bottom-0 w-px bg-border" />}
-      {/* Dot */}
       <span className={cn('mt-1 h-3 w-3 rounded-full shrink-0 ring-2', style.dot)} />
       <div className="flex flex-col gap-0.5 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
@@ -524,12 +529,7 @@ function BtnIcon({ d }: { d: string }) {
   );
 }
 
-function ActionBtn({
-  children,
-  onClick,
-  disabled = false,
-  variant = 'default',
-}: {
+function ActionBtn({ children, onClick, disabled = false, variant = 'default' }: {
   children: React.ReactNode;
   onClick: () => void;
   disabled?: boolean;
@@ -542,11 +542,9 @@ function ActionBtn({
       disabled={disabled}
       className={cn(
         'inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border transition-colors disabled:opacity-40 disabled:pointer-events-none',
-        variant === 'ghost'
-          ? 'border-border bg-background hover:bg-muted text-foreground'
-          : variant === 'danger'
-          ? 'border-transparent bg-red-600 text-white hover:bg-red-700'
-          : 'border-transparent bg-primary text-primary-foreground hover:bg-primary/90',
+        variant === 'ghost'  ? 'border-border bg-background hover:bg-muted text-foreground'
+        : variant === 'danger' ? 'border-transparent bg-red-600 text-white hover:bg-red-700'
+        : 'border-transparent bg-primary text-primary-foreground hover:bg-primary/90',
       )}
     >
       {children}
