@@ -328,7 +328,7 @@ export default function DashboardPage() {
                   </thead>
                   <tbody>
                     {visibleOrders.map((order) => (
-                      <OrderRow key={order.id} order={order} onAction={handleAction} />
+                      <OrderRow key={order.id} order={order} onAction={handleAction} configAccount={config?.account ?? undefined} />
                     ))}
                   </tbody>
                 </table>
