@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { OrderRow } from '@/components/OrderRow';
 import { Footer } from '@/components/Footer';
@@ -276,31 +276,12 @@ export default function DashboardPage() {
               </select>
 
               {uniqueAccounts.length > 0 && (
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="text-xs text-muted-foreground">Account:</span>
-                  {uniqueAccounts.map((account) => {
-                    const checked = filterAccounts.includes(account);
-                    return (
-                      <label
-                        key={account}
-                        className={[
-                          'flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-md border cursor-pointer transition-colors select-none',
-                          checked
-                            ? 'bg-primary text-primary-foreground border-primary'
-                            : 'border-border hover:bg-muted text-foreground',
-                        ].join(' ')}
-                      >
-                        <input
-                          type="checkbox"
-                          className="sr-only"
-                          checked={checked}
-                          onChange={() => toggleAccount(account)}
-                        />
-                        {account}
-                      </label>
-                    );
-                  })}
-                </div>
+                <AccountFilterDropdown
+                  accounts={uniqueAccounts}
+                  selected={filterAccounts}
+                  onToggle={toggleAccount}
+                  onClear={() => setFilterAccounts([])}
+                />
               )}
 
               <button
@@ -540,6 +521,121 @@ function levelCls(level: string) {
   if (level === 'ERROR') return `${base} bg-red-100 text-red-700`;
   if (level === 'WARN') return `${base} bg-yellow-100 text-yellow-700`;
   return `${base} bg-blue-100 text-blue-700`;
+}
+
+function AccountFilterDropdown({
+  accounts,
+  selected,
+  onToggle,
+  onClear,
+}: {
+  accounts: string[];
+  selected: string[];
+  onToggle: (account: string) => void;
+  onClear: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') setOpen(false);
+    }
+    document.addEventListener('mousedown', handleClick);
+    document.addEventListener('keydown', handleKey);
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('keydown', handleKey);
+    };
+  }, [open]);
+
+  const label =
+    selected.length === 0
+      ? 'All Accounts'
+      : selected.length === 1
+      ? selected[0]
+      : `${selected.length} accounts`;
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className={[
+          'flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-sm transition-colors focus:outline-none focus:ring-1 focus:ring-ring',
+          selected.length > 0
+            ? 'border-primary bg-primary/5 text-primary font-medium'
+            : 'border-input bg-background text-foreground',
+        ].join(' ')}
+      >
+        <svg className="w-3.5 h-3.5 shrink-0 text-muted-foreground" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="5" cy="5" r="3.5" />
+          <circle cx="9" cy="9" r="3.5" />
+        </svg>
+        <span className="max-w-[120px] truncate">{label}</span>
+        {selected.length > 0 && (
+          <span
+            className="ml-0.5 flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold bg-primary text-primary-foreground shrink-0"
+          >
+            {selected.length}
+          </span>
+        )}
+        <svg
+          className={`w-3 h-3 text-muted-foreground transition-transform duration-150 shrink-0 ${open ? 'rotate-180' : ''}`}
+          viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+        >
+          <path d="M2 4l4 4 4-4" />
+        </svg>
+      </button>
+
+      {open && (
+        <div className="absolute left-0 top-full mt-1 z-30 min-w-[180px] rounded-lg border border-border bg-background shadow-lg overflow-hidden">
+          {/* Header */}
+          <div className="flex items-center justify-between px-3 py-2 border-b border-border/60 bg-muted/30">
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Filter by Account</span>
+            {selected.length > 0 && (
+              <button
+                type="button"
+                onClick={() => { onClear(); setOpen(false); }}
+                className="text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+          {/* Options */}
+          <div className="py-1 max-h-56 overflow-y-auto">
+            {accounts.map((account) => {
+              const checked = selected.includes(account);
+              return (
+                <label
+                  key={account}
+                  className="flex items-center gap-2.5 px-3 py-2 cursor-pointer hover:bg-muted/50 transition-colors select-none"
+                >
+                  <div className={[
+                    'w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-all',
+                    checked ? 'border-primary bg-primary' : 'border-border bg-background',
+                  ].join(' ')}>
+                    {checked && (
+                      <svg className="w-2.5 h-2.5 text-primary-foreground" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M2 5l2.5 2.5 3.5-4" />
+                      </svg>
+                    )}
+                  </div>
+                  <input type="checkbox" className="sr-only" checked={checked} onChange={() => onToggle(account)} />
+                  <span className="text-sm text-foreground truncate">{account}</span>
+                </label>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 const selectCls =
