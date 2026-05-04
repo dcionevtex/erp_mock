@@ -159,7 +159,7 @@ export default function DashboardPage() {
 
   return (
     <AppShell>
-    <div className="bg-background flex flex-col flex-1">
+    <div className="bg-background min-h-full">
       {/* Header — VTEX brand: navy bg, pink accents */}
       <header className="border-b border-border px-4 py-0 flex items-stretch justify-between gap-4 sticky top-0 z-10" style={{ background: '#142032' }}>
         <div className="flex items-center gap-4 py-3">
@@ -201,7 +201,7 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      <main className="px-4 py-4 space-y-4 max-w-[1600px] mx-auto">
+      <main className="px-4 py-4 space-y-4 w-full max-w-[1600px] mx-auto">
         {/* Credentials warning — shown at the very top when creds are missing */}
         {credsMissing && (
           <div

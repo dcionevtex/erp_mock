@@ -9,7 +9,7 @@ export const metadata = {
 export default function AboutPage() {
   return (
     <AppShell>
-    <div className="bg-background flex flex-col flex-1">
+    <div className="bg-background min-h-full flex flex-col">
 
       {/* Header */}
       <header className="border-b border-border px-4 py-0 flex items-stretch gap-4 sticky top-0 z-10" style={{ background: '#142032' }}>
