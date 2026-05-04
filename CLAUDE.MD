@@ -300,15 +300,7 @@ The endpoint must:
 - Store the final result in the ERP Orders list.
 - Return 200 quickly with JSON response.
 
-Optional demo security:
-
-- Support shared secret validation through a header:
-
-```text
-x-demo-hook-secret
-```
-
-Document that this is demo-level security only.
+Note: The Hook endpoint must accept unauthenticated requests from VTEX. VTEX controls when and how hook notifications are sent — there is no mechanism to add a shared secret on the VTEX side. Do not implement any secret or token validation on this endpoint.
 
 ---
 
@@ -666,7 +658,6 @@ Errors must appear in:
 - Do not log full customer document.
 - Do not expose full customer document in the UI.
 - Add basic request validation.
-- Add optional hook secret.
 - Add CORS restrictions where appropriate.
 - Document production hardening recommendations.
 
@@ -738,7 +729,6 @@ VTEX_ACCOUNT=
 VTEX_ENVIRONMENT=vtexcommercestable.com.br
 VTEX_APP_KEY=
 VTEX_APP_TOKEN=
-DEMO_HOOK_SECRET=
 AUTO_COMMIT_FEED=false
 SIMULATE_ERP_FAILURE=false
 ```
