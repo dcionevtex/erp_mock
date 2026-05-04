@@ -10,6 +10,7 @@ import type { ErpOrderRecord, AppConfigPublic, EventLogEntry } from '@/types';
 
 type Tab = 'inbox' | 'events';
 type SortKey = 'receivedAt_desc' | 'receivedAt_asc';
+const PAGE_SIZE = 50;
 
 export default function DashboardPage() {
   const [orders, setOrders] = useState<ErpOrderRecord[]>([]);
@@ -23,6 +24,8 @@ export default function DashboardPage() {
   const [sort, setSort] = useState<SortKey>('receivedAt_desc');
   const [polling, setPolling] = useState(false);
   const [lastFetch, setLastFetch] = useState<Date | null>(null);
+  const [orderPage, setOrderPage] = useState(1);
+  const [eventPage, setEventPage] = useState(1);
 
   const fetchOrders = useCallback(async () => {
     try {
@@ -130,6 +133,16 @@ export default function DashboardPage() {
     [orders, filterAccounts],
   );
 
+  // Reset to page 1 whenever the filtered set changes
+  useEffect(() => { setOrderPage(1); }, [visibleOrders]);
+  useEffect(() => { setEventPage(1); }, [events]);
+
+  const orderTotalPages = Math.max(1, Math.ceil(visibleOrders.length / PAGE_SIZE));
+  const pagedOrders = visibleOrders.slice((orderPage - 1) * PAGE_SIZE, orderPage * PAGE_SIZE);
+
+  const eventTotalPages = Math.max(1, Math.ceil(events.length / PAGE_SIZE));
+  const pagedEvents = events.slice((eventPage - 1) * PAGE_SIZE, eventPage * PAGE_SIZE);
+
   function toggleAccount(account: string) {
     setFilterAccounts((prev) =>
       prev.includes(account) ? prev.filter((a) => a !== account) : [...prev, account],
@@ -227,6 +240,7 @@ export default function DashboardPage() {
           <button onClick={() => setActiveTab('inbox')} className={tabCls(activeTab === 'inbox')}>
             ERP Orders ({visibleOrders.length})
           </button>
+
           <button onClick={() => setActiveTab('events')} className={tabCls(activeTab === 'events')}>
             Event Log
           </button>
@@ -302,6 +316,7 @@ export default function DashboardPage() {
                 </p>
               </div>
             ) : (
+              <>
               <div className="overflow-x-auto rounded-lg border border-border">
                 <table className="w-full min-w-[1200px] text-sm">
                   <thead className="bg-muted/50">
@@ -327,12 +342,20 @@ export default function DashboardPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {visibleOrders.map((order) => (
+                    {pagedOrders.map((order) => (
                       <OrderRow key={order.id} order={order} onAction={handleAction} configAccount={config?.account ?? undefined} />
                     ))}
                   </tbody>
                 </table>
               </div>
+              <Pagination
+                page={orderPage}
+                totalPages={orderTotalPages}
+                totalItems={visibleOrders.length}
+                pageSize={PAGE_SIZE}
+                onPage={setOrderPage}
+              />
+              </>
             )}
           </div>
         )}
@@ -360,25 +383,34 @@ export default function DashboardPage() {
             {events.length === 0 ? (
               <div className="text-center py-12 text-muted-foreground text-sm">No events yet.</div>
             ) : (
-              <div className="rounded-lg border border-border overflow-auto max-h-[600px]">
-                <table className="w-full text-xs">
-                  <thead className="bg-muted/50 sticky top-0">
-                    <tr className="text-left text-muted-foreground uppercase tracking-wide">
-                      <th className="px-3 py-2 font-medium">Time</th>
-                      <th className="px-3 py-2 font-medium">Source</th>
-                      <th className="px-3 py-2 font-medium">Level</th>
-                      <th className="px-3 py-2 font-medium">Message</th>
-                      <th className="px-3 py-2 font-medium">Order ID</th>
-                      <th className="px-3 py-2 w-6"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {events.map((evt, i) => (
-                      <EventLogRow key={i} evt={evt} />
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <>
+                <div className="rounded-lg border border-border overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead className="bg-muted/50">
+                      <tr className="text-left text-muted-foreground uppercase tracking-wide">
+                        <th className="px-3 py-2 font-medium">Time</th>
+                        <th className="px-3 py-2 font-medium">Source</th>
+                        <th className="px-3 py-2 font-medium">Level</th>
+                        <th className="px-3 py-2 font-medium">Message</th>
+                        <th className="px-3 py-2 font-medium">Order ID</th>
+                        <th className="px-3 py-2 w-6"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pagedEvents.map((evt, i) => (
+                        <EventLogRow key={i} evt={evt} />
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <Pagination
+                  page={eventPage}
+                  totalPages={eventTotalPages}
+                  totalItems={events.length}
+                  pageSize={PAGE_SIZE}
+                  onPage={setEventPage}
+                />
+              </>
             )}
           </div>
         )}
@@ -634,6 +666,86 @@ function AccountFilterDropdown({
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function Pagination({
+  page,
+  totalPages,
+  totalItems,
+  pageSize,
+  onPage,
+}: {
+  page: number;
+  totalPages: number;
+  totalItems: number;
+  pageSize: number;
+  onPage: (p: number) => void;
+}) {
+  if (totalPages <= 1) return null;
+
+  const from = (page - 1) * pageSize + 1;
+  const to = Math.min(page * pageSize, totalItems);
+
+  // Build page number list: always show first, last, current ±1, with ellipsis gaps
+  const pages: (number | '…')[] = [];
+  const range = new Set([1, totalPages, page - 1, page, page + 1].filter((p) => p >= 1 && p <= totalPages));
+  let prev = 0;
+  for (const p of Array.from(range).sort((a, b) => a - b)) {
+    if (p - prev > 1) pages.push('…');
+    pages.push(p);
+    prev = p;
+  }
+
+  return (
+    <div className="flex items-center justify-between gap-4 pt-2">
+      <span className="text-xs text-muted-foreground tabular-nums">
+        Showing {from}–{to} of {totalItems}
+      </span>
+      <div className="flex items-center gap-1">
+        <button
+          onClick={() => onPage(page - 1)}
+          disabled={page === 1}
+          className="flex items-center gap-1 px-2.5 py-1.5 text-xs rounded border border-border hover:bg-muted disabled:opacity-40 disabled:pointer-events-none transition-colors"
+        >
+          <svg className="w-3 h-3" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M7.5 2.5L4 6l3.5 3.5" />
+          </svg>
+          Prev
+        </button>
+
+        {pages.map((p, i) =>
+          p === '…' ? (
+            <span key={`ellipsis-${i}`} className="px-1 text-xs text-muted-foreground select-none">…</span>
+          ) : (
+            <button
+              key={p}
+              onClick={() => onPage(p as number)}
+              className={[
+                'w-8 h-7 text-xs rounded border transition-colors',
+                p === page
+                  ? 'border-transparent font-semibold text-white'
+                  : 'border-border hover:bg-muted text-foreground',
+              ].join(' ')}
+              style={p === page ? { background: '#F71963' } : undefined}
+            >
+              {p}
+            </button>
+          )
+        )}
+
+        <button
+          onClick={() => onPage(page + 1)}
+          disabled={page === totalPages}
+          className="flex items-center gap-1 px-2.5 py-1.5 text-xs rounded border border-border hover:bg-muted disabled:opacity-40 disabled:pointer-events-none transition-colors"
+        >
+          Next
+          <svg className="w-3 h-3" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4.5 2.5L8 6l-3.5 3.5" />
+          </svg>
+        </button>
+      </div>
     </div>
   );
 }
