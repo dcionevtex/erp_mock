@@ -23,7 +23,7 @@ export default function LoginPage() {
         body: JSON.stringify({ password }),
       });
       if (res.ok) {
-        router.push('/');
+        router.push('/about');
         router.refresh();
       } else {
         setError('Invalid password. Please try again.');

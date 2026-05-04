@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import Link from 'next/link';
 import { OrderRow } from '@/components/OrderRow';
 import { Footer } from '@/components/Footer';
 import { InlineSetup } from '@/components/InlineSetup';
+import { AppShell } from '@/components/AppShell';
 import { DASHBOARD_POLL_INTERVAL_MS, ERP_STATUS_VALUES } from '@/lib/constants';
 import type { ErpOrderRecord, AppConfigPublic, EventLogEntry } from '@/types';
 
@@ -158,9 +158,10 @@ export default function DashboardPage() {
   const credsMissing = config !== null && !config.appTokenConfigured;
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <AppShell>
+    <div className="bg-background flex flex-col flex-1">
       {/* Header — VTEX brand: navy bg, pink accents */}
-      <header className="border-b border-border px-4 py-0 flex items-stretch justify-between gap-4" style={{ background: '#142032' }}>
+      <header className="border-b border-border px-4 py-0 flex items-stretch justify-between gap-4 sticky top-0 z-10" style={{ background: '#142032' }}>
         <div className="flex items-center gap-4 py-3">
           {/* VTEX wordmark */}
           <span className="text-xl font-black tracking-tighter leading-none" style={{ color: '#F71963' }}>VTEX</span>
@@ -178,12 +179,6 @@ export default function DashboardPage() {
               updated {lastFetch.toLocaleTimeString()}
             </span>
           )}
-          <Link
-            href="/about"
-            className="px-3 py-1.5 text-xs font-medium text-white/60 hover:text-white transition-colors rounded border border-white/10 hover:border-white/20"
-          >
-            Docs
-          </Link>
           <button
             onClick={async () => {
               await fetch('/api/auth/logout', { method: 'POST' });
@@ -417,6 +412,7 @@ export default function DashboardPage() {
       </main>
       <Footer />
     </div>
+    </AppShell>
   );
 }
 

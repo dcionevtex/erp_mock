@@ -1,6 +1,6 @@
-import Link from 'next/link';
 import { Footer } from '@/components/Footer';
 import { AccordionSection } from '@/components/AccordionSection';
+import { AppShell } from '@/components/AppShell';
 
 export const metadata = {
   title: 'About — VTEX A Simple ERP Simulator',
@@ -8,27 +8,17 @@ export const metadata = {
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <AppShell>
+    <div className="bg-background flex flex-col flex-1">
 
       {/* Header */}
-      <header className="border-b border-border px-4 py-0 flex items-stretch justify-between gap-4 sticky top-0 z-10" style={{ background: '#142032' }}>
+      <header className="border-b border-border px-4 py-0 flex items-stretch gap-4 sticky top-0 z-10" style={{ background: '#142032' }}>
         <div className="flex items-center gap-4 py-3">
           <span className="text-xl font-black tracking-tighter leading-none" style={{ color: '#F71963' }}>VTEX</span>
           <span className="text-white/20 text-lg font-thin">|</span>
           <span className="text-sm font-semibold text-white/90">A Simple ERP Simulator</span>
           <span className="text-white/20 text-lg font-thin hidden sm:block">|</span>
           <span className="text-sm text-white/50 hidden sm:block">Documentation</span>
-        </div>
-        <div className="flex items-center">
-          <Link
-            href="/"
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white/60 hover:text-white transition-colors rounded"
-          >
-            <svg className="w-3.5 h-3.5" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9 11L5 7l4-4" />
-            </svg>
-            Back to Console
-          </Link>
         </div>
       </header>
 
@@ -639,6 +629,7 @@ export default function AboutPage() {
       </main>
       <Footer />
     </div>
+    </AppShell>
   );
 }
 
