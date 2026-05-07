@@ -10,9 +10,20 @@ type ReleaseEntry = {
 
 const RELEASES: ReleaseEntry[] = [
   {
-    version: '1.0.5',
+    version: '1.0.6',
     date: 'May 7, 2026',
     tag: 'latest',
+    changes: [
+      { type: 'feat', text: 'Mock DANFE (Nota Fiscal Eletrônica) sheet available on invoiced orders' },
+      { type: 'feat', text: 'DANFE card appears in order modal alongside Shipping Label once invoice is sent' },
+      { type: 'feat', text: 'Imprimir DANFE button opens a printable A4 DANFE document in a new window' },
+      { type: 'feat', text: 'Access key barcode generated deterministically from orderId using CODE128' },
+      { type: 'feat', text: 'Full DANFE layout: emitente, destinatário, cálculo de imposto, transportadora, produtos, dados adicionais' },
+    ],
+  },
+  {
+    version: '1.0.5',
+    date: 'May 7, 2026',
     changes: [
       { type: 'feat', text: 'Release Notes moved to dedicated sidebar page' },
       { type: 'chore', text: 'Release Notes removed from dashboard tabs' },

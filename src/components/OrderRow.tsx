@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { StatusBadge } from './StatusBadge';
 import { ShippingLabel } from './ShippingLabel';
+import { DanfeSheet } from './DanfeSheet';
 import { cn } from '@/lib/utils';
 import type { ErpOrderRecord, ErpTimelineEntry } from '@/types';
 
@@ -390,6 +391,13 @@ function OrderDetailModal({
                 <ShippingLabel order={order} />
               </div>
             </CollapsibleCard>
+            {order.invoiceStatus === 'SUCCESS' && (
+              <CollapsibleCard title="DANFE (Nota Fiscal)">
+                <div className="py-2">
+                  <DanfeSheet order={order} />
+                </div>
+              </CollapsibleCard>
+            )}
           </div>
 
           {/* JSON payloads */}
