@@ -423,6 +423,7 @@ export default function DashboardPage() {
                         order={order}
                         onAction={handleAction}
                         configAccount={config?.account ?? undefined}
+                        credsConfigured={config !== null && (config.appTokenConfigured ?? false)}
                         selected={selectedIds.has(order.id)}
                         onSelect={toggleSelectId}
                       />

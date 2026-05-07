@@ -14,11 +14,12 @@ interface OrderRowProps {
   order: ErpOrderRecord;
   onAction: (action: ActionType, orderId: string) => void;
   configAccount?: string;
+  credsConfigured?: boolean;
   selected?: boolean;
   onSelect?: (id: string) => void;
 }
 
-export function OrderRow({ order, onAction, configAccount, selected = false, onSelect }: OrderRowProps) {
+export function OrderRow({ order, onAction, configAccount, credsConfigured, selected = false, onSelect }: OrderRowProps) {
   const [modalOpen, setModalOpen] = useState(false);
 
   function fmt(iso?: string) {
@@ -91,6 +92,7 @@ export function OrderRow({ order, onAction, configAccount, selected = false, onS
         <OrderDetailModal
           order={order}
           configAccount={configAccount}
+          credsConfigured={credsConfigured}
           onClose={() => setModalOpen(false)}
           onAction={(action, orderId) => {
             if (action === 'delete') setModalOpen(false);
@@ -110,16 +112,19 @@ const VTEX_API_ACTIONS: ActionType[] = ['reprocess', 'retry-start-handling', 'se
 function OrderDetailModal({
   order,
   configAccount,
+  credsConfigured,
   onClose,
   onAction,
 }: {
   order: ErpOrderRecord;
   configAccount?: string;
+  credsConfigured?: boolean;
   onClose: () => void;
   onAction: (action: ActionType, orderId: string) => void;
 }) {
-  const accountMismatch =
-    !!order.account && !!configAccount && order.account !== configAccount;
+  const missingCreds = !credsConfigured;
+  const accountMismatch = !missingCreds && !!order.account && !!configAccount && order.account !== configAccount;
+  const vtexBlocked = missingCreds || accountMismatch;
   const [trackingFormOpen, setTrackingFormOpen] = useState(false);
   const [trackingForm, setTrackingForm] = useState({ courier: '', trackingNumber: '', trackingUrl: '' });
   const [trackingSubmitting, setTrackingSubmitting] = useState(false);
@@ -212,6 +217,38 @@ function OrderDetailModal({
 
         {/* Scrollable body */}
         <div className="overflow-y-auto flex-1 px-6 py-5 space-y-4">
+
+          {/* Credential / account warning — shown at the very top so users see it before trying to act */}
+          {vtexBlocked && (
+            <div className="flex items-start gap-3 rounded-xl px-4 py-3 border-2" style={
+              missingCreds
+                ? { background: 'rgba(220,38,38,0.06)', borderColor: '#dc2626' }
+                : { background: 'rgba(245,158,11,0.08)', borderColor: '#f59e0b' }
+            }>
+              <svg className="w-4 h-4 shrink-0 mt-0.5" viewBox="0 0 16 16" fill="currentColor"
+                style={{ color: missingCreds ? '#dc2626' : '#d97706' }}>
+                <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 10 5zm0 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" clipRule="evenodd" />
+              </svg>
+              <div>
+                {missingCreds ? (
+                  <>
+                    <p className="text-sm font-bold text-red-700">VTEX credentials not configured</p>
+                    <p className="text-xs text-red-600 mt-0.5">
+                      Open <strong>Configuration</strong> and enter your App Key and App Token before using Reprocess, Start Handling, Invoice, or Cancel.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-sm font-bold text-amber-800">Account mismatch — VTEX API actions are disabled</p>
+                    <p className="text-xs text-amber-700 mt-0.5">
+                      This order belongs to account <strong>{order.account}</strong>, but your credentials are configured for <strong>{configAccount}</strong>.
+                      Switch to <strong>{order.account}</strong> in Configuration to perform these actions.
+                    </p>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Row 1: Summary + Timeline */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -414,24 +451,6 @@ function OrderDetailModal({
             )}
           </div>
 
-          {/* Account mismatch warning */}
-          {accountMismatch && (
-            <div className="rounded-lg border-2 border-amber-400 bg-amber-50 dark:bg-amber-950/30 px-4 py-3 flex items-start gap-3">
-              <svg className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" viewBox="0 0 16 16" fill="currentColor">
-                <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 10 5zm0 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" clipRule="evenodd" />
-              </svg>
-              <div>
-                <p className="text-sm font-semibold text-amber-800 dark:text-amber-200">
-                  Account mismatch — VTEX API actions are disabled
-                </p>
-                <p className="text-xs text-amber-700 dark:text-amber-300 mt-0.5 leading-relaxed">
-                  This order belongs to account <strong>{order.account}</strong>, but your configured credentials are for <strong>{configAccount}</strong>.
-                  Operations that call the VTEX API (Reprocess, Start Handling, Invoice, Cancel) will not work with the wrong credentials.
-                  Switch to the <strong>{order.account}</strong> account in Configuration to perform these actions.
-                </p>
-              </div>
-            </div>
-          )}
 
           {/* Actions */}
           <div className="rounded-lg border border-border bg-card px-4 py-3 flex flex-wrap gap-2">
@@ -442,15 +461,15 @@ function OrderDetailModal({
               </ActionBtn>
             ) : (
               <>
-                <ActionBtn disabled={accountMismatch} onClick={() => onAction('reprocess', order.orderId)}>
+                <ActionBtn disabled={vtexBlocked} onClick={() => onAction('reprocess', order.orderId)}>
                   <BtnIcon d="M4 4v3h3M12 12v-3h-3M3.5 7a5.5 5.5 0 1 1 .7 4" />
                   Reprocess
                 </ActionBtn>
-                <ActionBtn disabled={accountMismatch || order.startHandlingStatus === 'SUCCESS'} onClick={() => onAction('retry-start-handling', order.orderId)}>
+                <ActionBtn disabled={vtexBlocked || order.startHandlingStatus === 'SUCCESS'} onClick={() => onAction('retry-start-handling', order.orderId)}>
                   <BtnIcon d="M5 12h7M9 8l4 4-4 4" />
                   Retry Start Handling
                 </ActionBtn>
-                <ActionBtn disabled={accountMismatch || order.startHandlingStatus !== 'SUCCESS' || order.invoiceStatus === 'SUCCESS'} onClick={() => onAction('send-invoice', order.orderId)}>
+                <ActionBtn disabled={vtexBlocked || order.startHandlingStatus !== 'SUCCESS' || order.invoiceStatus === 'SUCCESS'} onClick={() => onAction('send-invoice', order.orderId)}>
                   <BtnIcon d="M2 4h10v6H2zM5 10v2m4-2v2M1 12h10" />
                   {order.invoiceStatus === 'ERROR' ? 'Retry Invoice' : 'Send Invoice'}
                 </ActionBtn>
@@ -473,7 +492,7 @@ function OrderDetailModal({
                     <ActionBtn variant="danger" onClick={() => {}} disabled>Cancel</ActionBtn>
                   </span>
                 ) : (
-                  <ActionBtn variant="danger" disabled={accountMismatch} onClick={() => onAction('cancel', order.orderId)}>Cancel</ActionBtn>
+                  <ActionBtn variant="danger" disabled={vtexBlocked} onClick={() => onAction('cancel', order.orderId)}>Cancel</ActionBtn>
                 )}
                 <ActionBtn variant="danger" onClick={() => onAction('delete', order.orderId)}>Delete</ActionBtn>
               </>
