@@ -4,13 +4,6 @@ export const dynamic = 'force-dynamic';
 import { getSql, ensureSchema } from '@/lib/db';
 
 export async function GET(): Promise<Response> {
-  const authEnv = {
-    AUTH_SECRET: !!process.env.AUTH_SECRET,
-    AUTH_URL: process.env.AUTH_URL ?? null,
-    GOOGLE_CLIENT_ID: !!process.env.GOOGLE_CLIENT_ID,
-    GOOGLE_CLIENT_SECRET: !!process.env.GOOGLE_CLIENT_SECRET,
-  };
-
   const sql = getSql();
 
   if (!sql) {
@@ -39,7 +32,6 @@ export async function GET(): Promise<Response> {
         event_log: events[0]?.count ?? 0,
         app_config: config[0]?.count ?? 0,
       },
-      authEnv,
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
