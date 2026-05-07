@@ -26,6 +26,7 @@ export default function DashboardPage() {
   const [lastFetch, setLastFetch] = useState<Date | null>(null);
   const [orderPage, setOrderPage] = useState(1);
   const [eventPage, setEventPage] = useState(1);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const fetchOrders = useCallback(async () => {
     try {
@@ -122,6 +123,44 @@ export default function DashboardPage() {
     await fetchOrders();
   }
 
+  async function handleBulkAction(action: 'delete' | 'resolve') {
+    const selectedOrders = orders.filter((o) => selectedIds.has(o.id));
+    if (selectedOrders.length === 0) return;
+
+    if (action === 'delete') {
+      if (!confirm(`Delete ${selectedOrders.length} selected order(s)? This cannot be undone.`)) return;
+    }
+
+    const orderIds = selectedOrders.map((o) => o.orderId);
+    await fetch('/api/erp/orders/bulk', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, orderIds }),
+    }).catch(() => {});
+
+    setSelectedIds(new Set());
+    await fetchOrders();
+  }
+
+  function toggleSelectId(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleSelectPage() {
+    const pageIds = pagedOrders.map((o) => o.id);
+    const allSelected = pageIds.every((id) => selectedIds.has(id));
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (allSelected) pageIds.forEach((id) => next.delete(id));
+      else pageIds.forEach((id) => next.add(id));
+      return next;
+    });
+  }
+
   const uniqueAccounts = useMemo(() => {
     const seen = new Set<string>();
     for (const o of orders) if (o.account) seen.add(o.account);
@@ -133,8 +172,8 @@ export default function DashboardPage() {
     [orders, filterAccounts],
   );
 
-  // Reset to page 1 whenever the filtered set changes
-  useEffect(() => { setOrderPage(1); }, [visibleOrders]);
+  // Reset to page 1 and clear selection whenever the filtered set changes
+  useEffect(() => { setOrderPage(1); setSelectedIds(new Set()); }, [visibleOrders]);
   useEffect(() => { setEventPage(1); }, [events]);
 
   const orderTotalPages = Math.max(1, Math.ceil(visibleOrders.length / PAGE_SIZE));
@@ -301,6 +340,35 @@ export default function DashboardPage() {
               </button>
             </div>
 
+            {/* Bulk action bar */}
+            {selectedIds.size > 0 && (
+              <div className="flex items-center gap-3 rounded-lg border border-primary/30 px-4 py-2.5 text-sm" style={{ background: 'rgba(247,25,99,0.05)' }}>
+                <span className="font-medium" style={{ color: '#F71963' }}>
+                  {selectedIds.size} order{selectedIds.size !== 1 ? 's' : ''} selected
+                </span>
+                <div className="flex items-center gap-2 ml-auto">
+                  <button
+                    onClick={() => { void handleBulkAction('resolve'); }}
+                    className="px-3 py-1.5 text-xs font-medium rounded border border-border bg-background hover:bg-muted transition-colors"
+                  >
+                    Mark as resolved
+                  </button>
+                  <button
+                    onClick={() => { void handleBulkAction('delete'); }}
+                    className="px-3 py-1.5 text-xs font-medium rounded border border-destructive/40 text-destructive hover:bg-destructive/10 transition-colors"
+                  >
+                    Delete selected
+                  </button>
+                  <button
+                    onClick={() => setSelectedIds(new Set())}
+                    className="px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Clear
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Orders table */}
             {orders.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 text-muted-foreground text-sm gap-2">
@@ -316,6 +384,18 @@ export default function DashboardPage() {
                 <table className="w-full min-w-[1200px] text-sm">
                   <thead className="bg-muted/50">
                     <tr className="text-left text-xs text-muted-foreground uppercase tracking-wide">
+                      <th className="pl-3 pr-1 py-2 w-8">
+                        <input
+                          type="checkbox"
+                          checked={pagedOrders.length > 0 && pagedOrders.every((o) => selectedIds.has(o.id))}
+                          ref={(el) => {
+                            if (el) el.indeterminate = pagedOrders.some((o) => selectedIds.has(o.id)) && !pagedOrders.every((o) => selectedIds.has(o.id));
+                          }}
+                          onChange={toggleSelectPage}
+                          className="w-4 h-4 rounded accent-primary cursor-pointer"
+                          aria-label="Select all on this page"
+                        />
+                      </th>
                       <th className="px-3 py-2 font-medium">Status</th>
                       <th className="px-3 py-2 font-medium">Account</th>
                       <th className="px-3 py-2 font-medium">Order ID</th>
@@ -338,7 +418,14 @@ export default function DashboardPage() {
                   </thead>
                   <tbody>
                     {pagedOrders.map((order) => (
-                      <OrderRow key={order.id} order={order} onAction={handleAction} configAccount={config?.account ?? undefined} />
+                      <OrderRow
+                        key={order.id}
+                        order={order}
+                        onAction={handleAction}
+                        configAccount={config?.account ?? undefined}
+                        selected={selectedIds.has(order.id)}
+                        onSelect={toggleSelectId}
+                      />
                     ))}
                   </tbody>
                 </table>

@@ -13,9 +13,11 @@ interface OrderRowProps {
   order: ErpOrderRecord;
   onAction: (action: ActionType, orderId: string) => void;
   configAccount?: string;
+  selected?: boolean;
+  onSelect?: (id: string) => void;
 }
 
-export function OrderRow({ order, onAction, configAccount }: OrderRowProps) {
+export function OrderRow({ order, onAction, configAccount, selected = false, onSelect }: OrderRowProps) {
   const [modalOpen, setModalOpen] = useState(false);
 
   function fmt(iso?: string) {
@@ -33,9 +35,25 @@ export function OrderRow({ order, onAction, configAccount }: OrderRowProps) {
   return (
     <>
       <tr
-        className="border-b border-border text-sm cursor-pointer hover:bg-muted/40 transition-colors"
-        onClick={() => setModalOpen(true)}
+        className={cn(
+          'border-b border-border text-sm hover:bg-muted/40 transition-colors',
+          selected ? 'bg-primary/5' : 'cursor-pointer',
+        )}
+        onClick={(e) => {
+          if ((e.target as HTMLElement).closest('[data-checkbox]')) return;
+          setModalOpen(true);
+        }}
       >
+        <td className="pl-3 pr-1 py-2 w-8 shrink-0" data-checkbox>
+          <input
+            type="checkbox"
+            checked={selected}
+            onChange={() => onSelect?.(order.id)}
+            onClick={(e) => e.stopPropagation()}
+            className="w-4 h-4 rounded accent-primary cursor-pointer"
+            aria-label={`Select order ${order.orderId}`}
+          />
+        </td>
         <td className="px-3 py-2 whitespace-nowrap"><StatusBadge status={order.erpStatus} /></td>
         <td className="px-3 py-2 text-xs font-medium text-muted-foreground whitespace-nowrap">{order.account ?? '—'}</td>
         <td className="px-3 py-2 font-mono text-xs max-w-[140px] truncate" title={order.orderId}>{order.orderId}</td>
