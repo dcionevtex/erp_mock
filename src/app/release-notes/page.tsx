@@ -10,9 +10,19 @@ type ReleaseEntry = {
 
 const RELEASES: ReleaseEntry[] = [
   {
-    version: '1.0.6',
+    version: '1.0.7',
     date: 'May 7, 2026',
     tag: 'latest',
+    changes: [
+      { type: 'feat', text: 'Google OAuth SSO login — only @vtex.com accounts are authorized' },
+      { type: 'feat', text: 'Sign out button added to sidebar footer' },
+      { type: 'chore', text: 'Password-based login removed; DEMO_PASSWORD env var no longer used' },
+      { type: 'chore', text: 'GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and AUTH_SECRET added to .env.example' },
+    ],
+  },
+  {
+    version: '1.0.6',
+    date: 'May 7, 2026',
     changes: [
       { type: 'feat', text: 'Electronic Invoice sheet available on invoiced orders' },
       { type: 'feat', text: 'Electronic Invoice card appears in order modal alongside Shipping Label once invoice is sent' },

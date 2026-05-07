@@ -1,29 +1,28 @@
-import { type NextRequest, NextResponse } from 'next/server';
+import { auth } from '@/auth';
+import { NextResponse } from 'next/server';
 
-const PUBLIC_PATHS = ['/login', '/api/auth/login', '/api/vtex/hook', '/api/health'];
+export default auth((req) => {
+  const { pathname } = req.nextUrl;
 
-export function middleware(request: NextRequest): NextResponse {
-  const { pathname } = request.nextUrl;
+  // Always public: VTEX hook receiver, health check, NextAuth internals
+  const ALWAYS_PUBLIC = ['/api/vtex/hook', '/api/health', '/api/auth'];
+  if (ALWAYS_PUBLIC.some((p) => pathname.startsWith(p))) return NextResponse.next();
 
-  if (PUBLIC_PATHS.some((p) => pathname.startsWith(p))) {
-    return NextResponse.next();
+  // Other API routes are invoked from the authenticated UI — no redirect needed
+  if (pathname.startsWith('/api/')) return NextResponse.next();
+
+  // Redirect authenticated users away from the login page
+  if (req.auth && pathname === '/login') {
+    return NextResponse.redirect(new URL('/', req.url));
   }
 
-  // API routes other than the hook don't need browser-session auth —
-  // they're called server-side or from the authed UI.
-  if (pathname.startsWith('/api/')) {
-    return NextResponse.next();
-  }
-
-  const session = request.cookies.get('vtex-erp-session');
-  if (!session) {
-    const url = request.nextUrl.clone();
-    url.pathname = '/login';
-    return NextResponse.redirect(url);
+  // Redirect unauthenticated users to login
+  if (!req.auth && pathname !== '/login') {
+    return NextResponse.redirect(new URL('/login', req.url));
   }
 
   return NextResponse.next();
-}
+});
 
 export const config = {
   matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],

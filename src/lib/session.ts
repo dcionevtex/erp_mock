@@ -3,7 +3,6 @@ import { cookies } from 'next/headers';
 import type { IntegrationMode } from '@/types';
 
 export interface SessionData {
-  authenticated?: boolean;
   account?: string;
   environment?: string;
   appKey?: string;

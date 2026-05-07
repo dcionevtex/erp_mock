@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { signOut } from 'next-auth/react';
 
 const NAV_ITEMS = [
   {
@@ -128,6 +129,22 @@ export function Sidebar() {
         ) : (
           <span className="text-xs font-black tracking-tighter" style={{ color: '#F71963' }}>V</span>
         )}
+      </div>
+
+      {/* Sign out */}
+      <div className="px-2 pb-3 shrink-0">
+        <button
+          onClick={() => signOut({ callbackUrl: '/login' })}
+          title={!expanded ? 'Sign out' : undefined}
+          className="flex items-center gap-3 rounded-lg px-2.5 py-2.5 w-full text-sm font-medium text-white/40 hover:text-white/80 hover:bg-white/5 transition-colors"
+        >
+          <svg className="w-5 h-5 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M7 3H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h3" />
+            <path d="M13 14l3-4-3-4" />
+            <path d="M16 10H7" />
+          </svg>
+          {expanded && <span className="truncate">Sign out</span>}
+        </button>
       </div>
     </aside>
   );

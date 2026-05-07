@@ -1,15 +1,14 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
+import { SessionProvider } from "next-auth/react";
 import "./globals.css";
 
-// Inter — used across VTEX Admin UI, developer portal, and design system
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
   display: "swap",
 });
 
-// JetBrains Mono — clear monospace for order IDs, JSON payloads, code
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
   subsets: ["latin"],
@@ -31,7 +30,9 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-background text-foreground">{children}</body>
+      <body className="min-h-full flex flex-col bg-background text-foreground">
+        <SessionProvider>{children}</SessionProvider>
+      </body>
     </html>
   );
 }
