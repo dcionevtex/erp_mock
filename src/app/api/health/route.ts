@@ -11,7 +11,6 @@ export async function GET(): Promise<Response> {
       ok: true,
       db: 'not_configured',
       message: 'DATABASE_URL not set — using in-memory store',
-      authEnv,
     });
   }
 
