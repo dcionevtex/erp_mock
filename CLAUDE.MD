@@ -903,8 +903,10 @@ Examples: `1.0.5`, `1.0.6`, `1.1.0`, `2.0.0`.
 The release log is defined as a static array `RELEASES` in:
 
 ```
-src/app/page.tsx
+src/app/release-notes/page.tsx
 ```
+
+This is a standalone Next.js page accessible from the sidebar under Documentation.
 
 Each entry follows this shape:
 
