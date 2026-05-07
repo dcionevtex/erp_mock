@@ -4,6 +4,13 @@ export const dynamic = 'force-dynamic';
 import { getSql, ensureSchema } from '@/lib/db';
 
 export async function GET(): Promise<Response> {
+  const authEnv = {
+    AUTH_SECRET: !!process.env.AUTH_SECRET,
+    AUTH_URL: process.env.AUTH_URL ?? null,
+    GOOGLE_CLIENT_ID: !!process.env.GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: !!process.env.GOOGLE_CLIENT_SECRET,
+  };
+
   const sql = getSql();
 
   if (!sql) {
@@ -11,6 +18,7 @@ export async function GET(): Promise<Response> {
       ok: true,
       db: 'not_configured',
       message: 'DATABASE_URL not set — using in-memory store',
+      authEnv,
     });
   }
 
