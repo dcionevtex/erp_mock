@@ -878,3 +878,59 @@ At the end, provide a concise summary:
 - How Start Handling works
 - Known limitations
 - Recommended next improvements
+
+---
+
+## 28. Release Management
+
+Every time a meaningful set of changes is shipped, update the Release Notes tab in the UI.
+
+### Version format
+
+Use semantic versioning with three parts: `MAJOR.MINOR.PATCH`.
+
+Current baseline: `1.0.4`.
+
+Rules:
+- Increment `PATCH` (third number) for bug fixes, small improvements, or isolated additions to existing features.
+- Increment `MINOR` (second number) for new self-contained features or significant UX changes.
+- Increment `MAJOR` (first number) only for breaking architectural changes or full redesigns.
+
+Examples: `1.0.5`, `1.0.6`, `1.1.0`, `2.0.0`.
+
+### Where release notes live
+
+The release log is defined as a static array `RELEASES` in:
+
+```
+src/app/page.tsx
+```
+
+Each entry follows this shape:
+
+```ts
+type ReleaseEntry = {
+  version: string;       // e.g. '1.0.5'
+  date: string;          // e.g. 'May 10, 2026'
+  tag?: 'latest';        // set only on the newest entry
+  changes: Array<{
+    type: 'feat' | 'fix' | 'chore';
+    text: string;
+  }>;
+};
+```
+
+### How to update on each release
+
+1. Remove `tag: 'latest'` from the previous top entry.
+2. Prepend a new entry to the `RELEASES` array with the new version, today's date, `tag: 'latest'`, and the list of changes.
+3. Use `feat` for new features, `fix` for bug fixes, `chore` for config, docs, or non-functional changes.
+4. Keep each change description to one clear sentence. No marketing language.
+5. Commit with: `chore: update release notes to vX.Y.Z`
+
+### What to include
+
+Include every change that is visible to the operator using the demo app.
+Skip internal refactors, type changes, or comment updates unless they affect behavior.
+
+Do not invent version numbers retroactively. If changes were already shipped without a release note, add them to the next release entry.
