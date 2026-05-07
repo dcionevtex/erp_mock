@@ -39,6 +39,7 @@ export async function GET(): Promise<Response> {
         event_log: events[0]?.count ?? 0,
         app_config: config[0]?.count ?? 0,
       },
+      authEnv,
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
