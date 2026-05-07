@@ -87,8 +87,8 @@ export function DanfeSheet({ order }: Props) {
         </div>
         {/* DANFE center block */}
         <div className="w-[108px] flex flex-col items-center justify-center p-2 border-r border-gray-400 text-center">
-          <div className="text-xl font-black tracking-widest leading-none">DANFE</div>
-          <div className="text-[8px] leading-snug mt-1 text-gray-500">Documento Auxiliar da<br />Nota Fiscal Eletrônica</div>
+          <div className="text-xl font-black tracking-widest leading-none">INVOICE</div>
+          <div className="text-[8px] leading-snug mt-1 text-gray-500">Simulated Electronic<br />Invoice Document</div>
           <div className="mt-2 flex gap-3 text-[9px]">
             <span>Entrada <b>1</b></span>
             <span className="border border-gray-800 px-1 font-black">2</span>
@@ -225,7 +225,7 @@ export function DanfeSheet({ order }: Props) {
             <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2H5zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1z"/>
             <path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2V7zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
           </svg>
-          Imprimir DANFE
+          Print Invoice
         </button>
       </div>
     </div>
@@ -274,7 +274,7 @@ function buildPrintHtml({ order, accessKey, invoiceNumber, emitente, icmsBase, b
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8"/>
-  <title>DANFE — NF ${invoiceNumber}</title>
+  <title>Electronic Invoice — NF ${invoiceNumber}</title>
   <style>
     @page { size: A4 portrait; margin: 8mm; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -345,8 +345,8 @@ function buildPrintHtml({ order, accessKey, invoiceNumber, emitente, icmsBase, b
       <div class="emitente-sub">vtex.com</div>
     </div>
     <div class="danfe-center">
-      <div class="danfe-title">DANFE</div>
-      <div class="danfe-sub">Documento Auxiliar da<br>Nota Fiscal Eletrônica</div>
+      <div class="danfe-title">INVOICE</div>
+      <div class="danfe-sub">Simulated Electronic<br>Invoice Document</div>
       <div class="danfe-tipo">
         <span>Entrada <b>1</b></span>
         <span class="danfe-tipo-box">2</span>

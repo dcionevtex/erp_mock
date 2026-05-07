@@ -392,7 +392,7 @@ function OrderDetailModal({
               </div>
             </CollapsibleCard>
             {order.invoiceStatus === 'SUCCESS' && (
-              <CollapsibleCard title="DANFE (Nota Fiscal)">
+              <CollapsibleCard title="Electronic Invoice">
                 <div className="py-2">
                   <DanfeSheet order={order} />
                 </div>
