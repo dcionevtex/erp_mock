@@ -16,12 +16,12 @@ const TOOLS = [
     ),
   },
   {
-    href: '#',
+    href: '/payment-provider',
     label: 'Payment Provider Simulator',
     description: 'Implement and test the VTEX Payment Provider Protocol. Expose all required endpoints, run the official test suite against them, and inspect every request and response with inline protocol documentation.',
-    tag: 'Coming soon',
-    tagColor: 'bg-white/5 text-white/30',
-    disabled: true,
+    tag: 'Live',
+    tagColor: 'bg-emerald-500/15 text-emerald-400',
+    disabled: false,
     icon: (
       <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <rect x="2" y="5" width="20" height="14" rx="2" />
