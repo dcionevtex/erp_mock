@@ -338,8 +338,8 @@ export default function PaymentProviderPage() {
       </header>
 
       {/* Flow diagram */}
-      <div className="border-b border-white/10 px-6 py-4 shrink-0">
-        <div className="flex items-center gap-1 overflow-x-auto">
+      <div className="border-b border-white/10 px-6 py-4 shrink-0 relative">
+        <div className="flex items-center justify-center gap-1 overflow-x-auto">
           {flowSteps.map((step, i) => (
             <div key={step.key} className="flex items-center gap-1 shrink-0">
               <button
@@ -373,15 +373,14 @@ export default function PaymentProviderPage() {
               )}
             </div>
           ))}
-          <div className="flex-1" />
-          <button
-            onClick={clearAll}
-            disabled={clearing || calls.length === 0}
-            className="text-xs text-white/20 hover:text-white/50 transition-colors disabled:opacity-40 shrink-0 ml-4"
-          >
-            {clearing ? 'Clearing…' : 'Clear'}
-          </button>
         </div>
+        <button
+          onClick={clearAll}
+          disabled={clearing || calls.length === 0}
+          className="absolute right-6 top-1/2 -translate-y-1/2 text-xs text-white/20 hover:text-white/50 transition-colors disabled:opacity-40"
+        >
+          {clearing ? 'Clearing…' : 'Clear'}
+        </button>
       </div>
 
       {/* Body */}
