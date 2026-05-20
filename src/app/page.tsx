@@ -34,6 +34,21 @@ const TOOLS = [
       </svg>
     ),
   },
+  {
+    href: '/marketplace',
+    label: 'Marketplace Protocol Simulator',
+    description: 'Simulate the VTEX External Seller Fulfillment protocol. Expose all required seller endpoints, run fulfillment simulation, order placement, authorization, and cancellation flows with live call inspection.',
+    tag: 'Live',
+    tagColor: 'bg-emerald-500/15 text-emerald-400',
+    disabled: false,
+    icon: (
+      <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+        <path d="M9 22V12h6v10" />
+        <path d="M15 6h2M15 9h2" />
+      </svg>
+    ),
+  },
 ];
 
 function BrazilianEngineeringLogo() {

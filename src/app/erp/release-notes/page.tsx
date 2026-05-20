@@ -10,9 +10,22 @@ type ReleaseEntry = {
 
 const RELEASES: ReleaseEntry[] = [
   {
+    version: '1.1.0',
+    date: 'May 20, 2026',
+    tag: 'latest',
+    changes: [
+      { type: 'feat', text: 'Marketplace Protocol Simulator added as a new tool in the platform' },
+      { type: 'feat', text: 'Exposes all 4 External Seller Fulfillment endpoints: Simulation, Placement, Authorize, Cancellation' },
+      { type: 'feat', text: 'Per-account namespacing — each VTEX account gets an isolated Fulfillment URL and call log' },
+      { type: 'feat', text: 'Three simulation scenarios: Available, Unavailable, Partial stock' },
+      { type: 'feat', text: 'Live call inspector with expandable request/response and VTEX API reference links' },
+      { type: 'feat', text: 'Step-by-step setup guide for connecting a VTEX external seller' },
+      { type: 'feat', text: 'Marketplace Protocol Simulator added to launcher and login page' },
+    ],
+  },
+  {
     version: '1.0.7',
     date: 'May 7, 2026',
-    tag: 'latest',
     changes: [
       { type: 'feat', text: 'Google OAuth SSO login — only @vtex.com accounts are authorized' },
       { type: 'feat', text: 'Sign out button added to sidebar footer' },
