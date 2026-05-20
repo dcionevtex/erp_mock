@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import type { PppCallLogEntry, PppPaymentRecord, PppConfig, PppScenario } from '@/types/ppp';
 
@@ -162,6 +162,11 @@ const SCENARIO_LABELS: Record<PppScenario, string> = {
   undefined: 'Undefined',
 };
 
+const SCENARIO_SOON: Partial<Record<PppScenario, boolean>> = {
+  denied: true,
+  pending: true,
+};
+
 const SCENARIO_DESC: Record<PppScenario, string> = {
   approved: 'Payment is authorized immediately. VTEX proceeds to fulfil the order.',
   denied: 'Payment is rejected. VTEX shows an error to the customer and does not complete the order.',
@@ -180,6 +185,7 @@ export default function PaymentProviderPage() {
   const [baseUrl, setBaseUrl] = useState('');
   const [copied, setCopied] = useState(false);
   const [clearing, setClearing] = useState(false);
+  const configInitialized = useRef(false);
 
   useEffect(() => {
     setBaseUrl(`${window.location.origin}/api/payment-provider/${config.scenario}`);
@@ -208,9 +214,10 @@ export default function PaymentProviderPage() {
           return JSON.stringify(prev) === JSON.stringify(incoming) ? prev : incoming;
         });
       }
-      if (configRes.ok) {
+      if (configRes.ok && !configInitialized.current) {
         const cfg = await configRes.json() as PppConfig;
-        setConfig(prev => prev.scenario === cfg.scenario ? prev : cfg);
+        setConfig(cfg);
+        configInitialized.current = true;
       }
     } catch {
       // silent — polling
@@ -435,6 +442,9 @@ export default function PaymentProviderPage() {
                         : 'bg-white/10',
                     ].join(' ')} />
                     <span className="text-xs font-medium">{SCENARIO_LABELS[s]}</span>
+                    {SCENARIO_SOON[s] && (
+                      <span className="text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded bg-white/5 text-white/25 border border-white/10 ml-auto">soon</span>
+                    )}
                   </div>
                   {config.scenario === s && (
                     <p className="text-[11px] mt-1.5 ml-3.5 leading-relaxed opacity-80">{SCENARIO_DESC[s]}</p>
