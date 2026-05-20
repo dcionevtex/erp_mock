@@ -193,8 +193,20 @@ export default function PaymentProviderPage() {
       ]);
       if (callsRes.ok) {
         const data = await callsRes.json() as { calls: PppCallLogEntry[]; payments: PppPaymentRecord[] };
-        setCalls(prev => JSON.stringify(prev) === JSON.stringify(data.calls) ? prev : data.calls);
-        setPayments(prev => JSON.stringify(prev) === JSON.stringify(data.payments) ? prev : data.payments);
+        // Vercel can route to cold instances with empty state — never replace with empty.
+        // Accumulate by ID so calls are never lost to a cold-start response.
+        setCalls(prev => {
+          const incoming = data.calls ?? [];
+          if (!incoming.length) return prev;
+          const existingIds = new Set(prev.map(c => c.id));
+          const added = incoming.filter(c => !existingIds.has(c.id));
+          return added.length ? [...prev, ...added] : prev;
+        });
+        setPayments(prev => {
+          const incoming = data.payments ?? [];
+          if (!incoming.length) return prev;
+          return JSON.stringify(prev) === JSON.stringify(incoming) ? prev : incoming;
+        });
       }
       if (configRes.ok) {
         const cfg = await configRes.json() as PppConfig;
