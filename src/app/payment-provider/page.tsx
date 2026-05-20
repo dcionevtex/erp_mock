@@ -555,26 +555,6 @@ export default function PaymentProviderPage() {
 
       {/* Footer */}
       <footer className="border-t px-8 py-4 flex items-center justify-between gap-4 flex-wrap shrink-0" style={{ borderColor: 'rgba(255,255,255,0.08)', background: '#0e1a27' }}>
-        <a
-          href="https://github.com/dcionevtex"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs transition-opacity hover:opacity-80"
-          style={{ color: 'rgba(255,255,255,0.4)' }}
-        >
-          Built by{' '}
-          <span className="font-semibold" style={{ color: 'rgba(255,255,255,0.75)' }}>@dcionevtex</span>
-          {' '}· VTEX
-        </a>
-        <a
-          href="https://brazilian.engineering/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="transition-opacity hover:opacity-80"
-          aria-label="Brazilian Engineering"
-        >
-          <BrazilianEngineeringLogo />
-        </a>
         <button
           onClick={() => signOut({ callbackUrl: '/login' })}
           className="flex items-center gap-2 text-xs font-medium transition-colors"
@@ -589,6 +569,26 @@ export default function PaymentProviderPage() {
           </svg>
           Sign out
         </button>
+        <a
+          href="https://brazilian.engineering/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="transition-opacity hover:opacity-80"
+          aria-label="Brazilian Engineering"
+        >
+          <BrazilianEngineeringLogo />
+        </a>
+        <a
+          href="https://github.com/dcionevtex"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs transition-opacity hover:opacity-80"
+          style={{ color: 'rgba(255,255,255,0.4)' }}
+        >
+          Built by{' '}
+          <span className="font-semibold" style={{ color: 'rgba(255,255,255,0.75)' }}>@dcionevtex</span>
+          {' '}· VTEX
+        </a>
       </footer>
 
     </div>
