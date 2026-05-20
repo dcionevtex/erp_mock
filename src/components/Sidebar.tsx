@@ -83,13 +83,13 @@ export function Sidebar() {
       </div>
 
       {/* Back to platform */}
-      <div className="px-2 pt-2 shrink-0">
+      <div className="px-2 pt-3 pb-1 shrink-0">
         <Link
           href="/"
           title={!expanded ? 'All tools' : undefined}
-          className="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs text-white/30 hover:text-white/60 hover:bg-white/5 transition-colors whitespace-nowrap"
+          className="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium text-white/50 hover:text-white hover:bg-white/10 transition-colors whitespace-nowrap border border-white/10 hover:border-white/20"
         >
-          <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M12 4l-6 6 6 6" />
           </svg>
           {expanded && <span>All tools</span>}
