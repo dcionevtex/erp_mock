@@ -114,16 +114,16 @@ export function handleOrderPlacement(
   const responseBody = {
     marketplaceOrderId,
     orderId: sellerOrderId,
-    followUpEmail: `seller-${account}@vtex.com`,
+    followUpEmail: `seller@${account}.com`,
     items: body.items ?? [],
     clientProfileData: body.clientProfileData ?? null,
     shippingData: body.shippingData ?? null,
-    paymentData: null,
     customData: {
       openTextField: body.openTextField ?? null,
       marketingData: body.marketingData ?? null,
     },
-    allowMultipleDeliveries: false,
+    paymentData: body.paymentData ?? null,
+    allowMultipleDeliveries: true,
   };
 
   appendCallLog(account, {
