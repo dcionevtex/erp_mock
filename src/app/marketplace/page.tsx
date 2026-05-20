@@ -372,6 +372,30 @@ export default function MarketplacePage() {
 
                 {/* Scenario selector */}
                 <div className="space-y-2">
+                  {/* Test product notice */}
+                  <div
+                    className="rounded-lg px-3 py-3 space-y-2"
+                    style={{ background: 'rgba(247,25,99,0.06)', border: '1px solid rgba(247,25,99,0.2)' }}
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 16 16" fill="#F71963"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm.75 3.5v4a.75.75 0 0 1-1.5 0v-4a.75.75 0 0 1 1.5 0zm0 6.5a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0z" /></svg>
+                      <p className="text-xs font-semibold" style={{ color: '#F71963' }}>Test product available</p>
+                    </div>
+                    <p className="text-xs text-white/40 leading-relaxed">
+                      A mock SKU is pre-configured in the <span className="text-white/60 font-mono">dcione</span> account mapped to seller <span className="text-white/60 font-mono">externalsellertest</span>. Use the link below to trigger a checkout flow directly.
+                    </p>
+                    <a
+                      href="https://dcione.myvtex.com/checkout/cart/add/?sku=100000&qty=1&seller=externalsellertest&sc=1"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-80 break-all"
+                      style={{ color: '#F71963' }}
+                    >
+                      <svg className="w-3 h-3 shrink-0" viewBox="0 0 16 16" fill="currentColor"><path d="M3.75 2h3.5a.75.75 0 0 1 0 1.5h-3.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-3.5a.75.75 0 0 1 1.5 0v3.5A1.75 1.75 0 0 1 12.25 14h-8.5A1.75 1.75 0 0 1 2 12.25v-8.5C2 2.784 2.784 2 3.75 2zm6.854-1h4.146a.25.25 0 0 1 .25.25v4.146a.25.25 0 0 1-.427.177L13.03 4.03 9.28 7.78a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042l3.75-3.75-1.543-1.543A.25.25 0 0 1 10.604 1z" /></svg>
+                      Add to cart and trigger checkout
+                    </a>
+                  </div>
+
                   <p className="text-[10px] uppercase tracking-widest text-white/25">Simulation Scenario</p>
                   <div className="space-y-1.5">
                     {SCENARIOS.map(s => (
