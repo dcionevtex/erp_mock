@@ -193,12 +193,12 @@ export default function PaymentProviderPage() {
       ]);
       if (callsRes.ok) {
         const data = await callsRes.json() as { calls: PppCallLogEntry[]; payments: PppPaymentRecord[] };
-        setCalls(data.calls);
-        setPayments(data.payments);
+        setCalls(prev => JSON.stringify(prev) === JSON.stringify(data.calls) ? prev : data.calls);
+        setPayments(prev => JSON.stringify(prev) === JSON.stringify(data.payments) ? prev : data.payments);
       }
       if (configRes.ok) {
         const cfg = await configRes.json() as PppConfig;
-        setConfig(cfg);
+        setConfig(prev => prev.scenario === cfg.scenario ? prev : cfg);
       }
     } catch {
       // silent — polling
