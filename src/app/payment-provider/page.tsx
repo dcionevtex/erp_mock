@@ -213,6 +213,7 @@ export default function PaymentProviderPage() {
   const [baseUrl, setBaseUrl] = useState('');
   const [copied, setCopied] = useState(false);
   const [clearing, setClearing] = useState(false);
+  const [showSetup, setShowSetup] = useState(false);
   const configInitialized = useRef(false);
 
   useEffect(() => {
@@ -389,8 +390,132 @@ export default function PaymentProviderPage() {
         {/* Context panel — scenario selector + endpoint docs */}
         <div className="w-80 shrink-0 overflow-auto flex flex-col border-r border-white/10">
 
-          {/* Scenario selector — always visible */}
-          <div className="px-5 py-4 border-b border-white/10 space-y-3">
+          {/* Tab toggle */}
+          <div className="flex border-b border-white/10 shrink-0">
+            <button
+              onClick={() => setShowSetup(false)}
+              className={['flex-1 px-3 py-2.5 text-[11px] font-semibold transition-colors', !showSetup ? 'text-white/80 border-b-2 border-pink-500' : 'text-white/30 hover:text-white/50'].join(' ')}
+            >
+              Scenario
+            </button>
+            <button
+              onClick={() => setShowSetup(true)}
+              className={['flex-1 px-3 py-2.5 text-[11px] font-semibold transition-colors', showSetup ? 'text-white/80 border-b-2 border-pink-500' : 'text-white/30 hover:text-white/50'].join(' ')}
+            >
+              Setup guide
+            </button>
+          </div>
+
+          {/* Setup guide */}
+          {showSetup && (
+            <div className="flex-1 px-5 py-5 space-y-6 overflow-auto">
+              <div className="space-y-1">
+                <p className="text-xs font-semibold text-white/70">How to run the VTEX PPP test suite</p>
+                <p className="text-[11px] text-white/35 leading-relaxed">
+                  Follow these steps to connect the official VTEX Payment Provider test suite to this simulator.
+                </p>
+              </div>
+
+              {/* Steps */}
+              {[
+                {
+                  n: 1,
+                  title: 'Open VTEX Admin',
+                  body: 'Log in to your VTEX Admin. Go to',
+                  link: { label: 'Payments → Settings → Gateway affiliations', href: 'https://help.vtex.com/en/tutorial/registering-a-gateway-affiliation--tutorials_444' },
+                  extra: null,
+                },
+                {
+                  n: 2,
+                  title: 'Create a new affiliation',
+                  body: 'Click the "+" button. Search for any custom connector or use a test connector type. Fill in the required fields.',
+                  link: null,
+                  extra: null,
+                },
+                {
+                  n: 3,
+                  title: 'Set the base URL',
+                  body: 'In the connector URL field, paste the base URL shown at the top of this page. It includes the scenario segment:',
+                  link: null,
+                  extra: 'copy-url',
+                },
+                {
+                  n: 4,
+                  title: 'Save and run tests',
+                  body: 'Save the affiliation. VTEX will call each required endpoint automatically. Watch the call log on the right as requests arrive.',
+                  link: { label: 'PPP homologation guide', href: 'https://developers.vtex.com/docs/guides/payment-provider-homologation' },
+                  extra: null,
+                },
+                {
+                  n: 5,
+                  title: 'Switch scenarios',
+                  body: 'Go to the Scenario tab to change the response the simulator returns (Approved, Denied, Pending). Update the URL in the affiliation to match.',
+                  link: null,
+                  extra: null,
+                },
+              ].map(step => (
+                <div key={step.n} className="flex gap-3">
+                  <span className="w-5 h-5 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold text-white/40 flex items-center justify-center shrink-0 mt-0.5">
+                    {step.n}
+                  </span>
+                  <div className="space-y-1 min-w-0">
+                    <p className="text-xs font-semibold text-white/70">{step.title}</p>
+                    <p className="text-[11px] text-white/40 leading-relaxed">{step.body}</p>
+                    {step.link && (
+                      <a
+                        href={step.link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-[11px] text-pink-400/70 hover:text-pink-400 transition-colors"
+                      >
+                        {step.link.label}
+                        <svg className="w-2.5 h-2.5" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M5 10h10M10 5l5 5-5 5" />
+                        </svg>
+                      </a>
+                    )}
+                    {step.extra === 'copy-url' && (
+                      <button
+                        onClick={copyBaseUrl}
+                        className="inline-flex items-center gap-1.5 text-[11px] font-mono text-white/40 bg-white/5 hover:bg-white/8 border border-white/10 rounded px-2 py-1 transition-colors mt-1 max-w-full"
+                      >
+                        <svg className="w-3 h-3 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                          <rect x="7" y="7" width="11" height="11" rx="1.5" />
+                          <path d="M4 13H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v1" />
+                        </svg>
+                        <span className="truncate">{copied ? 'Copied!' : (baseUrl || '…/api/payment-provider/approved')}</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+
+              {/* Reference links */}
+              <div className="pt-2 border-t border-white/5 space-y-2">
+                <p className="text-[10px] font-semibold text-white/25 uppercase tracking-wider">Official references</p>
+                {[
+                  { label: 'Payment Provider Protocol overview', href: 'https://developers.vtex.com/docs/guides/payment-provider-protocol' },
+                  { label: 'API reference', href: 'https://developers.vtex.com/docs/api-reference/payment-provider-protocol' },
+                  { label: 'Homologation process', href: 'https://developers.vtex.com/docs/guides/payment-provider-homologation' },
+                ].map(l => (
+                  <a
+                    key={l.href}
+                    href={l.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 text-[11px] text-white/30 hover:text-white/60 transition-colors"
+                  >
+                    <svg className="w-3 h-3 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 10h10M10 5l5 5-5 5" />
+                    </svg>
+                    {l.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {!showSetup && <div className="px-5 py-4 border-b border-white/10 space-y-3">
             <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider block">Response scenario</span>
             <div className="space-y-1.5">
               {SCENARIOS.map(s => (
@@ -424,8 +549,8 @@ export default function PaymentProviderPage() {
             </div>
           </div>
 
-          {/* Endpoint docs — shown when a call is selected */}
-          <div className="flex-1 px-5 py-4">
+          }
+          {!showSetup && <div className="flex-1 px-5 py-4">
             {contextDoc ? (
               <div className="space-y-4">
                 <div className="flex items-center justify-between gap-2">
@@ -481,7 +606,7 @@ export default function PaymentProviderPage() {
                 </div>
               </div>
             )}
-          </div>
+          </div>}
 
         </div>
 
