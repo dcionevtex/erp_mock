@@ -13,6 +13,7 @@ type EndpointDoc = {
   why: string;
   keyFields: Array<{ field: string; desc: string }>;
   expectedResponse?: string;
+  docUrl: string;
 };
 
 const ENDPOINT_DOCS: Record<string, EndpointDoc> = {
@@ -26,6 +27,7 @@ const ENDPOINT_DOCS: Record<string, EndpointDoc> = {
       { field: 'autoSettleDelay', desc: 'Window (in hours) VTEX waits before auto-settling. "0" to "720".' },
     ],
     expectedResponse: 'HTTP 200 with a valid manifest object. Any non-200 fails connector registration.',
+    docUrl: 'https://developers.vtex.com/docs/api-reference/payment-provider-protocol#get-/manifest',
   },
   'create-payment': {
     title: 'POST /payments',
@@ -39,6 +41,7 @@ const ENDPOINT_DOCS: Record<string, EndpointDoc> = {
       { field: 'authorizationId (response)', desc: 'Required when status is approved. VTEX stores this for settlement and refund traceability.' },
     ],
     expectedResponse: 'HTTP 200 always — even for denied payments. Non-200 is treated as a connector error, not a payment denial.',
+    docUrl: 'https://developers.vtex.com/docs/api-reference/payment-provider-protocol#post-/payments',
   },
   settlements: {
     title: 'POST /payments/{id}/settlements',
@@ -50,6 +53,7 @@ const ENDPOINT_DOCS: Record<string, EndpointDoc> = {
       { field: 'settleId (response)', desc: 'Your internal settlement reference. VTEX stores this for reconciliation.' },
     ],
     expectedResponse: 'HTTP 200 with settleId, value, and message. Errors should return HTTP 200 with an error code in the body, not a 4xx/5xx.',
+    docUrl: 'https://developers.vtex.com/docs/api-reference/payment-provider-protocol#post-/payments/-paymentId-/settlements',
   },
   cancellations: {
     title: 'POST /payments/{id}/cancellations',
@@ -60,6 +64,7 @@ const ENDPOINT_DOCS: Record<string, EndpointDoc> = {
       { field: 'cancellationId (response)', desc: 'Your void/cancellation reference. Required in the response.' },
     ],
     expectedResponse: 'HTTP 200 with cancellationId. If the payment was already settled, return an error code in the body explaining the conflict.',
+    docUrl: 'https://developers.vtex.com/docs/api-reference/payment-provider-protocol#post-/payments/-paymentId-/cancellations',
   },
   refunds: {
     title: 'POST /payments/{id}/refunds',
@@ -71,6 +76,7 @@ const ENDPOINT_DOCS: Record<string, EndpointDoc> = {
       { field: 'refundId (response)', desc: 'Your reversal reference for reconciliation.' },
     ],
     expectedResponse: 'HTTP 200 with refundId and the refunded value. Multiple calls with the same requestId should be idempotent.',
+    docUrl: 'https://developers.vtex.com/docs/api-reference/payment-provider-protocol#post-/payments/-paymentId-/refunds',
   },
   'get-payment': {
     title: 'GET /payments/{id}',
@@ -81,6 +87,7 @@ const ENDPOINT_DOCS: Record<string, EndpointDoc> = {
       { field: 'authorizationId', desc: 'Required in the response once status becomes "approved".' },
     ],
     expectedResponse: 'HTTP 200. VTEX will keep polling at increasing intervals. POST to callbackUrl to push the final status proactively and stop polling.',
+    docUrl: 'https://developers.vtex.com/docs/api-reference/payment-provider-protocol#get-/payments/-paymentId-',
   },
 };
 
@@ -293,33 +300,41 @@ export default function PaymentProviderPage() {
     <div className="min-h-screen flex flex-col" style={{ background: '#0d1826' }}>
 
       {/* Top bar */}
-      <header className="border-b border-white/10 px-6 h-14 flex items-center gap-4 shrink-0">
-        <Link
-          href="/"
-          className="flex items-center gap-1.5 text-xs text-white/30 hover:text-white/60 transition-colors shrink-0"
-        >
-          <svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 4l-6 6 6 6" />
-          </svg>
-          All tools
-        </Link>
-        <span className="text-white/10">|</span>
-        <span className="text-sm font-semibold text-white/80">Payment Provider Simulator</span>
-        <div className="flex-1" />
-        {/* Base URL */}
-        <div className="flex items-center gap-2">
-          <span className="text-[11px] text-white/30 hidden sm:block">Test suite base URL:</span>
-          <code className="text-[11px] font-mono bg-white/5 px-2 py-1 rounded hidden sm:flex items-center gap-0 max-w-sm truncate">
-            <span className="text-white/35">{baseUrl ? baseUrl.replace(`/${config.scenario}`, '') : '…/api/payment-provider'}</span>
-            {baseUrl && <span className={`font-bold ${config.scenario === 'approved' ? 'text-emerald-400' : config.scenario === 'denied' ? 'text-red-400' : config.scenario === 'pending' ? 'text-yellow-400' : 'text-white/50'}`}>/{config.scenario}</span>}
-          </code>
-          <button
-            onClick={copyBaseUrl}
-            className="text-xs px-2.5 py-1 rounded border border-white/10 text-white/40 hover:text-white/70 hover:border-white/20 transition-colors"
+      <header className="border-b border-white/10 px-6 h-16 grid grid-cols-3 items-center shrink-0">
+        {/* Left */}
+        <div className="flex items-center gap-3">
+          <Link
+            href="/"
+            className="flex items-center gap-1.5 text-xs text-white/30 hover:text-white/60 transition-colors"
           >
-            {copied ? 'Copied' : 'Copy'}
-          </button>
+            <svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 4l-6 6 6 6" />
+            </svg>
+            All tools
+          </Link>
+          <span className="text-white/10">|</span>
+          <span className="text-sm font-semibold text-white/80">Payment Provider Simulator</span>
         </div>
+
+        {/* Center — base URL */}
+        <div className="flex flex-col items-center gap-1">
+          <span className="text-[10px] text-white/25 uppercase tracking-wider">Test suite base URL</span>
+          <div className="flex items-center gap-2">
+            <code className="text-[11px] font-mono bg-white/5 px-3 py-1.5 rounded flex items-center gap-0 whitespace-nowrap">
+              <span className="text-white/40">{baseUrl ? baseUrl.replace(`/${config.scenario}`, '') : '…/api/payment-provider'}</span>
+              {baseUrl && <span className={`font-bold ${config.scenario === 'approved' ? 'text-emerald-400' : config.scenario === 'denied' ? 'text-red-400' : config.scenario === 'pending' ? 'text-yellow-400' : 'text-white/50'}`}>/{config.scenario}</span>}
+            </code>
+            <button
+              onClick={copyBaseUrl}
+              className="text-xs px-2.5 py-1 rounded border border-white/10 text-white/40 hover:text-white/70 hover:border-white/20 transition-colors whitespace-nowrap"
+            >
+              {copied ? 'Copied' : 'Copy'}
+            </button>
+          </div>
+        </div>
+
+        {/* Right — empty for balance */}
+        <div />
       </header>
 
       {/* Flow diagram */}
@@ -480,8 +495,19 @@ export default function PaymentProviderPage() {
           <div className="flex-1 px-5 py-4">
             {contextDoc ? (
               <div className="space-y-4">
-                <div>
+                <div className="flex items-center justify-between gap-2">
                   <code className="text-[11px] font-mono text-white/40 bg-white/5 px-2 py-1 rounded">{contextDoc.title}</code>
+                  <a
+                    href={contextDoc.docUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="shrink-0 flex items-center gap-1 text-[10px] font-medium text-white/30 hover:text-pink-400 transition-colors"
+                  >
+                    VTEX docs
+                    <svg className="w-3 h-3" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 10h10M10 5l5 5-5 5" />
+                    </svg>
+                  </a>
                 </div>
                 <div className="space-y-1.5">
                   <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider block">What this call does</span>
