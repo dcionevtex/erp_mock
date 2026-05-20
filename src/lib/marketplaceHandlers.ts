@@ -119,10 +119,32 @@ export function handleOrderPlacement(
 
   upsertOrder({ orderId: marketplaceOrderId, sellerOrderId, account, status: 'placed', placedAt: now, requestBody: body });
 
+  const items = ((body.items ?? []) as Record<string, unknown>[]).map(item => ({
+    id: item.id,
+    quantity: item.quantity,
+    seller: item.seller,
+    commission: item.commission ?? 0,
+    freightCommission: item.freightCommission ?? 0,
+    price: item.price,
+    bundleItems: item.bundleItems ?? [],
+    itemAttachment: { name: null, content: {} },
+    attachments: item.attachments ?? [],
+    priceTags: item.priceTags ?? [],
+    measurementUnit: item.measurementUnit,
+    unitMultiplier: item.unitMultiplier,
+    isGift: item.isGift ?? false,
+  }));
+
   const responseBody = {
     marketplaceOrderId,
     orderId: sellerOrderId,
     followUpEmail: `seller@${account}.com`,
+    items,
+    clientProfileData: body.clientProfileData ?? null,
+    shippingData: body.shippingData ?? null,
+    paymentData: null,
+    customData: null,
+    allowMultipleDeliveries: false,
   };
 
   appendCallLog(account, {
