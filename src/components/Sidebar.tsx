@@ -8,7 +8,7 @@ import { signOut } from 'next-auth/react';
 const NAV_ITEMS = [
   {
     label: 'ERP Orders',
-    href: '/',
+    href: '/erp',
     icon: (
       <svg className="w-5 h-5 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
         <rect x="2" y="3" width="16" height="14" rx="2" />
@@ -19,7 +19,7 @@ const NAV_ITEMS = [
   },
   {
     label: 'Documentation',
-    href: '/about',
+    href: '/erp/about',
     icon: (
       <svg className="w-5 h-5 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
         <path d="M4 2h9l5 5v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" />
@@ -29,7 +29,7 @@ const NAV_ITEMS = [
   },
   {
     label: 'Release Notes',
-    href: '/release-notes',
+    href: '/erp/release-notes',
     icon: (
       <svg className="w-5 h-5 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="10" cy="10" r="8" />
@@ -77,13 +77,27 @@ export function Sidebar() {
         </button>
         {expanded && (
           <span className="ml-3 text-sm font-semibold text-white/70 truncate whitespace-nowrap">
-            ERP Connect
+            ERP Simulator
           </span>
         )}
       </div>
 
+      {/* Back to platform */}
+      <div className="px-2 pt-2 shrink-0">
+        <Link
+          href="/"
+          title={!expanded ? 'All tools' : undefined}
+          className="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs text-white/30 hover:text-white/60 hover:bg-white/5 transition-colors whitespace-nowrap"
+        >
+          <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 4l-6 6 6 6" />
+          </svg>
+          {expanded && <span>All tools</span>}
+        </Link>
+      </div>
+
       {/* Nav */}
-      <nav className="flex-1 py-3 px-2 space-y-0.5">
+      <nav className="flex-1 py-2 px-2 space-y-0.5">
         {NAV_ITEMS.map((item) => {
           const active = pathname === item.href;
           return (
