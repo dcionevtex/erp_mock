@@ -37,7 +37,7 @@ function LoginForm() {
                 <line x1="12" y1="22.08" x2="12" y2="12"/>
               </svg>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">ERP Connect</h1>
+            <h1 className="text-2xl font-bold text-gray-900">A Simple ERP Simulator</h1>
             <p className="text-sm text-gray-500">VTEX OMS Integration Demo</p>
           </div>
 

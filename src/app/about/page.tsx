@@ -47,7 +47,7 @@ export default function AboutPage() {
           <div className="px-6 py-4 bg-muted/30 border-t border-border grid grid-cols-2 sm:grid-cols-4 gap-4">
             <Stat label="Integration modes" value="Feed + Hook" />
             <Stat label="VTEX APIs used" value="5" />
-            <Stat label="API endpoints" value="24" />
+            <Stat label="API endpoints" value="25" />
             <Stat label="Persistence" value="Neon Postgres" />
           </div>
         </div>
@@ -111,7 +111,7 @@ export default function AboutPage() {
             <FeatureCard
               icon={<InboxIcon />}
               title="ERP Inbox"
-              description="Every processed order lands in a unified inbox with status tracking, processing timeline, payload viewer, invoice flow, shipping label, and manual actions."
+              description="Every processed order lands in a unified inbox with status tracking, processing timeline, payload viewer, invoice flow, shipping label, bulk select/actions, and manual per-order actions."
             />
           </div>
         </AccordionSection>
@@ -158,15 +158,34 @@ export default function AboutPage() {
 
         {/* Access */}
         <AccordionSection title="Access &amp; Login">
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            The app is protected by a shared demo password set via the <code className="font-mono text-xs bg-muted px-1 rounded">DEMO_PASSWORD</code> environment variable (defaults to <code className="font-mono text-xs bg-muted px-1 rounded">vtex2024</code> if not set). On first visit, users are redirected to the login page where they must:
+          <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+            Access is protected by <strong>Google OAuth SSO via NextAuth.js</strong>. Only accounts with a <code className="font-mono text-xs bg-muted px-1 rounded">@vtex.com</code> email address are allowed — any other Google account is rejected at the sign-in callback.
           </p>
-          <ul className="mt-3 space-y-1.5 text-sm text-muted-foreground pl-5 list-disc">
-            <li>Enter the demo password.</li>
-            <li>Read and explicitly agree to the Terms &amp; Conditions — the Sign in button is disabled until the checkbox is checked.</li>
-          </ul>
+          <div className="grid sm:grid-cols-2 gap-3">
+            <div className="rounded-lg border border-border bg-card px-4 py-3 space-y-1.5">
+              <div className="text-xs font-semibold text-foreground">How login works</div>
+              <ul className="text-xs text-muted-foreground space-y-1 pl-4 list-disc leading-relaxed">
+                <li>On first visit, the app redirects unauthenticated users to <code className="font-mono text-[10px] bg-muted px-1 rounded">/login</code>.</li>
+                <li>Clicking <strong>Sign in with Google</strong> opens the standard Google OAuth consent screen.</li>
+                <li>Only <code className="font-mono text-[10px] bg-muted px-1 rounded">@vtex.com</code> email addresses pass the <code className="font-mono text-[10px] bg-muted px-1 rounded">signIn</code> callback — all others are rejected.</li>
+                <li>After approval, NextAuth creates an encrypted session cookie and redirects to the dashboard.</li>
+                <li>Clicking <strong>Sign out</strong> in the sidebar destroys the session immediately.</li>
+              </ul>
+            </div>
+            <div className="rounded-lg border border-border bg-card px-4 py-3 space-y-1.5">
+              <div className="text-xs font-semibold text-foreground">Required environment variables</div>
+              <ul className="text-xs text-muted-foreground space-y-1 pl-4 list-disc leading-relaxed">
+                <li><code className="font-mono text-[10px] bg-muted px-1 rounded">AUTH_GOOGLE_ID</code> — Google OAuth client ID</li>
+                <li><code className="font-mono text-[10px] bg-muted px-1 rounded">AUTH_GOOGLE_SECRET</code> — Google OAuth client secret</li>
+                <li><code className="font-mono text-[10px] bg-muted px-1 rounded">AUTH_SECRET</code> — min 32-char secret for NextAuth session encryption</li>
+              </ul>
+              <p className="text-[11px] text-muted-foreground mt-2">
+                Configure these in Google Cloud Console under <strong>APIs &amp; Services → Credentials</strong>. Add <code className="font-mono text-[10px] bg-muted px-1 rounded">/api/auth/callback/google</code> as an authorized redirect URI.
+              </p>
+            </div>
+          </div>
           <p className="text-xs text-muted-foreground mt-3">
-            Credentials (VTEX App Key / App Token) are stored in an encrypted HttpOnly session cookie isolated to each browser session — one session cannot see another&apos;s credentials. Sign out destroys the cookie immediately.
+            VTEX App Key / App Token are stored separately in an encrypted HttpOnly session cookie (via <code className="font-mono text-[10px] bg-muted px-1 rounded">iron-session</code>), isolated per browser session. Sign-out destroys both cookies immediately.
           </p>
         </AccordionSection>
 
@@ -193,8 +212,10 @@ export default function AboutPage() {
                   ['Integration Mode', '—', 'FEED or HOOK — determines active integration path'],
                   ['Auto Commit Feed', 'AUTO_COMMIT_FEED', 'Acknowledge feed handles after processing (true/false)'],
                   ['Simulate ERP Failure', 'SIMULATE_ERP_FAILURE', 'Force ERP simulation to fail for testing error flows'],
-                  ['Demo Password', 'DEMO_PASSWORD', 'Password for the login page. Defaults to vtex2024 if not set'],
-                  ['Session Secret', 'SESSION_SECRET', 'Min 32-char secret used to encrypt the credential cookie. Generate with: openssl rand -base64 32'],
+                  ['Google Client ID', 'AUTH_GOOGLE_ID', 'OAuth client ID from Google Cloud Console (also accepted as GOOGLE_CLIENT_ID)'],
+                  ['Google Client Secret', 'AUTH_GOOGLE_SECRET', 'OAuth client secret from Google Cloud Console (also accepted as GOOGLE_CLIENT_SECRET)'],
+                  ['Auth Secret', 'AUTH_SECRET', 'Min 32-char secret for NextAuth session encryption. Generate with: openssl rand -base64 32'],
+                  ['Session Secret', 'SESSION_SECRET', 'Min 32-char secret for the iron-session credential cookie. Generate separately from AUTH_SECRET'],
                   ['Cron Secret', 'CRON_SECRET', 'Bearer token Vercel injects when invoking the weekly cleanup cron. Leave blank to allow open access (demo only)'],
                   ['App URL', 'NEXT_PUBLIC_APP_URL', 'Public URL of the deployment — used to render the full Hook URL in the UI (e.g. https://your-app.vercel.app)'],
                 ].map(([field, env, desc]) => (
@@ -395,14 +416,15 @@ export default function AboutPage() {
               { method: 'POST', path: '/api/erp/orders/:orderId/send-invoice', desc: 'Send fiscal invoice to VTEX OMS (requires Start Handling SUCCESS)' },
               { method: 'POST', path: '/api/erp/orders/:orderId/update-tracking', desc: 'Add courier + tracking number to an already-invoiced order' },
               { method: 'POST', path: '/api/erp/orders/:orderId/cancel', desc: 'Cancel an order in VTEX (blocked once invoice is sent)' },
+              { method: 'POST', path: '/api/erp/orders/bulk', desc: 'Bulk delete or resolve multiple orders by orderId array' },
               { method: 'GET',  path: '/api/vtex/config/hook', desc: 'Read current VTEX Hook configuration for the account' },
               { method: 'POST', path: '/api/vtex/config/hook', desc: 'Save VTEX Hook configuration (overwrites immediately)' },
               { method: 'GET',  path: '/api/vtex/config/feed', desc: 'Read current VTEX Feed configuration for the account' },
               { method: 'POST', path: '/api/vtex/config/feed', desc: 'Save VTEX Feed configuration (overwrites immediately)' },
               { method: 'GET',  path: '/api/cron/cleanup', desc: 'Weekly cron — delete all orders and clear event log (protected by CRON_SECRET)' },
               { method: 'GET',  path: '/api/health', desc: 'DB connectivity check + row counts' },
-              { method: 'POST', path: '/api/auth/login', desc: 'Verify demo password and create an authenticated session cookie' },
-              { method: 'POST', path: '/api/auth/logout', desc: 'Destroy the session cookie and redirect to login' },
+              { method: 'GET',  path: '/api/auth/[...nextauth]', desc: 'NextAuth.js catch-all — handles Google OAuth callback, session, and sign-out' },
+              { method: 'POST', path: '/api/auth/[...nextauth]', desc: 'NextAuth.js catch-all — handles sign-in POST and CSRF token exchange' },
             ].map(({ method, path, desc }) => (
               <div key={path} className="flex items-start gap-3 px-4 py-3 rounded-lg border border-border bg-card hover:bg-muted/20 transition-colors">
                 <span className={`shrink-0 text-[10px] font-bold font-mono px-1.5 py-0.5 rounded ${methodColor(method)}`}>
@@ -538,9 +560,9 @@ export default function AboutPage() {
               },
               {
                 tag: 'AUTH',
-                title: 'Shared demo password — not production-grade',
-                body: 'Access is controlled by a single shared password (DEMO_PASSWORD env var). There is no per-user authentication, session expiry, or rate limiting on the login endpoint.',
-                fix: 'Acceptable for demo use. Replace with OAuth or an identity provider before any production deployment.',
+                title: 'Google SSO restricted to @vtex.com — no guest access',
+                body: 'Login requires a Google account with a @vtex.com email. External stakeholders or customers without a VTEX Google account cannot access the demo without being granted a @vtex.com identity or a workaround.',
+                fix: 'Workaround: share a read-only recording or hosted session. For broader access, swap the signIn callback to allow any domain or add an allowlist.',
                 fixed: false,
               },
               {
@@ -584,7 +606,8 @@ export default function AboutPage() {
               { name: 'TypeScript', role: 'Full type safety across client and server' },
               { name: 'Tailwind CSS v4', role: 'Utility-first styling with oklch color space' },
               { name: 'Neon Postgres', role: 'Serverless Postgres — order + event persistence' },
-              { name: 'iron-session', role: 'Encrypted HttpOnly cookie for credential storage' },
+              { name: 'NextAuth.js (Auth.js)', role: 'Google OAuth SSO — @vtex.com domain restricted sign-in' },
+              { name: 'iron-session', role: 'Encrypted HttpOnly cookie for VTEX credential storage' },
               { name: 'JsBarcode', role: 'CODE128 barcode generation for shipping labels' },
               { name: 'Vercel', role: 'Deployment — serverless functions + edge network' },
             ].map(({ name, role }) => (

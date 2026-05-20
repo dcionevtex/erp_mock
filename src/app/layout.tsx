@@ -16,7 +16,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "VTEX ERP Connect",
+  title: "VTEX — A Simple ERP Simulator",
   description: "Simulated ERP integration with VTEX OMS — Feed/Hook to Start Handling demo",
 };
 
