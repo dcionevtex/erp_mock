@@ -412,7 +412,7 @@ export default function PaymentProviderPage() {
               <div className="space-y-1">
                 <p className="text-xs font-semibold text-white/70">How to run the VTEX PPP test suite</p>
                 <p className="text-[11px] text-white/35 leading-relaxed">
-                  Follow these steps to connect the official VTEX Payment Provider test suite to this simulator.
+                  Connect the official VTEX Payment Provider Test Suite app to this simulator in a few steps.
                 </p>
               </div>
 
@@ -420,36 +420,36 @@ export default function PaymentProviderPage() {
               {[
                 {
                   n: 1,
-                  title: 'Open VTEX Admin',
-                  body: 'Log in to your VTEX Admin. Go to',
-                  link: { label: 'Payments → Settings → Gateway affiliations', href: 'https://help.vtex.com/en/tutorial/registering-a-gateway-affiliation--tutorials_444' },
+                  title: 'Install the test suite app',
+                  body: 'Open the VTEX App Store and install the Payment Provider Test Suite in your account.',
+                  link: { label: 'Payment Provider Test Suite → App Store', href: 'https://apps.vtex.com/vtex-payment-provider-test-suite/p' },
                   extra: null,
                 },
                 {
                   n: 2,
-                  title: 'Create a new affiliation',
-                  body: 'Click the "+" button. Search for any custom connector or use a test connector type. Fill in the required fields.',
-                  link: null,
-                  extra: null,
-                },
-                {
-                  n: 3,
-                  title: 'Set the base URL',
-                  body: 'In the connector URL field, paste the base URL shown at the top of this page. It includes the scenario segment:',
+                  title: 'Copy the base URL',
+                  body: 'Select a scenario in the Scenario tab, then copy the base URL shown at the top of this page:',
                   link: null,
                   extra: 'copy-url',
                 },
                 {
+                  n: 3,
+                  title: 'Open the test suite',
+                  body: 'In your VTEX Admin, open the installed Payment Provider Test Suite app. Paste the base URL into the connector URL field.',
+                  link: null,
+                  extra: null,
+                },
+                {
                   n: 4,
-                  title: 'Save and run tests',
-                  body: 'Save the affiliation. VTEX will call each required endpoint automatically. Watch the call log on the right as requests arrive.',
-                  link: { label: 'PPP homologation guide', href: 'https://developers.vtex.com/docs/guides/payment-provider-homologation' },
+                  title: 'Run the test flows',
+                  body: 'Select a flow (Approved, Cancellation, Refund) and click Run. The app will call each required endpoint in sequence.',
+                  link: null,
                   extra: null,
                 },
                 {
                   n: 5,
-                  title: 'Switch scenarios',
-                  body: 'Go to the Scenario tab to change the response the simulator returns (Approved, Denied, Pending). Update the URL in the affiliation to match.',
+                  title: 'Watch the call log',
+                  body: 'Every request from the test suite appears in the call log on the right. Click any row to see the full request and response with protocol documentation.',
                   link: null,
                   extra: null,
                 },
@@ -494,6 +494,7 @@ export default function PaymentProviderPage() {
               <div className="pt-2 border-t border-white/5 space-y-2">
                 <p className="text-[10px] font-semibold text-white/25 uppercase tracking-wider">Official references</p>
                 {[
+                  { label: 'Payment Provider Test Suite app', href: 'https://apps.vtex.com/vtex-payment-provider-test-suite/p' },
                   { label: 'Payment Provider Protocol overview', href: 'https://developers.vtex.com/docs/guides/payment-provider-protocol' },
                   { label: 'API reference', href: 'https://developers.vtex.com/docs/api-reference/payment-provider-protocol' },
                   { label: 'Homologation process', href: 'https://developers.vtex.com/docs/guides/payment-provider-homologation' },
