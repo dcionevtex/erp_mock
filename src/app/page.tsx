@@ -36,7 +36,7 @@ const TOOLS = [
   },
   {
     href: '/marketplace',
-    label: 'Marketplace Protocol Simulator',
+    label: 'External Seller Simulator',
     description: 'Simulate the VTEX External Seller Fulfillment protocol. Expose all required seller endpoints, run fulfillment simulation, order placement, authorization, and cancellation flows with live call inspection.',
     tag: 'Work in Progress',
     tagColor: 'bg-amber-500/15 text-amber-400',

@@ -28,7 +28,7 @@ const TOOLS = [
     ),
   },
   {
-    label: 'Marketplace Protocol Simulator',
+    label: 'External Seller Simulator',
     desc: 'External seller fulfillment endpoints — simulation, placement, authorization, cancellation',
     icon: (
       <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">

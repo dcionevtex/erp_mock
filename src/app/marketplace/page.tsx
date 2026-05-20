@@ -245,7 +245,7 @@ export default function MarketplacePage() {
             <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>Platform</span>
           </Link>
           <span style={{ color: 'rgba(255,255,255,0.15)' }}>/</span>
-          <span className="text-sm font-semibold text-white/70">Marketplace Protocol</span>
+          <span className="text-sm font-semibold text-white/70">External Seller Simulator</span>
         </div>
 
         <div className="flex flex-col items-center justify-center">
