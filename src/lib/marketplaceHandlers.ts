@@ -101,7 +101,7 @@ export function handleSimulation(
 
 export function handleOrderPlacement(
   account: string,
-  orderId: string,
+  marketplaceOrderId: string,
   body: MktOrderRequest,
   pathname: string,
   start: number,
@@ -109,16 +109,29 @@ export function handleOrderPlacement(
   const now = new Date().toISOString();
   const sellerOrderId = `MKT-${randomUUID().slice(0, 8).toUpperCase()}`;
 
-  upsertOrder({ orderId, sellerOrderId, account, status: 'placed', placedAt: now, requestBody: body });
+  upsertOrder({ orderId: marketplaceOrderId, sellerOrderId, account, status: 'placed', placedAt: now, requestBody: body });
 
-  const responseBody = { orderId, sellerOrderId };
+  const responseBody = {
+    marketplaceOrderId,
+    orderId: sellerOrderId,
+    followUpEmail: `seller-${account}@vtex.com`,
+    items: body.items ?? [],
+    clientProfileData: body.clientProfileData ?? null,
+    shippingData: body.shippingData ?? null,
+    paymentData: null,
+    customData: {
+      openTextField: body.openTextField ?? null,
+      marketingData: body.marketingData ?? null,
+    },
+    allowMultipleDeliveries: false,
+  };
 
   appendCallLog(account, {
     timestamp: now,
-    method: 'PUT',
+    method: 'POST',
     path: pathname,
     account,
-    orderId,
+    orderId: marketplaceOrderId,
     endpoint: 'placement',
     requestBody: body,
     responseBody,

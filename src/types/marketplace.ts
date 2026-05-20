@@ -17,9 +17,13 @@ export type MktSimulationRequest = {
 export type MktOrderRequest = {
   marketplaceOrderId?: string;
   marketplaceServicesEndpoint?: string;
+  marketplacePaymentValue?: number;
+  items?: unknown[];
   clientProfileData?: unknown;
   shippingData?: unknown;
-  items?: unknown[];
+  paymentData?: unknown;
+  marketingData?: unknown;
+  openTextField?: string;
   [key: string]: unknown;
 };
 
