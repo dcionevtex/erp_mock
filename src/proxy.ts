@@ -16,9 +16,9 @@ export default auth((req) => {
     return NextResponse.redirect(new URL('/', req.url));
   }
 
-  // Redirect unauthenticated users to login
+  // Redirect unauthenticated users to login (no callbackUrl — always land on launcher after auth)
   if (!req.auth && pathname !== '/login') {
-    return NextResponse.redirect(new URL('/login', req.url));
+    return NextResponse.redirect(new URL('/login', req.nextUrl.origin));
   }
 
   return NextResponse.next();
