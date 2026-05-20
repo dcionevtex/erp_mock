@@ -182,8 +182,8 @@ export default function PaymentProviderPage() {
   const [clearing, setClearing] = useState(false);
 
   useEffect(() => {
-    setBaseUrl(`${window.location.origin}/api/payment-provider`);
-  }, []);
+    setBaseUrl(`${window.location.origin}/api/payment-provider/${config.scenario}`);
+  }, [config.scenario]);
 
   const fetchData = useCallback(async () => {
     try {
