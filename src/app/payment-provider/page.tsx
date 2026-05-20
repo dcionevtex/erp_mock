@@ -387,74 +387,8 @@ export default function PaymentProviderPage() {
       {/* Body */}
       <div className="flex flex-1 min-h-0 overflow-hidden">
 
-        {/* Call log */}
-        <div className="flex-1 min-w-0 overflow-auto border-r border-white/10">
-          {calls.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full py-20 text-center px-8 space-y-3">
-              <svg className="w-8 h-8 text-white/10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3">
-                <rect x="2" y="5" width="20" height="14" rx="2" />
-                <path d="M2 10h20M6 15h4" strokeLinecap="round" />
-              </svg>
-              <p className="text-sm text-white/30">No calls received yet</p>
-              <p className="text-xs text-white/20 max-w-xs leading-relaxed">
-                Configure your VTEX payment connector to point to the base URL above, then run the test suite.
-              </p>
-            </div>
-          ) : (
-            <div className="divide-y divide-white/5">
-              {calls.map(call => {
-                const expanded = expandedIds.has(call.id);
-                const active = selectedKey === call.id;
-                return (
-                  <div
-                    key={call.id}
-                    className={['transition-colors', active ? 'bg-white/[0.04]' : 'hover:bg-white/[0.02]'].join(' ')}
-                  >
-                    <div
-                      className="flex items-center gap-3 px-5 py-3 cursor-pointer"
-                      onClick={() => { setSelectedKey(call.id); toggleExpand(call.id); }}
-                    >
-                      <span className={`shrink-0 text-[10px] font-bold font-mono px-1.5 py-0.5 rounded ${methodColor(call.method)}`}>
-                        {call.method}
-                      </span>
-                      <span className="text-xs font-mono text-white/60 flex-1 truncate">{call.path}</span>
-                      <span className={`text-xs font-mono shrink-0 ${statusColor(call.httpStatus)}`}>
-                        {call.httpStatus}
-                      </span>
-                      <span className="text-[11px] text-white/20 shrink-0">{call.durationMs}ms</span>
-                      <span className="text-[11px] text-white/20 shrink-0 hidden sm:block">{relativeTime(call.timestamp)}</span>
-                      <svg
-                        className={['w-3.5 h-3.5 text-white/20 shrink-0 transition-transform', expanded ? 'rotate-90' : ''].join(' ')}
-                        viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
-                      >
-                        <path d="M7 5l5 5-5 5" />
-                      </svg>
-                    </div>
-                    {expanded && (
-                      <div className="px-5 pb-4 grid sm:grid-cols-2 gap-3">
-                        <div className="space-y-1.5">
-                          <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider">Request</span>
-                          <pre className="text-[11px] font-mono text-white/50 bg-white/5 rounded p-3 overflow-auto max-h-48 whitespace-pre-wrap break-all">
-                            {call.requestBody ? JSON.stringify(call.requestBody, null, 2) : '—'}
-                          </pre>
-                        </div>
-                        <div className="space-y-1.5">
-                          <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider">Response</span>
-                          <pre className="text-[11px] font-mono text-white/50 bg-white/5 rounded p-3 overflow-auto max-h-48 whitespace-pre-wrap break-all">
-                            {call.responseBody ? JSON.stringify(call.responseBody, null, 2) : '—'}
-                          </pre>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* Context panel */}
-        <div className="w-80 shrink-0 overflow-auto flex flex-col">
+        {/* Context panel — scenario selector + endpoint docs */}
+        <div className="w-80 shrink-0 overflow-auto flex flex-col border-r border-white/10">
 
           {/* Scenario selector — always visible */}
           <div className="px-5 py-4 border-b border-white/10 space-y-3">
@@ -551,6 +485,73 @@ export default function PaymentProviderPage() {
           </div>
 
         </div>
+
+        {/* Call log */}
+        <div className="flex-1 min-w-0 overflow-auto">
+          {calls.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full py-20 text-center px-8 space-y-3">
+              <svg className="w-8 h-8 text-white/10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3">
+                <rect x="2" y="5" width="20" height="14" rx="2" />
+                <path d="M2 10h20M6 15h4" strokeLinecap="round" />
+              </svg>
+              <p className="text-sm text-white/30">No calls received yet</p>
+              <p className="text-xs text-white/20 max-w-xs leading-relaxed">
+                Configure your VTEX payment connector to point to the base URL above, then run the test suite.
+              </p>
+            </div>
+          ) : (
+            <div className="divide-y divide-white/5">
+              {calls.map(call => {
+                const expanded = expandedIds.has(call.id);
+                const active = selectedKey === call.id;
+                return (
+                  <div
+                    key={call.id}
+                    className={['transition-colors', active ? 'bg-white/[0.04]' : 'hover:bg-white/[0.02]'].join(' ')}
+                  >
+                    <div
+                      className="flex items-center gap-3 px-5 py-3 cursor-pointer"
+                      onClick={() => { setSelectedKey(call.id); toggleExpand(call.id); }}
+                    >
+                      <span className={`shrink-0 text-[10px] font-bold font-mono px-1.5 py-0.5 rounded ${methodColor(call.method)}`}>
+                        {call.method}
+                      </span>
+                      <span className="text-xs font-mono text-white/60 flex-1 truncate">{call.path}</span>
+                      <span className={`text-xs font-mono shrink-0 ${statusColor(call.httpStatus)}`}>
+                        {call.httpStatus}
+                      </span>
+                      <span className="text-[11px] text-white/20 shrink-0">{call.durationMs}ms</span>
+                      <span className="text-[11px] text-white/20 shrink-0 hidden sm:block">{relativeTime(call.timestamp)}</span>
+                      <svg
+                        className={['w-3.5 h-3.5 text-white/20 shrink-0 transition-transform', expanded ? 'rotate-90' : ''].join(' ')}
+                        viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+                      >
+                        <path d="M7 5l5 5-5 5" />
+                      </svg>
+                    </div>
+                    {expanded && (
+                      <div className="px-5 pb-4 grid sm:grid-cols-2 gap-3">
+                        <div className="space-y-1.5">
+                          <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider">Request</span>
+                          <pre className="text-[11px] font-mono text-white/50 bg-white/5 rounded p-3 overflow-auto max-h-48 whitespace-pre-wrap break-all">
+                            {call.requestBody ? JSON.stringify(call.requestBody, null, 2) : '—'}
+                          </pre>
+                        </div>
+                        <div className="space-y-1.5">
+                          <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider">Response</span>
+                          <pre className="text-[11px] font-mono text-white/50 bg-white/5 rounded p-3 overflow-auto max-h-48 whitespace-pre-wrap break-all">
+                            {call.responseBody ? JSON.stringify(call.responseBody, null, 2) : '—'}
+                          </pre>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
       </div>
 
       {/* Footer */}
