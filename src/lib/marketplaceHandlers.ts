@@ -135,13 +135,22 @@ export function handleOrderPlacement(
     isGift: item.isGift ?? false,
   }));
 
+  const rawShipping = body.shippingData as Record<string, unknown> | null | undefined;
+  const rawLogisticsInfo = (rawShipping?.logisticsInfo as Record<string, unknown>[] | undefined) ?? [];
+  const logisticsInfo = rawLogisticsInfo.map(li => ({
+    ...li,
+    selectedSla: (li.selectedSla as string | null) ?? 'Regular',
+    selectedDeliveryChannel: (li.selectedDeliveryChannel as string | null) ?? 'delivery',
+  }));
+  const shippingData = rawShipping ? { ...rawShipping, logisticsInfo } : null;
+
   const responseBody = {
     marketplaceOrderId,
     orderId: sellerOrderId,
     followUpEmail: `seller@${account}.com`,
     items,
     clientProfileData: body.clientProfileData ?? null,
-    shippingData: body.shippingData ?? null,
+    shippingData,
     paymentData: null,
     customData: null,
     allowMultipleDeliveries: false,
