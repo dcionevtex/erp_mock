@@ -6,7 +6,15 @@ const DEFAULT_SLA = {
   id: 'Regular',
   deliveryChannel: 'delivery',
   name: 'Regular Shipping',
-  deliveryIds: [],
+  deliveryIds: [
+    {
+      courierId: 'demo-carrier',
+      courierName: 'Demo Carrier',
+      dockId: 'demo-dock',
+      quantity: 1,
+      warehouseId: 'demo-warehouse',
+    },
+  ],
   shippingEstimate: '5bd',
   shippingEstimateDate: null,
   lockTTL: '1h',
