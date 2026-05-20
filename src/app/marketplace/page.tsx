@@ -131,7 +131,7 @@ export default function MarketplacePage() {
   const [baseUrl, setBaseUrl] = useState('');
   const [copied, setCopied] = useState(false);
   const [clearing, setClearing] = useState(false);
-  const [showSetup, setShowSetup] = useState(false);
+  const [activeTab, setActiveTab] = useState<'scenario' | 'setup' | 'catalog'>('scenario');
   const configInitialized = useRef(false);
 
   // Load account from localStorage on mount
@@ -292,29 +292,32 @@ export default function MarketplacePage() {
         <aside className="w-80 shrink-0 flex flex-col border-r border-white/10 overflow-hidden">
           {/* Tabs */}
           <div className="flex border-b border-white/10 shrink-0">
-            {(['Scenario', 'Setup'] as const).map(tab => {
-              const active = tab === 'Setup' ? showSetup : !showSetup;
-              return (
-                <button
-                  key={tab}
-                  onClick={() => setShowSetup(tab === 'Setup')}
-                  className={[
-                    'flex-1 py-3 text-xs font-medium transition-colors',
-                    active ? 'text-white/80 border-b-2 border-pink-500' : 'text-white/30 hover:text-white/50',
-                  ].join(' ')}
-                >
-                  {tab}
-                </button>
-              );
-            })}
-            <div className="flex-1 py-3 flex items-center justify-center gap-1.5 cursor-not-allowed opacity-40">
-              <span className="text-xs font-medium text-white/30">Catalog</span>
+            {([['scenario', 'Scenario'], ['setup', 'Setup']] as const).map(([val, label]) => (
+              <button
+                key={val}
+                onClick={() => setActiveTab(val)}
+                className={[
+                  'flex-1 py-3 text-xs font-medium transition-colors',
+                  activeTab === val ? 'text-white/80 border-b-2 border-pink-500' : 'text-white/30 hover:text-white/50',
+                ].join(' ')}
+              >
+                {label}
+              </button>
+            ))}
+            <button
+              onClick={() => setActiveTab('catalog')}
+              className={[
+                'flex-1 py-3 flex items-center justify-center gap-1.5 text-xs font-medium transition-colors',
+                activeTab === 'catalog' ? 'text-white/80 border-b-2 border-pink-500' : 'text-white/30 hover:text-white/50',
+              ].join(' ')}
+            >
+              Catalog
               <span className="text-[9px] font-semibold px-1 py-0.5 rounded" style={{ background: 'rgba(251,191,36,0.15)', color: '#fbbf24' }}>Soon</span>
-            </div>
+            </button>
           </div>
 
           <div className="flex-1 overflow-y-auto">
-            {!showSetup && (
+            {activeTab === 'scenario' && (
               <div className="p-4 space-y-6">
 
                 {/* Account config */}
@@ -418,7 +421,7 @@ export default function MarketplacePage() {
               </div>
             )}
 
-            {showSetup && (
+            {activeTab === 'setup' && (
               <div className="p-4 space-y-5">
                 <div>
                   <p className="text-xs font-semibold text-white/70">Setup guide</p>
@@ -506,6 +509,56 @@ export default function MarketplacePage() {
                     </a>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {activeTab === 'catalog' && (
+              <div className="p-4 flex flex-col items-center justify-center h-full gap-5 text-center">
+                <div
+                  className="w-12 h-12 rounded-xl flex items-center justify-center"
+                  style={{ background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.15)' }}
+                >
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" />
+                    <path d="M16 3H8l-2 4h12l-2-4z" />
+                    <path d="M12 12v4M10 14h4" />
+                  </svg>
+                </div>
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-center gap-2">
+                    <p className="text-sm font-semibold text-white/70">Catalog Sync</p>
+                    <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded" style={{ background: 'rgba(251,191,36,0.15)', color: '#fbbf24' }}>Coming Soon</span>
+                  </div>
+                  <p className="text-xs text-white/30 leading-relaxed max-w-[220px]">
+                    Push SKU suggestions from the seller to the VTEX marketplace catalog using the SKU Exchange API.
+                  </p>
+                </div>
+                <div className="space-y-2 w-full">
+                  {[
+                    'Define products and SKUs',
+                    'Send catalog notifications to marketplace',
+                    'Track approval status per SKU',
+                  ].map(item => (
+                    <div
+                      key={item}
+                      className="flex items-center gap-2.5 rounded-lg px-3 py-2 opacity-40"
+                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400/50 shrink-0" />
+                      <span className="text-xs text-white/50">{item}</span>
+                    </div>
+                  ))}
+                </div>
+                <a
+                  href="https://developers.vtex.com/docs/api-reference/marketplace-protocol-external-seller-fulfillment#post-/api/catalog_system/pvt/skuexchange/skuseller/-sellerId-/-sellerSkuId-"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs transition-opacity hover:opacity-80"
+                  style={{ color: 'rgba(255,255,255,0.3)' }}
+                >
+                  <svg className="w-3 h-3 shrink-0" viewBox="0 0 16 16" fill="currentColor"><path d="M3.75 2h3.5a.75.75 0 0 1 0 1.5h-3.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-3.5a.75.75 0 0 1 1.5 0v3.5A1.75 1.75 0 0 1 12.25 14h-8.5A1.75 1.75 0 0 1 2 12.25v-8.5C2 2.784 2.784 2 3.75 2zm6.854-1h4.146a.25.25 0 0 1 .25.25v4.146a.25.25 0 0 1-.427.177L13.03 4.03 9.28 7.78a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042l3.75-3.75-1.543-1.543A.25.25 0 0 1 10.604 1z" /></svg>
+                  SKU Exchange API reference
+                </a>
               </div>
             )}
           </div>
