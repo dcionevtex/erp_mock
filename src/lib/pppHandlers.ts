@@ -33,11 +33,11 @@ export function buildPaymentResponse(paymentId: string, scenario: PppScenario) {
     case 'approved':
       return { ...base, status: 'approved', authorizationId: randomUUID(), nsu: String(Date.now()) };
     case 'denied':
-      return { ...base, status: 'denied', authorizationId: null, nsu: null, code: 'cancel', message: 'Payment denied by simulator' };
+      return { ...base, status: 'denied', authorizationId: '', nsu: '', code: 'cancel', message: 'Payment denied by simulator' };
     case 'pending':
-      return { ...base, status: 'pending', authorizationId: null, nsu: null, message: 'Awaiting async callback' };
+      return { ...base, status: 'pending', authorizationId: '', nsu: '', message: 'Awaiting async callback' };
     case 'undefined':
-      return { ...base, status: 'undefined', authorizationId: null, nsu: null, message: 'Payment status undefined — callback required' };
+      return { ...base, status: 'undefined', authorizationId: '', nsu: '', message: 'Payment status undefined — callback required' };
     default:
       return { ...base, status: 'approved', authorizationId: randomUUID(), nsu: String(Date.now()) };
   }
