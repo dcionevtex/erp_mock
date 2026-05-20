@@ -10,8 +10,9 @@ export async function POST(
 ) {
   const start = Date.now();
   const { account } = await params;
-  const body = await req.json() as MktOrderRequest;
-  const orderId = (body.marketplaceOrderId as string | undefined) ?? crypto.randomUUID();
-  const responseBody = handleOrderPlacement(account, orderId, body, new URL(req.url).pathname, start);
+  const raw = await req.json();
+  const order = (Array.isArray(raw) ? raw[0] : raw) as MktOrderRequest;
+  const orderId = order.marketplaceOrderId ?? crypto.randomUUID();
+  const responseBody = handleOrderPlacement(account, orderId, order, new URL(req.url).pathname, start);
   return NextResponse.json(responseBody);
 }
