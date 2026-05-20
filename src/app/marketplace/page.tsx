@@ -307,6 +307,10 @@ export default function MarketplacePage() {
                 </button>
               );
             })}
+            <div className="flex-1 py-3 flex items-center justify-center gap-1.5 cursor-not-allowed opacity-40">
+              <span className="text-xs font-medium text-white/30">Catalog</span>
+              <span className="text-[9px] font-semibold px-1 py-0.5 rounded" style={{ background: 'rgba(251,191,36,0.15)', color: '#fbbf24' }}>Soon</span>
+            </div>
           </div>
 
           <div className="flex-1 overflow-y-auto">
