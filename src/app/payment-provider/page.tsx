@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
+import { signOut } from 'next-auth/react';
 import type { PppCallLogEntry, PppPaymentRecord, PppConfig, PppScenario } from '@/types/ppp';
 
 // ── Educational content per endpoint ─────────────────────────────────────────
@@ -174,6 +175,26 @@ const SCENARIO_DESC: Record<PppScenario, string> = {
   undefined: 'Provider-side uncertainty. Treated like pending — VTEX waits for async resolution before proceeding.',
 };
 
+// ── Brazilian Engineering logo ────────────────────────────────────────────────
+
+function BrazilianEngineeringLogo() {
+  return (
+    <div className="flex flex-col items-center select-none">
+      <span className="font-black italic leading-none tracking-tight" style={{ fontSize: '1.1rem', color: '#ffffff', fontFamily: 'Inter, sans-serif' }}>
+        #BrazilianEngineering
+      </span>
+      <svg viewBox="0 0 240 16" width="220" height="14" className="mt-1" aria-hidden="true">
+        <path d="M 2 8 C 60 15 100 13 112 8" stroke="#FEDF00" strokeWidth="2.8" fill="none" strokeLinecap="round" />
+        <path d="M 128 8 C 145 13 185 15 238 8" stroke="rgba(255,255,255,0.45)" strokeWidth="2.2" fill="none" strokeLinecap="round" />
+        <polygon points="120,1 130,8 120,15 110,8" fill="#009B3A" />
+        <polygon points="120,3.5 128,8 120,12.5 112,8" fill="#FEDF00" />
+        <circle cx="120" cy="8" r="4" fill="#002776" />
+        <path d="M 116.5 8 A 4 4 0 0 1 123.5 8" stroke="white" strokeWidth="0.7" fill="none" />
+      </svg>
+    </div>
+  );
+}
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function PaymentProviderPage() {
@@ -288,8 +309,9 @@ export default function PaymentProviderPage() {
         {/* Base URL */}
         <div className="flex items-center gap-2">
           <span className="text-[11px] text-white/30 hidden sm:block">Test suite base URL:</span>
-          <code className="text-[11px] font-mono text-white/50 bg-white/5 px-2 py-1 rounded hidden sm:block max-w-xs truncate">
-            {baseUrl || '…/api/payment-provider'}
+          <code className="text-[11px] font-mono bg-white/5 px-2 py-1 rounded hidden sm:flex items-center gap-0 max-w-sm truncate">
+            <span className="text-white/35">{baseUrl ? baseUrl.replace(`/${config.scenario}`, '') : '…/api/payment-provider'}</span>
+            {baseUrl && <span className={`font-bold ${config.scenario === 'approved' ? 'text-emerald-400' : config.scenario === 'denied' ? 'text-red-400' : config.scenario === 'pending' ? 'text-yellow-400' : 'text-white/50'}`}>/{config.scenario}</span>}
           </code>
           <button
             onClick={copyBaseUrl}
@@ -504,6 +526,45 @@ export default function PaymentProviderPage() {
 
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="border-t px-8 py-4 flex items-center justify-between gap-4 flex-wrap shrink-0" style={{ borderColor: 'rgba(255,255,255,0.08)', background: '#0e1a27' }}>
+        <a
+          href="https://github.com/dcionevtex"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs transition-opacity hover:opacity-80"
+          style={{ color: 'rgba(255,255,255,0.4)' }}
+        >
+          Built by{' '}
+          <span className="font-semibold" style={{ color: 'rgba(255,255,255,0.75)' }}>@dcionevtex</span>
+          {' '}· VTEX
+        </a>
+        <a
+          href="https://brazilian.engineering/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="transition-opacity hover:opacity-80"
+          aria-label="Brazilian Engineering"
+        >
+          <BrazilianEngineeringLogo />
+        </a>
+        <button
+          onClick={() => signOut({ callbackUrl: '/login' })}
+          className="flex items-center gap-2 text-xs font-medium transition-colors"
+          style={{ color: 'rgba(255,255,255,0.35)' }}
+          onMouseEnter={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.7)')}
+          onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.35)')}
+        >
+          <svg className="w-4 h-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M7 3H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h3" />
+            <path d="M13 14l3-4-3-4" />
+            <path d="M16 10H7" />
+          </svg>
+          Sign out
+        </button>
+      </footer>
+
     </div>
   );
 }
