@@ -27,12 +27,12 @@ const ENDPOINT_DOCS: Record<string, EndpointDoc> = {
   },
   placement: {
     label: 'Order Placement',
-    method: 'PUT',
-    pathTemplate: '/pvt/orders/{orderId}',
+    method: 'POST',
+    pathTemplate: '/pvt/orders',
     description:
-      'Called when the customer confirms the purchase. VTEX sends the full order to the seller. The seller must respond with a sellerOrderId to acknowledge registration.',
+      'Called when the customer confirms the purchase. VTEX sends the full order to the seller including marketplaceOrderId in the body. The seller must respond with a sellerOrderId to acknowledge registration.',
     docUrl:
-      'https://developers.vtex.com/docs/api-reference/marketplace-protocol-external-seller-fulfillment#put-/pvt/orders/-orderId-',
+      'https://developers.vtex.com/docs/api-reference/marketplace-protocol-external-seller-fulfillment#post-/pvt/orders',
   },
   fulfill: {
     label: 'Authorize Fulfillment',
