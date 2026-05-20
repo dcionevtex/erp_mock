@@ -242,7 +242,7 @@ export default function MarketplacePage() {
             <svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'rgba(255,255,255,0.4)' }}>
               <path d="M12 5l-5 5 5 5" />
             </svg>
-            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>Platform</span>
+            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>All tools</span>
           </Link>
           <span style={{ color: 'rgba(255,255,255,0.15)' }}>/</span>
           <span className="text-sm font-semibold text-white/70">External Seller Simulator</span>
