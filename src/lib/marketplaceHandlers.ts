@@ -115,15 +115,6 @@ export function handleOrderPlacement(
     marketplaceOrderId,
     orderId: sellerOrderId,
     followUpEmail: `seller@${account}.com`,
-    items: body.items ?? [],
-    clientProfileData: body.clientProfileData ?? null,
-    shippingData: body.shippingData ?? null,
-    customData: {
-      openTextField: body.openTextField ?? null,
-      marketingData: body.marketingData ?? null,
-    },
-    paymentData: body.paymentData ?? null,
-    allowMultipleDeliveries: true,
   };
 
   appendCallLog(account, {
