@@ -94,3 +94,48 @@ Greenfield Next.js app that simulates the full VTEX OMS-to-ERP handoff. The buil
 | 3. API Routes | 2/2 | Complete    | 2026-04-29 |
 | 4. UI Dashboard | 3/3 | Complete    | 2026-04-29 |
 | 5. Documentation | 1/1 | Complete    | 2026-04-29 |
+
+---
+
+# Milestone: v2 — VTEX Demo Platform
+
+**Goal:** Transform the single ERP mock into a multi-simulator platform. A launcher page at `/` presents all tools. Each simulator lives under its own route prefix with isolated state. Shared auth only.
+
+**Branch:** `feat/platform-shell`
+
+## Architecture
+
+```
+/                           → Launcher (tool picker)
+/erp/*                      → ERP Simulator (migrated from /)
+/payment-provider/*         → Payment Provider Simulator (new)
+/login                      → Shared Google OAuth login
+
+Shared: Google OAuth, iron-session VTEX credentials
+Isolated: all state, all routes, all components per tool
+API routes: /api/erp/*, /api/vtex/*, /api/payment-provider/* (no change to existing)
+```
+
+## Phases
+
+- [ ] **Phase 1 — Platform Shell** *(in progress 2026-05-20)*
+  Launcher page at `/`, ERP mock pages migrated to `/erp/*`, sidebar updated with back-to-platform link. No API or logic changes.
+  Branch: `feat/platform-shell`
+
+- [ ] **Phase 2 — Payment Provider Protocol: Core**
+  Implement all 6 PPP endpoints under `/api/payment-provider/*`. In-memory payment record store. Scenario toggles: approved / denied / pending / async callback.
+  Endpoints: `GET /manifest`, `POST /payments`, `POST /payments/{id}/cancellations`, `POST /payments/{id}/settlements`, `POST /payments/{id}/refunds`, `GET /payments/{id}`
+
+- [ ] **Phase 3 — Payment Provider Protocol: Dashboard**
+  Educational UI at `/payment-provider`. Flow diagram (test suite progress), live call log, context panel with inline protocol docs, annotated request/response, scenario controls.
+
+- [ ] **Phase 4 — Docs + Release Notes**
+  Update SDD for platform architecture, add payment provider protocol docs, update README. Add v2.0.0 release notes entry.
+
+## Payment Simulator Design Decisions
+
+- **Direction:** Mock acts as the *provider* (receives calls from VTEX test suite), not the caller
+- **URL routing:** VTEX test suite points to `{APP_URL}/payment-provider` as base URL
+- **Educational layer:** context panel is contextual — shown next to the live call, not in a separate docs tab
+- **Scope:** full PPP coverage (all 6 endpoints) for the core, happy path prioritised in UI
+- **State:** in-memory, same pattern as ERP mock. No shared state with ERP tool.
