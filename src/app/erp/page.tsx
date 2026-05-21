@@ -101,7 +101,6 @@ export default function DashboardPage() {
 
   async function handleAction(action: string, orderId: string) {
     if (action === 'delete') {
-      if (!confirm(`Delete order ${orderId} from ERP? This cannot be undone.`)) return;
       await fetch(`/api/erp/orders/${encodeURIComponent(orderId)}`, { method: 'DELETE' }).catch(() => {});
       await fetchOrders();
       return;

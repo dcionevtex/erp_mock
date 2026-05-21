@@ -128,6 +128,7 @@ function OrderDetailModal({
   const [trackingFormOpen, setTrackingFormOpen] = useState(false);
   const [trackingForm, setTrackingForm] = useState({ courier: '', trackingNumber: '', trackingUrl: '' });
   const [trackingSubmitting, setTrackingSubmitting] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const isCancelled = order.erpStatus === 'CANCELLED';
 
@@ -452,10 +453,36 @@ function OrderDetailModal({
           </div>
 
 
+          {/* Delete confirmation banner */}
+          {confirmDelete && (
+            <div className="rounded-lg border border-destructive/40 bg-destructive/10 px-4 py-3 flex items-center justify-between gap-4">
+              <div className="flex items-center gap-2 text-sm text-destructive">
+                <svg className="w-4 h-4 shrink-0" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm.75 3.5v4a.75.75 0 0 1-1.5 0v-4a.75.75 0 0 1 1.5 0zm0 6.5a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0z"/></svg>
+                <span>This will permanently remove the order from the ERP inbox. This cannot be undone.</span>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setConfirmDelete(false)}
+                  className="px-3 py-1.5 text-xs font-medium rounded border border-border text-muted-foreground hover:bg-muted transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setConfirmDelete(false); onAction('delete', order.orderId); }}
+                  className="px-3 py-1.5 text-xs font-medium rounded bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors"
+                >
+                  Delete permanently
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Actions */}
           <div className="rounded-lg border border-border bg-card px-4 py-3 flex flex-wrap gap-2">
             {isCancelled ? (
-              <ActionBtn variant="danger" onClick={() => onAction('delete', order.orderId)}>
+              <ActionBtn variant="danger" onClick={() => setConfirmDelete(true)}>
                 <BtnIcon d="M3 6h10M8 6V4M5 6l.5 8h5l.5-8" />
                 Delete Order
               </ActionBtn>
@@ -494,7 +521,7 @@ function OrderDetailModal({
                 ) : (
                   <ActionBtn variant="danger" disabled={vtexBlocked} onClick={() => onAction('cancel', order.orderId)}>Cancel</ActionBtn>
                 )}
-                <ActionBtn variant="danger" onClick={() => onAction('delete', order.orderId)}>Delete</ActionBtn>
+                <ActionBtn variant="danger" onClick={() => setConfirmDelete(true)}>Delete</ActionBtn>
               </>
             )}
           </div>
