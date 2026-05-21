@@ -250,17 +250,24 @@ export default function MarketplacePage() {
           <span className="text-sm font-semibold text-white/70">External Seller Simulator</span>
         </div>
 
-        <div className="flex flex-col items-center justify-center">
+        <div className="flex flex-col items-center justify-center min-w-0">
           {account ? (
             <>
               <span className="text-[10px] text-white/25 uppercase tracking-widest">Fulfillment URL</span>
               <div className="flex items-center gap-2 mt-0.5">
-                <span className="text-xs font-mono text-white/40 truncate max-w-[180px]">
-                  {`${typeof window !== 'undefined' ? window.location.origin : ''}/api/marketplace/`}
-                </span>
-                <span className={`text-xs font-mono font-bold ${activeScenario.color} whitespace-nowrap`}>
-                  {account}
-                </span>
+                <span className="text-xs font-mono text-white/50 break-all text-center">{baseUrl}</span>
+                <button
+                  onClick={copyUrl}
+                  title="Copy URL"
+                  className="shrink-0 transition-opacity hover:opacity-80"
+                  style={{ color: copied ? '#34d399' : 'rgba(255,255,255,0.35)' }}
+                >
+                  {copied ? (
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0z"/></svg>
+                  ) : (
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"/><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"/></svg>
+                  )}
+                </button>
               </div>
             </>
           ) : (
