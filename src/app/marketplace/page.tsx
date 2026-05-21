@@ -54,7 +54,7 @@ const ENDPOINT_DOCS: Record<string, EndpointDoc> = {
   },
 };
 
-const SCENARIOS: { value: MktScenario; label: string; color: string; dot: string; description: string }[] = [
+const SCENARIOS: { value: MktScenario; label: string; color: string; dot: string; description: string; comingSoon?: boolean }[] = [
   {
     value: 'available',
     label: 'Available',
