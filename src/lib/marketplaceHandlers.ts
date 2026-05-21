@@ -119,41 +119,10 @@ export function handleOrderPlacement(
 
   upsertOrder({ orderId: marketplaceOrderId, sellerOrderId, account, status: 'placed', placedAt: now, requestBody: body });
 
-  const items = ((body.items ?? []) as Record<string, unknown>[]).map(item => ({
-    id: item.id,
-    quantity: item.quantity,
-    seller: item.seller,
-    commission: item.commission ?? 0,
-    freightCommission: item.freightCommission ?? 0,
-    price: item.price,
-    bundleItems: item.bundleItems ?? [],
-    itemAttachment: { name: null, content: {} },
-    attachments: item.attachments ?? [],
-    priceTags: item.priceTags ?? [],
-    measurementUnit: item.measurementUnit,
-    unitMultiplier: item.unitMultiplier,
-    isGift: item.isGift ?? false,
-  }));
-
-  const rawShipping = body.shippingData as Record<string, unknown> | null | undefined;
-  const rawLogisticsInfo = (rawShipping?.logisticsInfo as Record<string, unknown>[] | undefined) ?? [];
-  const logisticsInfo = rawLogisticsInfo.map(li => ({
-    ...li,
-    selectedSla: (li.selectedSla as string | null) ?? 'Regular',
-    selectedDeliveryChannel: (li.selectedDeliveryChannel as string | null) ?? 'delivery',
-  }));
-  const shippingData = rawShipping ? { ...rawShipping, logisticsInfo } : null;
-
   const responseBody = {
-    marketplaceOrderId,
+    ...body,
     orderId: sellerOrderId,
     followUpEmail: `seller@${account}.com`,
-    items,
-    clientProfileData: body.clientProfileData ?? null,
-    shippingData,
-    paymentData: null,
-    customData: null,
-    allowMultipleDeliveries: false,
   };
 
   appendCallLog(account, {

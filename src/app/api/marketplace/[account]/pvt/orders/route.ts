@@ -23,10 +23,12 @@ export async function POST(
   }
 
   try {
-    const order = (Array.isArray(raw) ? raw[0] : raw) as MktOrderRequest;
-    const orderId = order.marketplaceOrderId ?? crypto.randomUUID();
-    const responseBody = handleOrderPlacement(account, orderId, order, pathname, start);
-    return NextResponse.json(responseBody);
+    const orders = (Array.isArray(raw) ? raw : [raw]) as MktOrderRequest[];
+    const responses = orders.map(order => {
+      const orderId = order.marketplaceOrderId ?? crypto.randomUUID();
+      return handleOrderPlacement(account, orderId, order, pathname, start);
+    });
+    return NextResponse.json(responses);
   } catch (e) {
     const body = { error: 'Order placement handler failed', detail: String(e), receivedBody: raw };
     appendCallLog(account, { timestamp: new Date().toISOString(), method: 'POST', path: pathname, account, endpoint: 'placement', requestBody: raw, responseBody: body, httpStatus: 500, durationMs: Date.now() - start });
