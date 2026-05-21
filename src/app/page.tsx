@@ -51,6 +51,52 @@ const TOOLS = [
   },
 ];
 
+const LAB_APPS = [
+  {
+    label: 'Email Translator',
+    description: 'Translate VTEX transactional emails into any language for international demos.',
+    icon: '✉',
+  },
+  {
+    label: 'Gift Card Generator',
+    description: 'Create and test gift card flows without touching a live account.',
+    icon: '🎁',
+  },
+  {
+    label: 'Checkout Validator',
+    description: 'Inspect and debug checkout payloads in real time.',
+    icon: '✓',
+  },
+];
+
+// 8-bit pixel flask icon
+function PixelFlask() {
+  const px = 3;
+  // Each cell: [col, row, color]
+  const pixels: [number, number, string][] = [
+    // Neck
+    [3, 0, '#a78bfa'], [4, 0, '#a78bfa'],
+    [3, 1, '#a78bfa'], [4, 1, '#a78bfa'],
+    [2, 2, '#a78bfa'], [3, 2, '#a78bfa'], [4, 2, '#a78bfa'], [5, 2, '#a78bfa'],
+    // Body outer
+    [1, 3, '#7c3aed'], [2, 3, '#a78bfa'], [3, 3, '#c4b5fd'], [4, 3, '#c4b5fd'], [5, 3, '#a78bfa'], [6, 3, '#7c3aed'],
+    [0, 4, '#7c3aed'], [1, 4, '#a78bfa'], [2, 4, '#c4b5fd'], [3, 4, '#e9d5ff'], [4, 4, '#e9d5ff'], [5, 4, '#c4b5fd'], [6, 4, '#a78bfa'], [7, 4, '#7c3aed'],
+    [0, 5, '#7c3aed'], [1, 5, '#a78bfa'], [2, 5, '#7c3aed'], [3, 5, '#7c3aed'], [4, 5, '#c4b5fd'], [5, 5, '#e9d5ff'], [6, 5, '#a78bfa'], [7, 5, '#7c3aed'],
+    [0, 6, '#7c3aed'], [1, 6, '#a78bfa'], [2, 6, '#c4b5fd'], [3, 6, '#7c3aed'], [4, 6, '#7c3aed'], [5, 6, '#c4b5fd'], [6, 6, '#a78bfa'], [7, 6, '#7c3aed'],
+    // Base
+    [0, 7, '#6d28d9'], [1, 7, '#6d28d9'], [2, 7, '#6d28d9'], [3, 7, '#6d28d9'], [4, 7, '#6d28d9'], [5, 7, '#6d28d9'], [6, 7, '#6d28d9'], [7, 7, '#6d28d9'],
+  ];
+  const w = 8 * px;
+  const h = 8 * px;
+  return (
+    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ imageRendering: 'pixelated' }}>
+      {pixels.map(([col, row, color], i) => (
+        <rect key={i} x={col * px} y={row * px} width={px} height={px} fill={color} />
+      ))}
+    </svg>
+  );
+}
+
 function BrazilianEngineeringLogo() {
   return (
     <div className="flex flex-col items-center select-none">
@@ -86,64 +132,119 @@ export default function LauncherPage() {
       </header>
 
       {/* Content */}
-      <main className="flex-1 flex flex-col items-center justify-center px-6 py-16">
-        <div className="w-full max-w-2xl space-y-10">
+      <main className="flex-1 flex flex-col items-center px-6 py-16">
+        <div className="w-full max-w-2xl space-y-14">
 
-          {/* Title */}
-          <div className="space-y-2">
-            <h1 className="text-2xl font-semibold text-white/90">Integration simulators</h1>
-            <p className="text-sm text-white/40 leading-relaxed">
-              Hands-on tools for demonstrating VTEX integration patterns. Each simulator exposes real endpoints and shows every request and response in a live dashboard.
-            </p>
-          </div>
+          {/* Integration Simulators */}
+          <section className="space-y-6">
+            <div className="space-y-1.5">
+              <h1 className="text-lg font-semibold text-white/90">Integration simulators</h1>
+              <p className="text-sm text-white/35 leading-relaxed">
+                Hands-on tools for demonstrating VTEX integration patterns. Each simulator exposes real endpoints and shows every request and response in a live dashboard.
+              </p>
+            </div>
 
-          {/* Tool cards */}
-          <div className="space-y-3">
-            {TOOLS.map((tool) => {
-              const card = (
-                <div
-                  className={[
-                    'group rounded-xl border p-5 transition-all duration-150',
-                    tool.disabled
-                      ? 'border-white/5 opacity-50 cursor-not-allowed'
-                      : 'border-white/10 hover:border-white/20 hover:bg-white/[0.03] cursor-pointer',
-                  ].join(' ')}
-                >
-                  <div className="flex items-start gap-4">
-                    <div
-                      className="shrink-0 w-12 h-12 rounded-lg flex items-center justify-center text-white/50"
-                      style={{ background: 'rgba(247,25,99,0.08)' }}
-                    >
-                      {tool.icon}
-                    </div>
-                    <div className="flex-1 min-w-0 space-y-1.5">
-                      <div className="flex items-center gap-2.5">
-                        <span className="text-sm font-semibold text-white/90">{tool.label}</span>
-                        <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${tool.tagColor}`}>
-                          {tool.tag}
-                        </span>
-                      </div>
-                      <p className="text-xs text-white/40 leading-relaxed">{tool.description}</p>
-                    </div>
-                    {!tool.disabled && (
-                      <svg
-                        className="w-4 h-4 shrink-0 text-white/20 group-hover:text-white/50 transition-colors mt-0.5"
-                        viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+            <div className="space-y-3">
+              {TOOLS.map((tool) => {
+                const card = (
+                  <div
+                    className={[
+                      'group rounded-xl border p-5 transition-all duration-150',
+                      tool.disabled
+                        ? 'border-white/5 opacity-50 cursor-not-allowed'
+                        : 'border-white/10 hover:border-white/20 hover:bg-white/[0.03] cursor-pointer',
+                    ].join(' ')}
+                  >
+                    <div className="flex items-start gap-4">
+                      <div
+                        className="shrink-0 w-12 h-12 rounded-lg flex items-center justify-center text-white/50"
+                        style={{ background: 'rgba(247,25,99,0.08)' }}
                       >
-                        <path d="M5 10h10M10 5l5 5-5 5" />
-                      </svg>
-                    )}
+                        {tool.icon}
+                      </div>
+                      <div className="flex-1 min-w-0 space-y-1.5">
+                        <div className="flex items-center gap-2.5">
+                          <span className="text-sm font-semibold text-white/90">{tool.label}</span>
+                          <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${tool.tagColor}`}>
+                            {tool.tag}
+                          </span>
+                        </div>
+                        <p className="text-xs text-white/40 leading-relaxed">{tool.description}</p>
+                      </div>
+                      {!tool.disabled && (
+                        <svg
+                          className="w-4 h-4 shrink-0 text-white/20 group-hover:text-white/50 transition-colors mt-0.5"
+                          viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+                        >
+                          <path d="M5 10h10M10 5l5 5-5 5" />
+                        </svg>
+                      )}
+                    </div>
+                  </div>
+                );
+
+                return tool.disabled ? (
+                  <div key={tool.label}>{card}</div>
+                ) : (
+                  <Link key={tool.label} href={tool.href}>{card}</Link>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* Divider */}
+          <div className="border-t border-white/[0.06]" />
+
+          {/* The Lab */}
+          <section className="space-y-6">
+            <div className="flex items-start gap-4">
+              <div
+                className="shrink-0 w-12 h-12 rounded-lg flex items-center justify-center"
+                style={{ background: 'rgba(124,58,237,0.12)', border: '1px solid rgba(167,139,250,0.15)' }}
+              >
+                <PixelFlask />
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2.5">
+                  <h2 className="text-lg font-semibold" style={{ color: '#c4b5fd' }}>The Lab</h2>
+                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded" style={{ background: 'rgba(124,58,237,0.15)', color: '#a78bfa' }}>
+                    Experimental
+                  </span>
+                </div>
+                <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                  Not every useful thing needs to be a full simulator. The Lab is where small, focused utilities live — the kind of tool you build because you needed it on a demo and it was too good not to keep.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {LAB_APPS.map((app) => (
+                <div
+                  key={app.label}
+                  className="rounded-xl p-4 space-y-3"
+                  style={{
+                    background: 'rgba(124,58,237,0.05)',
+                    border: '1px dashed rgba(167,139,250,0.15)',
+                  }}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg">{app.icon}</span>
+                    <span
+                      className="text-[9px] uppercase tracking-widest px-1.5 py-0.5 rounded"
+                      style={{ background: 'rgba(124,58,237,0.2)', color: 'rgba(167,139,250,0.6)' }}
+                    >
+                      Soon
+                    </span>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs font-semibold" style={{ color: 'rgba(196,181,253,0.7)' }}>{app.label}</p>
+                    <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.25)' }}>{app.description}</p>
                   </div>
                 </div>
-              );
+              ))}
+            </div>
+          </section>
 
-              return tool.disabled ? (
-                <div key={tool.label}>{card}</div>
-              ) : (
-                <Link key={tool.label} href={tool.href}>{card}</Link>
-              );
-            })}
-          </div>
         </div>
       </main>
 
