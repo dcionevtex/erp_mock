@@ -5,7 +5,11 @@ import type { PppCreatePaymentRequest } from '@/types/ppp';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(request: Request) {
+export async function POST(
+  request: Request,
+  { params }: { params: Promise<{ account: string }> },
+) {
+  const { account } = await params;
   let body: PppCreatePaymentRequest;
   try {
     body = await request.json() as PppCreatePaymentRequest;
@@ -13,6 +17,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
   }
   const url = new URL(request.url);
-  const { scenario } = getPppConfig();
-  return NextResponse.json(handleCreatePayment(body, url.pathname, scenario, Date.now()));
+  const { scenario } = getPppConfig(account);
+  return NextResponse.json(handleCreatePayment(account, body, url.pathname, scenario, Date.now()));
 }

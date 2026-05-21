@@ -1,5 +1,6 @@
 // In-memory store for the Payment Provider Protocol simulator.
-// Same globalThis singleton pattern as store.ts — resets on cold start, fine for demo.
+// Account-scoped — each VTEX account gets an isolated call log, payment records, and config.
+// Same globalThis singleton pattern as marketplaceStore.ts — resets on cold start, fine for demo.
 
 import { randomUUID } from 'crypto';
 import type { PppPaymentRecord, PppCallLogEntry, PppConfig, PppScenario } from '@/types/ppp';
@@ -8,72 +9,77 @@ import type { PppPaymentRecord, PppCallLogEntry, PppConfig, PppScenario } from '
 
 declare global {
   // eslint-disable-next-line no-var
-  var __pppPayments: Map<string, PppPaymentRecord> | undefined;
+  var __pppPayments: Map<string, Map<string, PppPaymentRecord>> | undefined;
   // eslint-disable-next-line no-var
-  var __pppCallLog: PppCallLogEntry[] | undefined;
+  var __pppCallLog: Map<string, PppCallLogEntry[]> | undefined;
   // eslint-disable-next-line no-var
-  var __pppConfig: PppConfig | undefined;
+  var __pppConfig: Map<string, PppConfig> | undefined;
 }
 
-function getPayments(): Map<string, PppPaymentRecord> {
+function getPaymentMaps(): Map<string, Map<string, PppPaymentRecord>> {
   if (!globalThis.__pppPayments) globalThis.__pppPayments = new Map();
   return globalThis.__pppPayments;
 }
 
-function getCallLog(): PppCallLogEntry[] {
-  if (!globalThis.__pppCallLog) globalThis.__pppCallLog = [];
+function getCallLogs(): Map<string, PppCallLogEntry[]> {
+  if (!globalThis.__pppCallLog) globalThis.__pppCallLog = new Map();
   return globalThis.__pppCallLog;
 }
 
-function getConfig(): PppConfig {
-  if (!globalThis.__pppConfig) globalThis.__pppConfig = { scenario: 'approved' };
+function getConfigs(): Map<string, PppConfig> {
+  if (!globalThis.__pppConfig) globalThis.__pppConfig = new Map();
   return globalThis.__pppConfig;
 }
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
-export function getPppConfig(): PppConfig {
-  return { ...getConfig() };
+export function getPppConfig(account: string): PppConfig {
+  return getConfigs().get(account) ?? { scenario: 'approved' };
 }
 
-export function setPppScenario(scenario: PppScenario): void {
-  getConfig().scenario = scenario;
+export function setPppScenario(account: string, scenario: PppScenario): void {
+  getConfigs().set(account, { scenario });
 }
 
 // ── Payment records ───────────────────────────────────────────────────────────
 
-export function upsertPayment(record: PppPaymentRecord): void {
-  getPayments().set(record.paymentId, record);
+export function upsertPayment(account: string, record: PppPaymentRecord): void {
+  const maps = getPaymentMaps();
+  if (!maps.has(account)) maps.set(account, new Map());
+  maps.get(account)!.set(record.paymentId, record);
 }
 
-export function getPayment(paymentId: string): PppPaymentRecord | undefined {
-  return getPayments().get(paymentId);
+export function getPayment(account: string, paymentId: string): PppPaymentRecord | undefined {
+  return getPaymentMaps().get(account)?.get(paymentId);
 }
 
-export function listPayments(): PppPaymentRecord[] {
-  return Array.from(getPayments().values()).sort(
+export function listPayments(account: string): PppPaymentRecord[] {
+  const map = getPaymentMaps().get(account);
+  if (!map) return [];
+  return Array.from(map.values()).sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 }
 
-export function clearPayments(): void {
-  getPayments().clear();
-}
-
 // ── Call log ──────────────────────────────────────────────────────────────────
 
-export function appendCallLog(entry: Omit<PppCallLogEntry, 'id'>): PppCallLogEntry {
-  const log = getCallLog();
+export function appendCallLog(account: string, entry: Omit<PppCallLogEntry, 'id'>): PppCallLogEntry {
+  const logs = getCallLogs();
+  const log = logs.get(account) ?? [];
   const full: PppCallLogEntry = { id: randomUUID(), ...entry };
   log.unshift(full);
   if (log.length > 500) log.splice(500);
+  logs.set(account, log);
   return full;
 }
 
-export function listCallLog(): PppCallLogEntry[] {
-  return [...getCallLog()];
+export function listCallLog(account: string): PppCallLogEntry[] {
+  return [...(getCallLogs().get(account) ?? [])];
 }
 
-export function clearCallLog(): void {
-  globalThis.__pppCallLog = [];
+// ── Clear ─────────────────────────────────────────────────────────────────────
+
+export function clearAll(account: string): void {
+  getCallLogs().set(account, []);
+  getPaymentMaps().delete(account);
 }

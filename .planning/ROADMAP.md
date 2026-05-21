@@ -101,41 +101,46 @@ Greenfield Next.js app that simulates the full VTEX OMS-to-ERP handoff. The buil
 
 **Goal:** Transform the single ERP mock into a multi-simulator platform. A launcher page at `/` presents all tools. Each simulator lives under its own route prefix with isolated state. Shared auth only.
 
-**Branch:** `feat/platform-shell`
+**Status: Complete** — all work landed on `main`. Branch `feat/platform-shell` deleted (fully merged).
 
 ## Architecture
 
 ```
-/                           → Launcher (tool picker)
+/                           → Launcher (tool picker + The Lab section)
 /erp/*                      → ERP Simulator (migrated from /)
-/payment-provider/*         → Payment Provider Simulator (new)
-/login                      → Shared Google OAuth login
+/payment-provider/*         → Payment Provider Simulator
+/marketplace/*              → External Seller Simulator (Marketplace Protocol)
+/login                      → Shared Google OAuth login (@vtex.com only)
 
 Shared: Google OAuth, iron-session VTEX credentials
 Isolated: all state, all routes, all components per tool
-API routes: /api/erp/*, /api/vtex/*, /api/payment-provider/* (no change to existing)
+API routes: /api/erp/*, /api/vtex/*, /api/payment-provider/*, /api/marketplace/*
 ```
 
 ## Phases
 
-- [ ] **Phase 1 — Platform Shell** *(in progress 2026-05-20)*
+- [x] **Phase 1 — Platform Shell** *(completed 2026-05-20)*
   Launcher page at `/`, ERP mock pages migrated to `/erp/*`, sidebar updated with back-to-platform link. No API or logic changes.
-  Branch: `feat/platform-shell`
 
-- [ ] **Phase 2 — Payment Provider Protocol: Core**
-  Implement all 6 PPP endpoints under `/api/payment-provider/*`. In-memory payment record store. Scenario toggles: approved / denied / pending / async callback.
+- [x] **Phase 2 — Payment Provider Protocol: Core** *(completed 2026-05-20)*
+  All 6 PPP endpoints under `/api/payment-provider/*`. In-memory payment record store. Scenario toggles: approved / denied / pending / undefined.
   Endpoints: `GET /manifest`, `POST /payments`, `POST /payments/{id}/cancellations`, `POST /payments/{id}/settlements`, `POST /payments/{id}/refunds`, `GET /payments/{id}`
 
-- [ ] **Phase 3 — Payment Provider Protocol: Dashboard**
-  Educational UI at `/payment-provider`. Flow diagram (test suite progress), live call log, context panel with inline protocol docs, annotated request/response, scenario controls.
+- [x] **Phase 3 — Payment Provider Protocol: Dashboard** *(completed 2026-05-20)*
+  Educational UI at `/payment-provider`. Flow diagram (test suite progress), live call log, context panel with inline protocol docs, annotated request/response, scenario controls. Setup guide tab added.
 
-- [ ] **Phase 4 — Docs + Release Notes**
-  Update SDD for platform architecture, add payment provider protocol docs, update README. Add v2.0.0 release notes entry.
+- [x] **Phase 4 — External Seller Simulator (Marketplace Protocol)** *(completed 2026-05-21)*
+  Four External Seller Fulfillment endpoints under `/api/marketplace/[account]/*`. Live call log at `/marketplace`. Test product callout with direct checkout link. Catalog tab (Coming Soon). Released as Beta.
+  Endpoints: `POST /pvt/orderForms/simulation`, `POST /pvt/orders`, `POST /pvt/orders/{id}/fulfill`, `POST /pvt/orders/{id}/cancel`
 
-## Payment Simulator Design Decisions
+- [x] **Phase 5 — Docs + Release Notes** *(completed 2026-05-21)*
+  Release notes updated to v1.1.1. Launcher updated with The Lab section. Login page redesigned for multi-tool platform.
 
-- **Direction:** Mock acts as the *provider* (receives calls from VTEX test suite), not the caller
-- **URL routing:** VTEX test suite points to `{APP_URL}/payment-provider` as base URL
-- **Educational layer:** context panel is contextual — shown next to the live call, not in a separate docs tab
-- **Scope:** full PPP coverage (all 6 endpoints) for the core, happy path prioritised in UI
-- **State:** in-memory, same pattern as ERP mock. No shared state with ERP tool.
+## Design Decisions
+
+- PPP mock acts as the *provider* (receives calls from VTEX test suite), not the caller
+- VTEX test suite points to `{APP_URL}/api/payment-provider` as base URL
+- PPP educational layer is contextual — shown next to the live call, not in a separate docs tab
+- Marketplace mock uses dynamic `[account]` route segment — same deployment handles any VTEX account
+- External Seller endpoints follow the pattern from `vtex-apps/external-seller-example` (official reference)
+- Order placement response must spread the full input body (preserves `selectedSla` and all logistics fields)

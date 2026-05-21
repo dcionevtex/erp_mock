@@ -205,6 +205,8 @@ function BrazilianEngineeringLogo() {
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function PaymentProviderPage() {
+  const [accountInput, setAccountInput] = useState('');
+  const [account, setAccount] = useState('');
   const [calls, setCalls] = useState<PppCallLogEntry[]>([]);
   const [, setPayments] = useState<PppPaymentRecord[]>([]);
   const [config, setConfig] = useState<PppConfig>({ scenario: 'approved' });
@@ -217,19 +219,26 @@ export default function PaymentProviderPage() {
   const configInitialized = useRef(false);
 
   useEffect(() => {
-    setBaseUrl(`${window.location.origin}/api/payment-provider/${config.scenario}`);
-  }, [config.scenario]);
+    const saved = localStorage.getItem('ppp_account') ?? '';
+    setAccountInput(saved);
+    setAccount(saved);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !account) return;
+    setBaseUrl(`${window.location.origin}/api/payment-provider/${account}`);
+  }, [account]);
 
   const fetchData = useCallback(async () => {
+    if (!account) return;
     try {
       const [callsRes, configRes] = await Promise.all([
-        fetch('/api/payment-provider/calls'),
-        fetch('/api/payment-provider/config'),
+        fetch(`/api/payment-provider/${account}/calls`),
+        fetch(`/api/payment-provider/${account}/config`),
       ]);
       if (callsRes.ok) {
         const data = await callsRes.json() as { calls: PppCallLogEntry[]; payments: PppPaymentRecord[] };
-        // Vercel can route to cold instances with empty state — never replace with empty.
-        // Accumulate by ID so calls are never lost to a cold-start response.
+        // Accumulate by ID — Vercel can route to cold instances with empty state.
         setCalls(prev => {
           const incoming = data.calls ?? [];
           if (!incoming.length) return prev;
@@ -251,16 +260,27 @@ export default function PaymentProviderPage() {
     } catch {
       // silent — polling
     }
-  }, []);
+  }, [account]);
 
   useEffect(() => {
+    if (!account) return;
+    configInitialized.current = false;
+    setCalls([]);
     fetchData();
     const id = setInterval(fetchData, 3000);
     return () => clearInterval(id);
-  }, [fetchData]);
+  }, [account, fetchData]);
+
+  function commitAccount() {
+    const trimmed = accountInput.trim().toLowerCase();
+    if (!trimmed) return;
+    setAccount(trimmed);
+    localStorage.setItem('ppp_account', trimmed);
+  }
 
   async function setScenario(scenario: PppScenario) {
-    await fetch('/api/payment-provider/config', {
+    if (!account) return;
+    await fetch(`/api/payment-provider/${account}/config`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ scenario }),
@@ -269,8 +289,9 @@ export default function PaymentProviderPage() {
   }
 
   async function clearAll() {
+    if (!account) return;
     setClearing(true);
-    await fetch('/api/payment-provider/calls', { method: 'DELETE' });
+    await fetch(`/api/payment-provider/${account}/calls`, { method: 'DELETE' });
     setCalls([]);
     setPayments([]);
     setClearing(false);
@@ -318,28 +339,53 @@ export default function PaymentProviderPage() {
         </div>
 
         {/* Center — base URL */}
-        <div className="flex flex-col items-center gap-1">
-          <span className="text-[10px] text-white/25 uppercase tracking-wider">Test suite base URL</span>
-          <div className="flex items-center gap-2">
-            <code className="text-[11px] font-mono bg-white/5 px-3 py-1.5 rounded flex items-center gap-0 whitespace-nowrap">
-              <span className="text-white/40">{baseUrl ? baseUrl.replace(`/${config.scenario}`, '') : '…/api/payment-provider'}</span>
-              {baseUrl && <span className={`font-bold ${config.scenario === 'approved' ? 'text-emerald-400' : config.scenario === 'denied' ? 'text-red-400' : config.scenario === 'pending' ? 'text-yellow-400' : 'text-white/50'}`}>/{config.scenario}</span>}
-            </code>
-            <button
-              onClick={copyBaseUrl}
-              className="text-xs px-2.5 py-1 rounded border border-white/10 text-white/40 hover:text-white/70 hover:border-white/20 transition-colors whitespace-nowrap"
-            >
-              {copied ? 'Copied' : 'Copy'}
-            </button>
-          </div>
+        <div className="flex flex-col items-center justify-center min-w-0">
+          {account ? (
+            <>
+              <span className="text-[10px] text-white/25 uppercase tracking-widest">Test suite base URL</span>
+              <div className="flex items-center gap-2 mt-0.5">
+                <span className="text-xs font-mono text-white/50 truncate max-w-xs">{baseUrl}</span>
+                <button
+                  onClick={copyBaseUrl}
+                  title="Copy URL"
+                  className="shrink-0 transition-opacity hover:opacity-80"
+                  style={{ color: copied ? '#34d399' : 'rgba(255,255,255,0.35)' }}
+                >
+                  {copied ? (
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0z"/></svg>
+                  ) : (
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"/><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"/></svg>
+                  )}
+                </button>
+              </div>
+            </>
+          ) : (
+            <span className="text-xs text-white/25">Configure account to get started</span>
+          )}
         </div>
 
-        {/* Right — empty for balance */}
-        <div />
+        {/* Right */}
+        <div className="flex justify-end">
+          {account && (
+            <button
+              onClick={clearAll}
+              disabled={clearing || calls.length === 0}
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg transition-all disabled:opacity-30"
+              style={{ color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}
+              onMouseEnter={e => { if (!clearing) e.currentTarget.style.color = 'rgba(255,255,255,0.7)'; }}
+              onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.4)'; }}
+            >
+              <svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 7h12M6 7l1 9h6l1-9M8 7V4h4v3" />
+              </svg>
+              {clearing ? 'Clearing…' : 'Clear'}
+            </button>
+          )}
+        </div>
       </header>
 
       {/* Flow diagram */}
-      <div className="border-b border-white/10 px-6 py-4 shrink-0 relative">
+      <div className="border-b border-white/10 px-6 py-4 shrink-0">
         <div className="flex items-center justify-center gap-1 overflow-x-auto">
           {flowSteps.map((step, i) => (
             <div key={step.key} className="flex items-center gap-1 shrink-0">
@@ -375,13 +421,6 @@ export default function PaymentProviderPage() {
             </div>
           ))}
         </div>
-        <button
-          onClick={clearAll}
-          disabled={clearing || calls.length === 0}
-          className="absolute right-6 top-1/2 -translate-y-1/2 text-xs text-white/20 hover:text-white/50 transition-colors disabled:opacity-40"
-        >
-          {clearing ? 'Clearing…' : 'Clear'}
-        </button>
       </div>
 
       {/* Body */}
@@ -428,7 +467,7 @@ export default function PaymentProviderPage() {
                 {
                   n: 2,
                   title: 'Copy the base URL',
-                  body: 'Select a scenario in the Scenario tab, then copy the base URL shown at the top of this page:',
+                  body: 'Enter your VTEX account name in the Scenario tab, then copy the base URL shown at the top of this page:',
                   link: null,
                   extra: 'copy-url',
                 },
@@ -483,7 +522,7 @@ export default function PaymentProviderPage() {
                           <rect x="7" y="7" width="11" height="11" rx="1.5" />
                           <path d="M4 13H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v1" />
                         </svg>
-                        <span className="truncate">{copied ? 'Copied!' : (baseUrl || '…/api/payment-provider/approved')}</span>
+                        <span className="truncate">{copied ? 'Copied!' : (baseUrl || '…/api/payment-provider/{account}')}</span>
                       </button>
                     )}
                   </div>
@@ -517,6 +556,40 @@ export default function PaymentProviderPage() {
           )}
 
           {!showSetup && <div className="px-5 py-4 border-b border-white/10 space-y-3">
+
+            {/* Account input */}
+            <div className="space-y-2 pb-3 border-b border-white/5">
+              <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider block">VTEX Account</span>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={accountInput}
+                  onChange={e => setAccountInput(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && commitAccount()}
+                  placeholder="mystore"
+                  className="flex-1 text-sm rounded-lg px-3 py-2 outline-none focus:ring-1 focus:ring-pink-500/50"
+                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.8)' }}
+                />
+                <button
+                  onClick={commitAccount}
+                  disabled={!accountInput.trim()}
+                  className="px-3 py-2 rounded-lg text-xs font-semibold transition-all disabled:opacity-30"
+                  style={{ background: 'rgba(247,25,99,0.15)', border: '1px solid rgba(247,25,99,0.3)', color: '#F71963' }}
+                >
+                  Set
+                </button>
+              </div>
+              {account && (
+                <div
+                  className="rounded-lg px-3 py-2 space-y-1"
+                  style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
+                >
+                  <p className="text-[10px] text-white/25">Base URL for VTEX test suite</p>
+                  <p className="text-xs font-mono break-all" style={{ color: 'rgba(255,255,255,0.6)' }}>{baseUrl}</p>
+                </div>
+              )}
+            </div>
+
             <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider block">Response scenario</span>
             <div className="space-y-1.5">
               {SCENARIOS.map(s => (
@@ -621,7 +694,9 @@ export default function PaymentProviderPage() {
               </svg>
               <p className="text-sm text-white/30">No calls received yet</p>
               <p className="text-xs text-white/20 max-w-xs leading-relaxed">
-                Configure your VTEX payment connector to point to the base URL above, then run the test suite.
+                {account
+                  ? 'Configure your VTEX payment connector to point to the base URL above, then run the test suite.'
+                  : 'Enter your VTEX account name in the Scenario tab to get started.'}
               </p>
             </div>
           ) : (

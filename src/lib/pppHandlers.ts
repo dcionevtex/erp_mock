@@ -1,5 +1,4 @@
-// Shared business logic for PPP routes — used by both the scenario-in-URL routes
-// (/api/payment-provider/[scenario]/...) and the legacy stateful routes.
+// Shared business logic for PPP routes — all handlers are account-scoped.
 
 import { randomUUID } from 'crypto';
 import { upsertPayment, getPayment, appendCallLog } from '@/lib/pppStore';
@@ -43,9 +42,9 @@ export function buildPaymentResponse(paymentId: string, scenario: PppScenario) {
   }
 }
 
-export function handleManifest(pathname: string, start: number) {
+export function handleManifest(account: string, pathname: string, start: number) {
   const response = PPP_MANIFEST;
-  appendCallLog({
+  appendCallLog(account, {
     timestamp: new Date().toISOString(),
     method: 'GET',
     path: pathname,
@@ -56,11 +55,11 @@ export function handleManifest(pathname: string, start: number) {
   return response;
 }
 
-export function handleCreatePayment(body: PppCreatePaymentRequest, pathname: string, scenario: PppScenario, start: number) {
+export function handleCreatePayment(account: string, body: PppCreatePaymentRequest, pathname: string, scenario: PppScenario, start: number) {
   const paymentId = body.paymentId ?? randomUUID();
   const now = new Date().toISOString();
 
-  upsertPayment({
+  upsertPayment(account, {
     paymentId,
     orderId: body.orderId,
     transactionId: body.transactionId,
@@ -78,7 +77,7 @@ export function handleCreatePayment(body: PppCreatePaymentRequest, pathname: str
 
   const responseBody = buildPaymentResponse(paymentId, scenario);
 
-  appendCallLog({
+  appendCallLog(account, {
     timestamp: now,
     method: 'POST',
     path: pathname,
@@ -92,13 +91,13 @@ export function handleCreatePayment(body: PppCreatePaymentRequest, pathname: str
   return responseBody;
 }
 
-export function handleGetPayment(paymentId: string, pathname: string, start: number) {
-  const record = getPayment(paymentId);
+export function handleGetPayment(account: string, paymentId: string, pathname: string, start: number) {
+  const record = getPayment(account, paymentId);
   const now = new Date().toISOString();
 
   if (!record) {
     const body = { error: 'Payment not found' };
-    appendCallLog({ timestamp: now, method: 'GET', path: pathname, paymentId, responseBody: body, httpStatus: 404, durationMs: Date.now() - start });
+    appendCallLog(account, { timestamp: now, method: 'GET', path: pathname, paymentId, responseBody: body, httpStatus: 404, durationMs: Date.now() - start });
     return { body, status: 404 };
   }
 
@@ -111,39 +110,39 @@ export function handleGetPayment(paymentId: string, pathname: string, start: num
     code: null,
     message: null,
   };
-  appendCallLog({ timestamp: now, method: 'GET', path: pathname, paymentId, responseBody: body, httpStatus: 200, durationMs: Date.now() - start });
+  appendCallLog(account, { timestamp: now, method: 'GET', path: pathname, paymentId, responseBody: body, httpStatus: 200, durationMs: Date.now() - start });
   return { body, status: 200 };
 }
 
-export function handleSettlement(paymentId: string, body: Record<string, unknown>, pathname: string, start: number) {
-  const record = getPayment(paymentId);
+export function handleSettlement(account: string, paymentId: string, body: Record<string, unknown>, pathname: string, start: number) {
+  const record = getPayment(account, paymentId);
   const now = new Date().toISOString();
   const settleId = randomUUID();
-  if (record) upsertPayment({ ...record, settleId, settledAt: now });
+  if (record) upsertPayment(account, { ...record, settleId, settledAt: now });
 
   const responseBody = { paymentId, settleId, value: body.value ?? null, code: null, message: 'Successfully settled', requestId: body.requestId ?? null };
-  appendCallLog({ timestamp: now, method: 'POST', path: pathname, paymentId, requestBody: body, responseBody, httpStatus: 200, durationMs: Date.now() - start });
+  appendCallLog(account, { timestamp: now, method: 'POST', path: pathname, paymentId, requestBody: body, responseBody, httpStatus: 200, durationMs: Date.now() - start });
   return responseBody;
 }
 
-export function handleCancellation(paymentId: string, body: Record<string, unknown>, pathname: string, start: number) {
-  const record = getPayment(paymentId);
+export function handleCancellation(account: string, paymentId: string, body: Record<string, unknown>, pathname: string, start: number) {
+  const record = getPayment(account, paymentId);
   const now = new Date().toISOString();
   const cancellationId = randomUUID();
-  if (record) upsertPayment({ ...record, cancellationId, cancelledAt: now, status: 'denied' });
+  if (record) upsertPayment(account, { ...record, cancellationId, cancelledAt: now, status: 'denied' });
 
   const responseBody = { paymentId, cancellationId, code: null, message: 'Successfully cancelled', requestId: body.requestId ?? null };
-  appendCallLog({ timestamp: now, method: 'POST', path: pathname, paymentId, requestBody: body, responseBody, httpStatus: 200, durationMs: Date.now() - start });
+  appendCallLog(account, { timestamp: now, method: 'POST', path: pathname, paymentId, requestBody: body, responseBody, httpStatus: 200, durationMs: Date.now() - start });
   return responseBody;
 }
 
-export function handleRefund(paymentId: string, body: Record<string, unknown>, pathname: string, start: number) {
-  const record = getPayment(paymentId);
+export function handleRefund(account: string, paymentId: string, body: Record<string, unknown>, pathname: string, start: number) {
+  const record = getPayment(account, paymentId);
   const now = new Date().toISOString();
   const refundId = randomUUID();
-  if (record) upsertPayment({ ...record, refundId, refundedAt: now });
+  if (record) upsertPayment(account, { ...record, refundId, refundedAt: now });
 
   const responseBody = { paymentId, refundId, value: body.value ?? null, code: null, message: 'Successfully refunded', requestId: body.requestId ?? null };
-  appendCallLog({ timestamp: now, method: 'POST', path: pathname, paymentId, requestBody: body, responseBody, httpStatus: 200, durationMs: Date.now() - start });
+  appendCallLog(account, { timestamp: now, method: 'POST', path: pathname, paymentId, requestBody: body, responseBody, httpStatus: 200, durationMs: Date.now() - start });
   return responseBody;
 }
