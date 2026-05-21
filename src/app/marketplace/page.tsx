@@ -382,7 +382,7 @@ export default function MarketplacePage() {
                       <p className="text-xs font-semibold" style={{ color: '#F71963' }}>Test product available</p>
                     </div>
                     <p className="text-xs text-white/40 leading-relaxed">
-                      A mock SKU is pre-configured in the <span className="text-white/60 font-mono">dcione</span> account mapped to seller <span className="text-white/60 font-mono">externalsellertest</span>. Use the link below to trigger a checkout flow directly.
+                      A mock SKU is pre-configured in the <span className="text-white/60 font-mono">dcione</span> account mapped to seller <span className="text-white/60 font-mono">externalsellertest</span>. Use the link below to trigger a checkout flow directly. When prompted for a shipping address, use a Brazilian zip code (e.g. <span className="text-white/60 font-mono">05012000</span>).
                     </p>
                     <a
                       href="https://dcione.myvtex.com/checkout/cart/add/?sku=100000&qty=1&seller=externalsellertest&sc=1"
