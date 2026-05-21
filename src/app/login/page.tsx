@@ -152,7 +152,7 @@ function LoginForm() {
           className="text-xs transition-opacity hover:opacity-80"
           style={{ color: 'rgba(255,255,255,0.3)' }}
         >
-          Built by <span className="font-semibold" style={{ color: 'rgba(255,255,255,0.6)' }}>@dcionevtex</span> · VTEX
+          Built by <span className="font-semibold" style={{ color: 'rgba(255,255,255,0.6)' }}>@dcionevtex</span> & his bot army
         </a>
         <a
           href="https://brazilian.engineering/"

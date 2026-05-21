@@ -166,7 +166,7 @@ export function Footer() {
         >
           Built by{' '}
           <span className="font-semibold" style={{ color: 'rgba(255,255,255,0.75)' }}>@dcionevtex</span>
-          {' '}· VTEX
+          {' '}& his bot army
         </a>
         <a
           href="https://brazilian.engineering/"

@@ -761,7 +761,7 @@ export default function MarketplacePage() {
           className="text-xs transition-opacity hover:opacity-80"
           style={{ color: 'rgba(255,255,255,0.4)' }}
         >
-          Built by <span className="font-semibold" style={{ color: 'rgba(255,255,255,0.75)' }}>@dcionevtex</span> · VTEX
+          Built by <span className="font-semibold" style={{ color: 'rgba(255,255,255,0.75)' }}>@dcionevtex</span> & his bot army
         </a>
       </footer>
     </div>
