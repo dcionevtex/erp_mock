@@ -10,9 +10,17 @@ type ReleaseEntry = {
 
 const RELEASES: ReleaseEntry[] = [
   {
+    version: '1.1.1',
+    date: 'May 21, 2026',
+    tag: 'latest',
+    changes: [
+      { type: 'fix', text: 'Order Placement now spreads the full VTEX input and returns an array response, matching the External Seller Fulfillment protocol exactly' },
+      { type: 'fix', text: 'Checkout no longer fails with "The requested order couldn\'t be created" — selectedSla and shippingData are now preserved from the VTEX request' },
+    ],
+  },
+  {
     version: '1.1.0',
     date: 'May 20, 2026',
-    tag: 'latest',
     changes: [
       { type: 'feat', text: 'Marketplace Protocol Simulator added as a new tool in the platform' },
       { type: 'feat', text: 'Exposes all 4 External Seller Fulfillment endpoints: Simulation, Placement, Authorize, Cancellation' },
