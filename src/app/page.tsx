@@ -284,7 +284,17 @@ export default function LauncherPage() {
         >
           Built by{' '}
           <span className="font-semibold" style={{ color: 'rgba(255,255,255,0.75)' }}>@dcionevtex</span>
-          {' '}& his bot army
+          {' '}& his bot army{' '}
+          <svg width="14" height="16" viewBox="0 0 14 16" style={{ imageRendering: 'pixelated', display: 'inline-block', verticalAlign: 'middle', marginBottom: '1px' }}>
+            <rect x="6" y="0" width="2" height="4" fill="#c4b5fd"/>
+            <rect x="2" y="4" width="10" height="2" fill="#94a3b8"/>
+            <rect x="0" y="6" width="2" height="8" fill="#94a3b8"/>
+            <rect x="12" y="6" width="2" height="8" fill="#94a3b8"/>
+            <rect x="2" y="14" width="10" height="2" fill="#94a3b8"/>
+            <rect x="4" y="8" width="2" height="2" fill="#5eead4"/>
+            <rect x="8" y="8" width="2" height="2" fill="#5eead4"/>
+            <rect x="4" y="12" width="6" height="2" fill="#f87171"/>
+          </svg>
         </a>
       </footer>
 
