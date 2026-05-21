@@ -68,6 +68,7 @@ const SCENARIOS: { value: MktScenario; label: string; color: string; dot: string
     color: 'text-red-400',
     dot: 'bg-red-400',
     description: 'No stock. Returns quantity 0 and empty SLA list.',
+    comingSoon: true,
   },
   {
     value: 'partial',
@@ -75,6 +76,7 @@ const SCENARIOS: { value: MktScenario; label: string; color: string; dot: string
     color: 'text-amber-400',
     dot: 'bg-amber-400',
     description: 'First item available, remaining items out of stock.',
+    comingSoon: true,
   },
 ];
 
@@ -401,10 +403,10 @@ export default function MarketplacePage() {
                     {SCENARIOS.map(s => (
                       <button
                         key={s.value}
-                        onClick={() => changeScenario(s.value)}
-                        disabled={!account}
+                        onClick={() => !s.comingSoon && changeScenario(s.value)}
+                        disabled={!account || !!s.comingSoon}
                         className={[
-                          'w-full flex items-start gap-3 rounded-lg px-3 py-2.5 text-left transition-all disabled:opacity-30',
+                          'w-full flex items-start gap-3 rounded-lg px-3 py-2.5 text-left transition-all disabled:opacity-40 disabled:cursor-not-allowed',
                           scenario === s.value
                             ? 'border border-white/20'
                             : 'border border-transparent hover:border-white/10',
@@ -414,8 +416,13 @@ export default function MarketplacePage() {
                         }}
                       >
                         <span className={`mt-1 w-1.5 h-1.5 rounded-full shrink-0 ${s.dot}`} />
-                        <div>
-                          <p className={`text-xs font-semibold ${s.color}`}>{s.label}</p>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <p className={`text-xs font-semibold ${s.color}`}>{s.label}</p>
+                            {s.comingSoon && (
+                              <span className="text-[9px] uppercase tracking-widest px-1.5 py-0.5 rounded border border-white/10 text-white/30">Coming Soon</span>
+                            )}
+                          </div>
                           <p className="text-xs text-white/30 mt-0.5 leading-relaxed">{s.description}</p>
                         </div>
                       </button>
