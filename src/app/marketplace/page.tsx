@@ -140,7 +140,7 @@ export default function MarketplacePage() {
   const [suggestForm, setSuggestForm] = useState({
     sellerSkuId: '', productName: '', skuName: '', brandName: '',
     categoryFullPath: '', refId: '', ean: '', imageUrl: '',
-    availableQuantity: '', salePrice: '', height: '', width: '', length: '', weight: '',
+    availableQuantity: '', salePrice: '', height: '1', width: '1', length: '1', weight: '1',
   });
   const [suggesting, setSuggesting] = useState(false);
   const [suggestResult, setSuggestResult] = useState<MktSuggestResult | null>(null);
