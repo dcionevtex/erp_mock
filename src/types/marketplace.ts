@@ -68,3 +68,34 @@ export type MktCallLogEntry = {
 export type MktConfig = {
   scenario: MktScenario;
 };
+
+export type MktSkuSuggestionPayload = {
+  ProductName: string;
+  SkuName: string;
+  BrandName?: string;
+  CategoryFullPath?: string;
+  RefId?: string;
+  EAN?: string;
+  Height?: number;
+  Width?: number;
+  Length?: number;
+  Weight?: number;
+  AvailableQuantity?: number;
+  Images?: Array<{ imageName: string; imageUrl: string }>;
+  Pricing?: { Currency: string; SalePrice: number; CurrencySymbol: string };
+};
+
+export type MktSuggestRequest = {
+  sellerId: string;
+  sellerSkuId: string;
+  appKey: string;
+  appToken: string;
+  payload: MktSkuSuggestionPayload;
+};
+
+export type MktSuggestResult = {
+  ok: boolean;
+  vtexStatus: number;
+  message: string;
+  data?: unknown;
+};

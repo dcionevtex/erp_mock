@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
-import type { MktCallLogEntry, MktScenario } from '@/types/marketplace';
+import type { MktCallLogEntry, MktScenario, MktSuggestResult } from '@/types/marketplace';
 
 // ─── Metadata ────────────────────────────────────────────────────────────────
 
@@ -133,7 +133,17 @@ export default function MarketplacePage() {
   const [baseUrl, setBaseUrl] = useState('');
   const [copied, setCopied] = useState(false);
   const [clearing, setClearing] = useState(false);
-  const [activeTab, setActiveTab] = useState<'scenario' | 'setup' | 'catalog'>('scenario');
+  const [activeTab, setActiveTab] = useState<'scenario' | 'setup' | 'suggest'>('scenario');
+
+  // SKU suggestion state
+  const [suggestCreds, setSuggestCreds] = useState({ sellerId: '', appKey: '', appToken: '' });
+  const [suggestForm, setSuggestForm] = useState({
+    sellerSkuId: '', productName: '', skuName: '', brandName: '',
+    categoryFullPath: '', refId: '', ean: '', imageUrl: '',
+    availableQuantity: '', salePrice: '', height: '', width: '', length: '', weight: '',
+  });
+  const [suggesting, setSuggesting] = useState(false);
+  const [suggestResult, setSuggestResult] = useState<MktSuggestResult | null>(null);
   const configInitialized = useRef(false);
 
   // Load account from localStorage on mount
@@ -141,6 +151,10 @@ export default function MarketplacePage() {
     const saved = localStorage.getItem('mkt_account') ?? '';
     setAccountInput(saved);
     setAccount(saved);
+    const creds = localStorage.getItem('mkt_suggest_creds');
+    if (creds) {
+      try { setSuggestCreds(JSON.parse(creds) as typeof suggestCreds); } catch { /* ignore */ }
+    }
   }, []);
 
   // Update base URL when account or origin changes
@@ -229,6 +243,52 @@ export default function MarketplacePage() {
     });
   }
 
+  function saveSuggestCreds(updated: typeof suggestCreds) {
+    setSuggestCreds(updated);
+    localStorage.setItem('mkt_suggest_creds', JSON.stringify(updated));
+  }
+
+  async function submitSuggestion() {
+    if (!account || !suggestCreds.sellerId || !suggestCreds.appKey || !suggestCreds.appToken) return;
+    setSuggesting(true);
+    setSuggestResult(null);
+    try {
+      const res = await fetch(`/api/marketplace/${account}/suggest-sku`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sellerId: suggestCreds.sellerId,
+          sellerSkuId: suggestForm.sellerSkuId,
+          appKey: suggestCreds.appKey,
+          appToken: suggestCreds.appToken,
+          payload: {
+            ProductName: suggestForm.productName,
+            SkuName: suggestForm.skuName,
+            BrandName: suggestForm.brandName || undefined,
+            CategoryFullPath: suggestForm.categoryFullPath || undefined,
+            RefId: suggestForm.refId || undefined,
+            EAN: suggestForm.ean || undefined,
+            AvailableQuantity: suggestForm.availableQuantity ? Number(suggestForm.availableQuantity) : undefined,
+            Height: suggestForm.height ? Number(suggestForm.height) : undefined,
+            Width: suggestForm.width ? Number(suggestForm.width) : undefined,
+            Length: suggestForm.length ? Number(suggestForm.length) : undefined,
+            Weight: suggestForm.weight ? Number(suggestForm.weight) : undefined,
+            Images: suggestForm.imageUrl ? [{ imageName: 'Main', imageUrl: suggestForm.imageUrl }] : undefined,
+            Pricing: suggestForm.salePrice
+              ? { Currency: 'BRL', SalePrice: Number(suggestForm.salePrice), CurrencySymbol: 'R$' }
+              : undefined,
+          },
+        }),
+      });
+      const data = await res.json() as MktSuggestResult;
+      setSuggestResult(data);
+    } catch {
+      setSuggestResult({ ok: false, vtexStatus: 0, message: 'Network error' });
+    } finally {
+      setSuggesting(false);
+    }
+  }
+
   const activeScenario = SCENARIOS.find(s => s.value === scenario)!;
   const sortedCalls = [...calls].sort((a, b) => a.timestamp.localeCompare(b.timestamp));
 
@@ -301,7 +361,7 @@ export default function MarketplacePage() {
         <aside className="w-80 shrink-0 flex flex-col border-r border-white/10 overflow-hidden">
           {/* Tabs */}
           <div className="flex border-b border-white/10 shrink-0">
-            {([['scenario', 'Scenario'], ['setup', 'Setup']] as const).map(([val, label]) => (
+            {([['scenario', 'Scenario'], ['setup', 'Setup'], ['suggest', 'Suggest SKU']] as const).map(([val, label]) => (
               <button
                 key={val}
                 onClick={() => setActiveTab(val)}
@@ -313,16 +373,6 @@ export default function MarketplacePage() {
                 {label}
               </button>
             ))}
-            <button
-              onClick={() => setActiveTab('catalog')}
-              className={[
-                'flex-1 py-3 flex items-center justify-center gap-1.5 text-xs font-medium transition-colors',
-                activeTab === 'catalog' ? 'text-white/80 border-b-2 border-pink-500' : 'text-white/30 hover:text-white/50',
-              ].join(' ')}
-            >
-              Catalog
-              <span className="text-[9px] font-semibold px-1 py-0.5 rounded" style={{ background: 'rgba(251,191,36,0.15)', color: '#fbbf24' }}>Soon</span>
-            </button>
           </div>
 
           <div className="flex-1 overflow-y-auto">
@@ -550,52 +600,137 @@ export default function MarketplacePage() {
               </div>
             )}
 
-            {activeTab === 'catalog' && (
-              <div className="p-4 flex flex-col items-center justify-center h-full gap-5 text-center">
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center"
-                  style={{ background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.15)' }}
-                >
-                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" />
-                    <path d="M16 3H8l-2 4h12l-2-4z" />
-                    <path d="M12 12v4M10 14h4" />
-                  </svg>
-                </div>
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-center gap-2">
-                    <p className="text-sm font-semibold text-white/70">Catalog Sync</p>
-                    <span className="text-[9px] font-semibold px-1.5 py-0.5 rounded" style={{ background: 'rgba(251,191,36,0.15)', color: '#fbbf24' }}>Coming Soon</span>
-                  </div>
-                  <p className="text-xs text-white/30 leading-relaxed max-w-[220px]">
-                    Push SKU suggestions from the seller to the VTEX marketplace catalog using the SKU Exchange API.
+            {activeTab === 'suggest' && (
+              <div className="p-4 space-y-5 overflow-y-auto">
+
+                {/* Credentials */}
+                <div className="space-y-2">
+                  <p className="text-[10px] uppercase tracking-widest text-white/25">Credentials</p>
+                  <p className="text-[11px] text-white/30 leading-relaxed">
+                    Uses the marketplace account set in the Scenario tab. Credentials are stored locally and never sent to our server — only forwarded to VTEX.
                   </p>
-                </div>
-                <div className="space-y-2 w-full">
                   {[
-                    'Define products and SKUs',
-                    'Send catalog notifications to marketplace',
-                    'Track approval status per SKU',
-                  ].map(item => (
-                    <div
-                      key={item}
-                      className="flex items-center gap-2.5 rounded-lg px-3 py-2 opacity-40"
-                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
-                    >
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400/50 shrink-0" />
-                      <span className="text-xs text-white/50">{item}</span>
+                    { key: 'sellerId', label: 'Seller ID', placeholder: 'externalsellertest', type: 'text' },
+                    { key: 'appKey', label: 'App Key', placeholder: 'vtexappkey_...', type: 'text' },
+                    { key: 'appToken', label: 'App Token', placeholder: '••••••••', type: 'password' },
+                  ].map(field => (
+                    <div key={field.key} className="space-y-1">
+                      <label className="text-[10px] text-white/35">{field.label}</label>
+                      <input
+                        type={field.type}
+                        value={suggestCreds[field.key as keyof typeof suggestCreds]}
+                        onChange={e => saveSuggestCreds({ ...suggestCreds, [field.key]: e.target.value })}
+                        placeholder={field.placeholder}
+                        className="w-full text-xs rounded-lg px-3 py-2 outline-none focus:ring-1 focus:ring-pink-500/50"
+                        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.75)' }}
+                      />
                     </div>
                   ))}
                 </div>
+
+                {/* SKU data */}
+                <div className="space-y-2">
+                  <p className="text-[10px] uppercase tracking-widest text-white/25">SKU data</p>
+                  {[
+                    { key: 'sellerSkuId', label: 'Seller SKU ID *', placeholder: 'SKU-001' },
+                    { key: 'productName', label: 'Product Name *', placeholder: 'My Product' },
+                    { key: 'skuName', label: 'SKU Name *', placeholder: 'My Product — Blue / M' },
+                    { key: 'brandName', label: 'Brand', placeholder: 'ACME' },
+                    { key: 'categoryFullPath', label: 'Category path', placeholder: 'Electronics/Phones' },
+                    { key: 'refId', label: 'Ref ID', placeholder: 'REF-001' },
+                    { key: 'ean', label: 'EAN', placeholder: '7891234567890' },
+                    { key: 'imageUrl', label: 'Image URL', placeholder: 'https://...' },
+                    { key: 'availableQuantity', label: 'Stock qty', placeholder: '10' },
+                    { key: 'salePrice', label: 'Sale price (BRL)', placeholder: '99.90' },
+                  ].map(field => (
+                    <div key={field.key} className="space-y-1">
+                      <label className="text-[10px] text-white/35">{field.label}</label>
+                      <input
+                        type="text"
+                        value={suggestForm[field.key as keyof typeof suggestForm]}
+                        onChange={e => setSuggestForm(f => ({ ...f, [field.key]: e.target.value }))}
+                        placeholder={field.placeholder}
+                        className="w-full text-xs rounded-lg px-3 py-2 outline-none focus:ring-1 focus:ring-pink-500/50"
+                        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.75)' }}
+                      />
+                    </div>
+                  ))}
+
+                  {/* Dimensions row */}
+                  <div>
+                    <label className="text-[10px] text-white/35 block mb-1">Dimensions (cm / kg)</label>
+                    <div className="grid grid-cols-4 gap-1.5">
+                      {[
+                        { key: 'height', placeholder: 'H' },
+                        { key: 'width', placeholder: 'W' },
+                        { key: 'length', placeholder: 'L' },
+                        { key: 'weight', placeholder: 'Wt' },
+                      ].map(f => (
+                        <input
+                          key={f.key}
+                          type="text"
+                          value={suggestForm[f.key as keyof typeof suggestForm]}
+                          onChange={e => setSuggestForm(form => ({ ...form, [f.key]: e.target.value }))}
+                          placeholder={f.placeholder}
+                          className="text-xs rounded-lg px-2 py-2 outline-none focus:ring-1 focus:ring-pink-500/50 text-center"
+                          style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.75)' }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Submit */}
+                <button
+                  onClick={submitSuggestion}
+                  disabled={suggesting || !account || !suggestCreds.sellerId || !suggestCreds.appKey || !suggestCreds.appToken || !suggestForm.sellerSkuId || !suggestForm.productName || !suggestForm.skuName}
+                  className="w-full py-2.5 rounded-lg text-xs font-semibold transition-all disabled:opacity-30"
+                  style={{ background: 'rgba(247,25,99,0.15)', border: '1px solid rgba(247,25,99,0.3)', color: '#F71963' }}
+                >
+                  {suggesting ? 'Sending…' : 'Send SKU Suggestion'}
+                </button>
+
+                {!account && (
+                  <p className="text-[11px] text-white/30 text-center">Set the marketplace account in the Scenario tab first.</p>
+                )}
+
+                {/* Result */}
+                {suggestResult && (
+                  <div
+                    className="rounded-lg p-3 space-y-1"
+                    style={{
+                      background: suggestResult.ok ? 'rgba(52,211,153,0.06)' : 'rgba(248,113,113,0.06)',
+                      border: `1px solid ${suggestResult.ok ? 'rgba(52,211,153,0.2)' : 'rgba(248,113,113,0.2)'}`,
+                    }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="text-[10px] font-bold font-mono px-1.5 py-0.5 rounded"
+                        style={{ color: suggestResult.ok ? '#34d399' : '#f87171', background: 'rgba(255,255,255,0.05)' }}
+                      >
+                        {suggestResult.vtexStatus || 'ERR'}
+                      </span>
+                      <span className={`text-xs font-medium ${suggestResult.ok ? 'text-emerald-400' : 'text-red-400'}`}>
+                        {suggestResult.message}
+                      </span>
+                    </div>
+                    {suggestResult.data != null && (
+                      <pre className="text-[10px] font-mono text-white/30 mt-2 overflow-auto max-h-24 whitespace-pre-wrap break-all">
+                        {JSON.stringify(suggestResult.data, null, 2)}
+                      </pre>
+                    )}
+                  </div>
+                )}
+
                 <a
-                  href="https://developers.vtex.com/docs/api-reference/marketplace-protocol-external-seller-fulfillment#post-/api/catalog_system/pvt/skuexchange/skuseller/-sellerId-/-sellerSkuId-"
+                  href="https://developers.vtex.com/docs/api-reference/marketplace-apis-suggestions#put-/suggestions/-sellerId-/-sellerSkuId-"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs transition-opacity hover:opacity-80"
-                  style={{ color: 'rgba(255,255,255,0.3)' }}
+                  className="flex items-center gap-1.5 text-[11px] transition-opacity hover:opacity-80"
+                  style={{ color: 'rgba(255,255,255,0.25)' }}
                 >
                   <svg className="w-3 h-3 shrink-0" viewBox="0 0 16 16" fill="currentColor"><path d="M3.75 2h3.5a.75.75 0 0 1 0 1.5h-3.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-3.5a.75.75 0 0 1 1.5 0v3.5A1.75 1.75 0 0 1 12.25 14h-8.5A1.75 1.75 0 0 1 2 12.25v-8.5C2 2.784 2.784 2 3.75 2zm6.854-1h4.146a.25.25 0 0 1 .25.25v4.146a.25.25 0 0 1-.427.177L13.03 4.03 9.28 7.78a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042l3.75-3.75-1.543-1.543A.25.25 0 0 1 10.604 1z" /></svg>
-                  SKU Exchange API reference
+                  VTEX Suggestions API reference
                 </a>
               </div>
             )}
