@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import type { MktSuggestRequest } from '@/types/marketplace';
+import type { MktChangeNotifRequest } from '@/types/marketplace';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,36 +8,35 @@ export async function POST(
   { params }: { params: Promise<{ account: string }> },
 ) {
   const { account } = await params;
-  let body: MktSuggestRequest;
+  let body: MktChangeNotifRequest;
 
   try {
-    body = await req.json() as MktSuggestRequest;
+    body = await req.json() as MktChangeNotifRequest;
   } catch {
     return NextResponse.json({ ok: false, vtexStatus: 400, message: 'Invalid JSON' }, { status: 400 });
   }
 
-  const { sellerId, sellerSkuId, appKey, appToken, payload } = body;
+  const { skuId, sellerAccount, appKey, appToken } = body;
 
-  if (!sellerId || !sellerSkuId || !appKey || !appToken) {
+  if (!skuId || !sellerAccount || !appKey || !appToken) {
     return NextResponse.json(
-      { ok: false, vtexStatus: 400, message: 'sellerId, sellerSkuId, appKey and appToken are required' },
+      { ok: false, vtexStatus: 400, message: 'skuId, sellerAccount, appKey and appToken are required' },
       { status: 400 },
     );
   }
 
-  const url = `https://api.vtex.com/${account}/suggestions/${encodeURIComponent(sellerId)}/${encodeURIComponent(sellerSkuId)}`;
+  const url = `https://${account}.vtexcommercestable.com.br/api/catalog_system/pvt/skuseller/changenotification/${encodeURIComponent(skuId)}?an=${encodeURIComponent(sellerAccount)}`;
 
   let vtexRes: Response;
   try {
     vtexRes = await fetch(url, {
-      method: 'PUT',
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'X-VTEX-API-AppKey': appKey,
         'X-VTEX-API-AppToken': appToken,
       },
-      body: JSON.stringify(payload),
     });
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Network error calling VTEX';
@@ -53,11 +52,8 @@ export async function POST(
     data = rawText || null;
   }
 
-  if (vtexStatus === 200) {
-    return NextResponse.json({ ok: true, vtexStatus, message: 'Suggestion sent successfully', data });
-  }
-  if (vtexStatus === 304) {
-    return NextResponse.json({ ok: true, vtexStatus, message: 'SKU already exists in the marketplace catalog', data });
+  if (vtexStatus >= 200 && vtexStatus < 300) {
+    return NextResponse.json({ ok: true, vtexStatus, message: 'Change notification sent successfully', data });
   }
 
   return NextResponse.json(
@@ -67,7 +63,6 @@ export async function POST(
       message: `VTEX returned ${vtexStatus}`,
       data,
       sentUrl: url,
-      sentPayload: payload,
     },
     { status: vtexStatus >= 400 && vtexStatus < 600 ? vtexStatus : 502 },
   );

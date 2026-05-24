@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
-import type { MktCallLogEntry, MktScenario, MktSuggestResult } from '@/types/marketplace';
+import type { MktCallLogEntry, MktScenario, MktSuggestResult, MktChangeNotifResult } from '@/types/marketplace';
 
 // ─── Metadata ────────────────────────────────────────────────────────────────
 
@@ -144,6 +144,12 @@ export default function MarketplacePage() {
   });
   const [suggesting, setSuggesting] = useState(false);
   const [suggestResult, setSuggestResult] = useState<MktSuggestResult | null>(null);
+
+  // Change notification state
+  const [notifForm, setNotifForm] = useState({ skuId: '', sellerAccount: '' });
+  const [notifying, setNotifying] = useState(false);
+  const [notifResult, setNotifResult] = useState<MktChangeNotifResult | null>(null);
+
   const configInitialized = useRef(false);
 
   // Load account from localStorage on mount
@@ -246,6 +252,30 @@ export default function MarketplacePage() {
   function saveSuggestCreds(updated: typeof suggestCreds) {
     setSuggestCreds(updated);
     localStorage.setItem('mkt_suggest_creds', JSON.stringify(updated));
+  }
+
+  async function submitChangeNotif() {
+    if (!account || !suggestCreds.appKey || !suggestCreds.appToken || !notifForm.skuId || !notifForm.sellerAccount) return;
+    setNotifying(true);
+    setNotifResult(null);
+    try {
+      const res = await fetch(`/api/marketplace/${account}/change-notification`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          skuId: notifForm.skuId,
+          sellerAccount: notifForm.sellerAccount,
+          appKey: suggestCreds.appKey,
+          appToken: suggestCreds.appToken,
+        }),
+      });
+      const data = await res.json() as MktChangeNotifResult;
+      setNotifResult(data);
+    } catch {
+      setNotifResult({ ok: false, vtexStatus: 0, message: 'Network error' });
+    } finally {
+      setNotifying(false);
+    }
   }
 
   async function submitSuggestion() {
@@ -361,7 +391,7 @@ export default function MarketplacePage() {
         <aside className="w-80 shrink-0 flex flex-col border-r border-white/10 overflow-hidden">
           {/* Tabs */}
           <div className="flex border-b border-white/10 shrink-0">
-            {([['scenario', 'Scenario'], ['setup', 'Setup'], ['suggest', 'Suggest SKU']] as const).map(([val, label]) => (
+            {([['scenario', 'Scenario'], ['setup', 'Setup'], ['suggest', 'Catalog']] as const).map(([val, label]) => (
               <button
                 key={val}
                 onClick={() => setActiveTab(val)}
@@ -757,6 +787,95 @@ export default function MarketplacePage() {
                   <svg className="w-3 h-3 shrink-0" viewBox="0 0 16 16" fill="currentColor"><path d="M3.75 2h3.5a.75.75 0 0 1 0 1.5h-3.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-3.5a.75.75 0 0 1 1.5 0v3.5A1.75 1.75 0 0 1 12.25 14h-8.5A1.75 1.75 0 0 1 2 12.25v-8.5C2 2.784 2.784 2 3.75 2zm6.854-1h4.146a.25.25 0 0 1 .25.25v4.146a.25.25 0 0 1-.427.177L13.03 4.03 9.28 7.78a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042l3.75-3.75-1.543-1.543A.25.25 0 0 1 10.604 1z" /></svg>
                   VTEX Suggestions API reference
                 </a>
+
+                {/* Divider */}
+                <div className="border-t border-white/08 pt-5 space-y-4">
+                  <div>
+                    <p className="text-xs font-semibold text-white/70">Change Notification</p>
+                    <p className="text-[11px] text-white/30 mt-1 leading-relaxed">
+                      Notify the marketplace that a seller SKU has changed (price, stock, or catalog data). Uses the same App Key and App Token from the Credentials section above.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    {[
+                      { key: 'skuId', label: 'SKU ID (marketplace side) *', placeholder: '12345' },
+                      { key: 'sellerAccount', label: 'Seller account name (an) *', placeholder: 'externalsellertest' },
+                    ].map(field => (
+                      <div key={field.key} className="space-y-1">
+                        <label className="text-[10px] text-white/35">{field.label}</label>
+                        <input
+                          type="text"
+                          value={notifForm[field.key as keyof typeof notifForm]}
+                          onChange={e => setNotifForm(f => ({ ...f, [field.key]: e.target.value }))}
+                          placeholder={field.placeholder}
+                          className="w-full text-xs rounded-lg px-3 py-2 outline-none focus:ring-1 focus:ring-pink-500/50"
+                          style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.75)' }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={submitChangeNotif}
+                    disabled={notifying || !account || !suggestCreds.appKey || !suggestCreds.appToken || !notifForm.skuId || !notifForm.sellerAccount}
+                    className="w-full py-2.5 rounded-lg text-xs font-semibold transition-all disabled:opacity-30"
+                    style={{ background: 'rgba(247,25,99,0.15)', border: '1px solid rgba(247,25,99,0.3)', color: '#F71963' }}
+                  >
+                    {notifying ? 'Sending…' : 'Send Change Notification'}
+                  </button>
+
+                  {notifResult && (
+                    <div
+                      className="rounded-lg p-3 space-y-2"
+                      style={{
+                        background: notifResult.ok ? 'rgba(52,211,153,0.06)' : 'rgba(248,113,113,0.06)',
+                        border: `1px solid ${notifResult.ok ? 'rgba(52,211,153,0.2)' : 'rgba(248,113,113,0.2)'}`,
+                      }}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span
+                          className="text-[10px] font-bold font-mono px-1.5 py-0.5 rounded"
+                          style={{ color: notifResult.ok ? '#34d399' : '#f87171', background: 'rgba(255,255,255,0.05)' }}
+                        >
+                          {notifResult.vtexStatus || 'ERR'}
+                        </span>
+                        <span className={`text-xs font-medium ${notifResult.ok ? 'text-emerald-400' : 'text-red-400'}`}>
+                          {notifResult.message}
+                        </span>
+                      </div>
+
+                      {notifResult.data != null && (
+                        <div className="space-y-0.5">
+                          <p className="text-[10px] text-white/25 uppercase tracking-wider">VTEX response</p>
+                          <pre className="text-[10px] font-mono text-white/50 overflow-auto max-h-32 whitespace-pre-wrap break-all">
+                            {typeof notifResult.data === 'string'
+                              ? notifResult.data
+                              : JSON.stringify(notifResult.data, null, 2)}
+                          </pre>
+                        </div>
+                      )}
+
+                      {!notifResult.ok && notifResult.sentUrl && (
+                        <div className="space-y-0.5">
+                          <p className="text-[10px] text-white/25 uppercase tracking-wider">URL called</p>
+                          <p className="text-[10px] font-mono text-white/35 break-all">{notifResult.sentUrl}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <a
+                    href="https://developers.vtex.com/docs/api-reference/catalog-api#post-/api/catalog_system/pvt/skuseller/changenotification/-skuId-"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 text-[11px] transition-opacity hover:opacity-80"
+                    style={{ color: 'rgba(255,255,255,0.25)' }}
+                  >
+                    <svg className="w-3 h-3 shrink-0" viewBox="0 0 16 16" fill="currentColor"><path d="M3.75 2h3.5a.75.75 0 0 1 0 1.5h-3.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-3.5a.75.75 0 0 1 1.5 0v3.5A1.75 1.75 0 0 1 12.25 14h-8.5A1.75 1.75 0 0 1 2 12.25v-8.5C2 2.784 2.784 2 3.75 2zm6.854-1h4.146a.25.25 0 0 1 .25.25v4.146a.25.25 0 0 1-.427.177L13.03 4.03 9.28 7.78a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042l3.75-3.75-1.543-1.543A.25.25 0 0 1 10.604 1z" /></svg>
+                    VTEX Catalog API — Change Notification
+                  </a>
+                </div>
               </div>
             )}
           </div>

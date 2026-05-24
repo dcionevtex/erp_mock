@@ -101,3 +101,18 @@ export type MktSuggestResult = {
   sentUrl?: string;
   sentPayload?: unknown;
 };
+
+export type MktChangeNotifRequest = {
+  skuId: string;
+  sellerAccount: string;
+  appKey: string;
+  appToken: string;
+};
+
+export type MktChangeNotifResult = {
+  ok: boolean;
+  vtexStatus: number;
+  message: string;
+  data?: unknown;
+  sentUrl?: string;
+};
