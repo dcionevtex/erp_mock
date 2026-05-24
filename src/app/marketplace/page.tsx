@@ -135,20 +135,18 @@ export default function MarketplacePage() {
   const [clearing, setClearing] = useState(false);
   const [activeTab, setActiveTab] = useState<'scenario' | 'setup' | 'suggest'>('scenario');
 
-  // SKU suggestion state
-  const [suggestCreds, setSuggestCreds] = useState({ sellerId: '', appKey: '', appToken: '' });
+  // SKU registration state
+  const [suggestCreds, setSuggestCreds] = useState({ sellerId: '', sellerAccount: '', appKey: '', appToken: '' });
   const [suggestForm, setSuggestForm] = useState({
     sellerSkuId: '', productName: '', skuName: '', brandName: '',
     categoryFullPath: '', refId: '', ean: '', imageUrl: 'https://placehold.co/400x400.png',
     availableQuantity: '99', salePrice: '99.99', currency: 'USD', height: '1', width: '1', length: '1', weight: '1',
   });
-  const [suggesting, setSuggesting] = useState(false);
-  const [suggestResult, setSuggestResult] = useState<MktSuggestResult | null>(null);
-
-  // Change notification state
-  const [notifForm, setNotifForm] = useState({ skuId: '', sellerAccount: '' });
-  const [notifying, setNotifying] = useState(false);
-  const [notifResult, setNotifResult] = useState<MktChangeNotifResult | null>(null);
+  const [registering, setRegistering] = useState(false);
+  const [registerSteps, setRegisterSteps] = useState<Array<{
+    label: string; ok: boolean; vtexStatus: number; message: string;
+    data?: unknown; sentUrl?: string; sentPayload?: unknown;
+  }> | null>(null);
 
   const configInitialized = useRef(false);
 
@@ -254,36 +252,43 @@ export default function MarketplacePage() {
     localStorage.setItem('mkt_suggest_creds', JSON.stringify(updated));
   }
 
-  async function submitChangeNotif() {
-    if (!account || !suggestCreds.appKey || !suggestCreds.appToken || !notifForm.skuId || !notifForm.sellerAccount) return;
-    setNotifying(true);
-    setNotifResult(null);
+  async function registerSku() {
+    if (!account || !suggestCreds.sellerId || !suggestCreds.sellerAccount || !suggestCreds.appKey || !suggestCreds.appToken || !suggestForm.sellerSkuId || !suggestForm.productName || !suggestForm.skuName) return;
+    setRegistering(true);
+    setRegisterSteps(null);
+    const steps: typeof registerSteps = [];
+
+    // Step 1: Change Notification — check if SKU already exists in marketplace
     try {
-      const res = await fetch(`/api/marketplace/${account}/change-notification`, {
+      const notifRes = await fetch(`/api/marketplace/${account}/change-notification`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          skuId: notifForm.skuId,
-          sellerAccount: notifForm.sellerAccount,
+          skuId: suggestForm.sellerSkuId,
+          sellerAccount: suggestCreds.sellerAccount,
           appKey: suggestCreds.appKey,
           appToken: suggestCreds.appToken,
         }),
       });
-      const data = await res.json() as MktChangeNotifResult;
-      setNotifResult(data);
-    } catch {
-      setNotifResult({ ok: false, vtexStatus: 0, message: 'Network error' });
-    } finally {
-      setNotifying(false);
-    }
-  }
+      const notifData = await notifRes.json() as MktChangeNotifResult;
+      steps.push({ label: 'Change Notification', ...notifData });
+      setRegisterSteps([...steps]);
 
-  async function submitSuggestion() {
-    if (!account || !suggestCreds.sellerId || !suggestCreds.appKey || !suggestCreds.appToken) return;
-    setSuggesting(true);
-    setSuggestResult(null);
+      if (notifData.vtexStatus !== 404) {
+        // 200 = already exists and updated; anything else except 404 = stop
+        setRegistering(false);
+        return;
+      }
+    } catch {
+      steps.push({ label: 'Change Notification', ok: false, vtexStatus: 0, message: 'Network error' });
+      setRegisterSteps([...steps]);
+      setRegistering(false);
+      return;
+    }
+
+    // Step 2: SKU Suggestion — only reached when change notification returned 404
     try {
-      const res = await fetch(`/api/marketplace/${account}/suggest-sku`, {
+      const suggestRes = await fetch(`/api/marketplace/${account}/suggest-sku`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -310,12 +315,14 @@ export default function MarketplacePage() {
           },
         }),
       });
-      const data = await res.json() as MktSuggestResult;
-      setSuggestResult(data);
+      const suggestData = await suggestRes.json() as MktSuggestResult;
+      steps.push({ label: 'SKU Suggestion', ...suggestData });
+      setRegisterSteps([...steps]);
     } catch {
-      setSuggestResult({ ok: false, vtexStatus: 0, message: 'Network error' });
+      steps.push({ label: 'SKU Suggestion', ok: false, vtexStatus: 0, message: 'Network error' });
+      setRegisterSteps([...steps]);
     } finally {
-      setSuggesting(false);
+      setRegistering(false);
     }
   }
 
@@ -637,10 +644,11 @@ export default function MarketplacePage() {
                 <div className="space-y-2">
                   <p className="text-[10px] uppercase tracking-widest text-white/25">Credentials</p>
                   <p className="text-[11px] text-white/30 leading-relaxed">
-                    Uses the marketplace account set in the Scenario tab. Credentials are stored locally and never sent to our server — only forwarded to VTEX.
+                    Stored locally. Forwarded to VTEX — never persisted on our server.
                   </p>
                   {[
                     { key: 'sellerId', label: 'Seller ID', placeholder: 'externalsellertest', type: 'text' },
+                    { key: 'sellerAccount', label: 'Seller account name', placeholder: 'myseller', type: 'text' },
                     { key: 'appKey', label: 'App Key', placeholder: 'vtexappkey_...', type: 'text' },
                     { key: 'appToken', label: 'App Token', placeholder: '••••••••', type: 'password' },
                   ].map(field => (
@@ -670,7 +678,7 @@ export default function MarketplacePage() {
                     { key: 'refId', label: 'Ref ID', placeholder: 'REF-001' },
                     { key: 'ean', label: 'EAN', placeholder: '7891234567890' },
                     { key: 'imageUrl', label: 'Image URL', placeholder: 'https://...' },
-                    { key: 'availableQuantity', label: 'Stock qty', placeholder: '10' },
+                    { key: 'availableQuantity', label: 'Stock qty', placeholder: '99' },
                     { key: 'salePrice', label: 'Sale price', placeholder: '99.99' },
                     { key: 'currency', label: 'Currency code', placeholder: 'USD' },
                   ].map(field => (
@@ -711,171 +719,79 @@ export default function MarketplacePage() {
                   </div>
                 </div>
 
-                {/* Submit */}
+                {/* Register button */}
                 <button
-                  onClick={submitSuggestion}
-                  disabled={suggesting || !account || !suggestCreds.sellerId || !suggestCreds.appKey || !suggestCreds.appToken || !suggestForm.sellerSkuId || !suggestForm.productName || !suggestForm.skuName}
+                  onClick={registerSku}
+                  disabled={registering || !account || !suggestCreds.sellerId || !suggestCreds.sellerAccount || !suggestCreds.appKey || !suggestCreds.appToken || !suggestForm.sellerSkuId || !suggestForm.productName || !suggestForm.skuName}
                   className="w-full py-2.5 rounded-lg text-xs font-semibold transition-all disabled:opacity-30"
                   style={{ background: 'rgba(247,25,99,0.15)', border: '1px solid rgba(247,25,99,0.3)', color: '#F71963' }}
                 >
-                  {suggesting ? 'Sending…' : 'Send SKU Suggestion'}
+                  {registering ? 'Registering…' : 'Register SKU'}
                 </button>
 
                 {!account && (
                   <p className="text-[11px] text-white/30 text-center">Set the marketplace account in the Scenario tab first.</p>
                 )}
 
-                {/* Result */}
-                {suggestResult && (
-                  <div
-                    className="rounded-lg p-3 space-y-2"
-                    style={{
-                      background: suggestResult.ok ? 'rgba(52,211,153,0.06)' : 'rgba(248,113,113,0.06)',
-                      border: `1px solid ${suggestResult.ok ? 'rgba(52,211,153,0.2)' : 'rgba(248,113,113,0.2)'}`,
-                    }}
-                  >
-                    <div className="flex items-center gap-2">
-                      <span
-                        className="text-[10px] font-bold font-mono px-1.5 py-0.5 rounded"
-                        style={{ color: suggestResult.ok ? '#34d399' : '#f87171', background: 'rgba(255,255,255,0.05)' }}
-                      >
-                        {suggestResult.vtexStatus || 'ERR'}
-                      </span>
-                      <span className={`text-xs font-medium ${suggestResult.ok ? 'text-emerald-400' : 'text-red-400'}`}>
-                        {suggestResult.message}
-                      </span>
-                    </div>
-
-                    {/* VTEX error body */}
-                    {suggestResult.data != null && (
-                      <div className="space-y-0.5">
-                        <p className="text-[10px] text-white/25 uppercase tracking-wider">VTEX response</p>
-                        <pre className="text-[10px] font-mono text-white/50 overflow-auto max-h-32 whitespace-pre-wrap break-all">
-                          {typeof suggestResult.data === 'string'
-                            ? suggestResult.data
-                            : JSON.stringify(suggestResult.data, null, 2)}
-                        </pre>
-                      </div>
-                    )}
-
-                    {/* Sent payload — shown on errors */}
-                    {!suggestResult.ok && suggestResult.sentPayload != null && (
-                      <div className="space-y-0.5">
-                        <p className="text-[10px] text-white/25 uppercase tracking-wider">Payload sent to VTEX</p>
-                        <pre className="text-[10px] font-mono text-white/40 overflow-auto max-h-40 whitespace-pre-wrap break-all">
-                          {JSON.stringify(suggestResult.sentPayload, null, 2)}
-                        </pre>
-                      </div>
-                    )}
-
-                    {/* URL called — shown on errors */}
-                    {!suggestResult.ok && suggestResult.sentUrl && (
-                      <div className="space-y-0.5">
-                        <p className="text-[10px] text-white/25 uppercase tracking-wider">URL called</p>
-                        <p className="text-[10px] font-mono text-white/35 break-all">{suggestResult.sentUrl}</p>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                <a
-                  href="https://developers.vtex.com/docs/api-reference/marketplace-apis-suggestions#put-/suggestions/-sellerId-/-sellerSkuId-"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 text-[11px] transition-opacity hover:opacity-80"
-                  style={{ color: 'rgba(255,255,255,0.25)' }}
-                >
-                  <svg className="w-3 h-3 shrink-0" viewBox="0 0 16 16" fill="currentColor"><path d="M3.75 2h3.5a.75.75 0 0 1 0 1.5h-3.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-3.5a.75.75 0 0 1 1.5 0v3.5A1.75 1.75 0 0 1 12.25 14h-8.5A1.75 1.75 0 0 1 2 12.25v-8.5C2 2.784 2.784 2 3.75 2zm6.854-1h4.146a.25.25 0 0 1 .25.25v4.146a.25.25 0 0 1-.427.177L13.03 4.03 9.28 7.78a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042l3.75-3.75-1.543-1.543A.25.25 0 0 1 10.604 1z" /></svg>
-                  VTEX Suggestions API reference
-                </a>
-
-                {/* Divider */}
-                <div className="border-t border-white/08 pt-5 space-y-4">
-                  <div>
-                    <p className="text-xs font-semibold text-white/70">Change Notification</p>
-                    <p className="text-[11px] text-white/30 mt-1 leading-relaxed">
-                      Notify the marketplace that a seller SKU has changed (price, stock, or catalog data). Uses the same App Key and App Token from the Credentials section above.
-                    </p>
-                  </div>
-
+                {/* Step-by-step result */}
+                {registerSteps && registerSteps.length > 0 && (
                   <div className="space-y-2">
-                    {[
-                      { key: 'skuId', label: 'SKU ID (marketplace side) *', placeholder: '12345' },
-                      { key: 'sellerAccount', label: 'Seller account name (an) *', placeholder: 'externalsellertest' },
-                    ].map(field => (
-                      <div key={field.key} className="space-y-1">
-                        <label className="text-[10px] text-white/35">{field.label}</label>
-                        <input
-                          type="text"
-                          value={notifForm[field.key as keyof typeof notifForm]}
-                          onChange={e => setNotifForm(f => ({ ...f, [field.key]: e.target.value }))}
-                          placeholder={field.placeholder}
-                          className="w-full text-xs rounded-lg px-3 py-2 outline-none focus:ring-1 focus:ring-pink-500/50"
-                          style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.75)' }}
-                        />
+                    {registerSteps.map((step, i) => (
+                      <div
+                        key={i}
+                        className="rounded-lg p-3 space-y-2"
+                        style={{
+                          background: step.ok ? 'rgba(52,211,153,0.06)' : step.vtexStatus === 404 ? 'rgba(251,191,36,0.06)' : 'rgba(248,113,113,0.06)',
+                          border: `1px solid ${step.ok ? 'rgba(52,211,153,0.2)' : step.vtexStatus === 404 ? 'rgba(251,191,36,0.2)' : 'rgba(248,113,113,0.2)'}`,
+                        }}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] text-white/30 font-medium">Step {i + 1}</span>
+                          <span className="text-[10px] text-white/50">{step.label}</span>
+                          <span
+                            className="ml-auto text-[10px] font-bold font-mono px-1.5 py-0.5 rounded"
+                            style={{
+                              color: step.ok ? '#34d399' : step.vtexStatus === 404 ? '#fbbf24' : '#f87171',
+                              background: 'rgba(255,255,255,0.05)',
+                            }}
+                          >
+                            {step.vtexStatus || 'ERR'}
+                          </span>
+                        </div>
+                        <p className={`text-xs font-medium ${step.ok ? 'text-emerald-400' : step.vtexStatus === 404 ? 'text-amber-400' : 'text-red-400'}`}>
+                          {step.message}
+                        </p>
+                        {step.data != null && (
+                          <pre className="text-[10px] font-mono text-white/40 overflow-auto max-h-28 whitespace-pre-wrap break-all">
+                            {typeof step.data === 'string' ? step.data : JSON.stringify(step.data, null, 2)}
+                          </pre>
+                        )}
+                        {!step.ok && step.sentUrl && (
+                          <p className="text-[10px] font-mono text-white/30 break-all">{step.sentUrl}</p>
+                        )}
                       </div>
                     ))}
                   </div>
+                )}
 
-                  <button
-                    onClick={submitChangeNotif}
-                    disabled={notifying || !account || !suggestCreds.appKey || !suggestCreds.appToken || !notifForm.skuId || !notifForm.sellerAccount}
-                    className="w-full py-2.5 rounded-lg text-xs font-semibold transition-all disabled:opacity-30"
-                    style={{ background: 'rgba(247,25,99,0.15)', border: '1px solid rgba(247,25,99,0.3)', color: '#F71963' }}
-                  >
-                    {notifying ? 'Sending…' : 'Send Change Notification'}
-                  </button>
-
-                  {notifResult && (
-                    <div
-                      className="rounded-lg p-3 space-y-2"
-                      style={{
-                        background: notifResult.ok ? 'rgba(52,211,153,0.06)' : 'rgba(248,113,113,0.06)',
-                        border: `1px solid ${notifResult.ok ? 'rgba(52,211,153,0.2)' : 'rgba(248,113,113,0.2)'}`,
-                      }}
+                {/* Docs */}
+                <div className="space-y-1.5 pt-1">
+                  {[
+                    { label: 'VTEX Catalog API — Change Notification', url: 'https://developers.vtex.com/docs/api-reference/catalog-api#post-/api/catalog_system/pvt/skuseller/changenotification/-skuId-' },
+                    { label: 'VTEX Suggestions API', url: 'https://developers.vtex.com/docs/api-reference/marketplace-apis-suggestions#put-/suggestions/-sellerId-/-sellerSkuId-' },
+                  ].map(link => (
+                    <a
+                      key={link.url}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 text-[11px] transition-opacity hover:opacity-80"
+                      style={{ color: 'rgba(255,255,255,0.25)' }}
                     >
-                      <div className="flex items-center gap-2">
-                        <span
-                          className="text-[10px] font-bold font-mono px-1.5 py-0.5 rounded"
-                          style={{ color: notifResult.ok ? '#34d399' : '#f87171', background: 'rgba(255,255,255,0.05)' }}
-                        >
-                          {notifResult.vtexStatus || 'ERR'}
-                        </span>
-                        <span className={`text-xs font-medium ${notifResult.ok ? 'text-emerald-400' : 'text-red-400'}`}>
-                          {notifResult.message}
-                        </span>
-                      </div>
-
-                      {notifResult.data != null && (
-                        <div className="space-y-0.5">
-                          <p className="text-[10px] text-white/25 uppercase tracking-wider">VTEX response</p>
-                          <pre className="text-[10px] font-mono text-white/50 overflow-auto max-h-32 whitespace-pre-wrap break-all">
-                            {typeof notifResult.data === 'string'
-                              ? notifResult.data
-                              : JSON.stringify(notifResult.data, null, 2)}
-                          </pre>
-                        </div>
-                      )}
-
-                      {!notifResult.ok && notifResult.sentUrl && (
-                        <div className="space-y-0.5">
-                          <p className="text-[10px] text-white/25 uppercase tracking-wider">URL called</p>
-                          <p className="text-[10px] font-mono text-white/35 break-all">{notifResult.sentUrl}</p>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  <a
-                    href="https://developers.vtex.com/docs/api-reference/catalog-api#post-/api/catalog_system/pvt/skuseller/changenotification/-skuId-"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 text-[11px] transition-opacity hover:opacity-80"
-                    style={{ color: 'rgba(255,255,255,0.25)' }}
-                  >
-                    <svg className="w-3 h-3 shrink-0" viewBox="0 0 16 16" fill="currentColor"><path d="M3.75 2h3.5a.75.75 0 0 1 0 1.5h-3.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-3.5a.75.75 0 0 1 1.5 0v3.5A1.75 1.75 0 0 1 12.25 14h-8.5A1.75 1.75 0 0 1 2 12.25v-8.5C2 2.784 2.784 2 3.75 2zm6.854-1h4.146a.25.25 0 0 1 .25.25v4.146a.25.25 0 0 1-.427.177L13.03 4.03 9.28 7.78a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042l3.75-3.75-1.543-1.543A.25.25 0 0 1 10.604 1z" /></svg>
-                    VTEX Catalog API — Change Notification
-                  </a>
+                      <svg className="w-3 h-3 shrink-0" viewBox="0 0 16 16" fill="currentColor"><path d="M3.75 2h3.5a.75.75 0 0 1 0 1.5h-3.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-3.5a.75.75 0 0 1 1.5 0v3.5A1.75 1.75 0 0 1 12.25 14h-8.5A1.75 1.75 0 0 1 2 12.25v-8.5C2 2.784 2.784 2 3.75 2zm6.854-1h4.146a.25.25 0 0 1 .25.25v4.146a.25.25 0 0 1-.427.177L13.03 4.03 9.28 7.78a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042l3.75-3.75-1.543-1.543A.25.25 0 0 1 10.604 1z" /></svg>
+                      {link.label}
+                    </a>
+                  ))}
                 </div>
               </div>
             )}
