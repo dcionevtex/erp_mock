@@ -69,6 +69,36 @@ const LAB_APPS = [
   },
 ];
 
+// 8-bit pixel paintbrush icon for Claude Skills
+function PixelBrush() {
+  const px = 3;
+  // Brush handle (top) + ferrule + bristles
+  const pixels: [number, number, string][] = [
+    // Handle
+    [3, 0, '#F71963'], [4, 0, '#F71963'],
+    [3, 1, '#F71963'], [4, 1, '#F71963'],
+    [3, 2, '#F71963'], [4, 2, '#F71963'],
+    [3, 3, '#F71963'], [4, 3, '#F71963'],
+    // Ferrule
+    [2, 4, '#94a3b8'], [3, 4, '#cbd5e1'], [4, 4, '#cbd5e1'], [5, 4, '#94a3b8'],
+    [2, 5, '#94a3b8'], [3, 5, '#e2e8f0'], [4, 5, '#e2e8f0'], [5, 5, '#94a3b8'],
+    // Bristles
+    [2, 6, '#fbbf24'], [3, 6, '#fde68a'], [4, 6, '#fde68a'], [5, 6, '#fbbf24'],
+    [2, 7, '#f59e0b'], [3, 7, '#fbbf24'], [4, 7, '#fbbf24'], [5, 7, '#f59e0b'],
+    [3, 8, '#f59e0b'], [4, 8, '#f59e0b'],
+    [3, 9, '#d97706'],
+  ];
+  const w = 8 * px;
+  const h = 10 * px;
+  return (
+    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ imageRendering: 'pixelated' }}>
+      {pixels.map(([col, row, color], i) => (
+        <rect key={i} x={col * px} y={row * px} width={px} height={px} fill={color} />
+      ))}
+    </svg>
+  );
+}
+
 // 8-bit pixel flask icon
 function PixelFlask() {
   const px = 3;
@@ -270,6 +300,72 @@ export default function LauncherPage() {
                   </div>
                 </div>
               ))}
+            </div>
+          </section>
+
+          <div className="border-t border-white/[0.06]" />
+
+          {/* Claude Skills */}
+          <section className="space-y-6">
+            <div className="flex items-start gap-4">
+              <div
+                className="shrink-0 w-12 h-12 rounded-lg flex items-center justify-center"
+                style={{ background: 'rgba(247,25,99,0.08)', border: '1px solid rgba(247,25,99,0.15)' }}
+              >
+                <PixelBrush />
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2.5">
+                  <h2 className="text-lg font-semibold text-white/90">Claude Skills</h2>
+                  <span
+                    className="text-[10px] font-medium px-1.5 py-0.5 rounded"
+                    style={{ background: 'rgba(247,25,99,0.12)', color: '#F71963' }}
+                  >
+                    Claude Code
+                  </span>
+                </div>
+                <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                  Skill files for Claude Code that inject VTEX domain knowledge directly into your AI workflow. Install once in <span className="font-mono text-white/50">~/.claude/skills/</span> and trigger with a prompt.
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {/* VTEX Brand Skill */}
+              <a
+                href="https://github.com/dcionevtex/vtex-brand-skill"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-start gap-4 rounded-xl border p-5 transition-all"
+                style={{ border: '1px solid rgba(247,25,99,0.15)', background: 'rgba(247,25,99,0.04)' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(247,25,99,0.08)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(247,25,99,0.3)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(247,25,99,0.04)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(247,25,99,0.15)'; }}
+              >
+                <div
+                  className="shrink-0 w-12 h-12 rounded-lg flex items-center justify-center text-lg"
+                  style={{ background: 'rgba(247,25,99,0.1)' }}
+                >
+                  🎨
+                </div>
+                <div className="flex-1 min-w-0 space-y-1.5">
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-sm font-semibold text-white/90">VTEX Brand</span>
+                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded" style={{ background: 'rgba(247,25,99,0.12)', color: '#F71963' }}>Skill</span>
+                  </div>
+                  <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                    Gives Claude the complete VTEX brand system — Rebel Pink, typography, logo rules, and voice guidelines. Generates branded PowerPoint presentations and Marp slides from a single prompt.
+                  </p>
+                  <div className="flex items-center gap-1.5 pt-0.5">
+                    <svg className="w-3 h-3" viewBox="0 0 16 16" fill="currentColor" style={{ color: 'rgba(255,255,255,0.25)' }}>
+                      <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+                    </svg>
+                    <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.25)' }}>dcionevtex/vtex-brand-skill</span>
+                  </div>
+                </div>
+                <svg className="w-4 h-4 shrink-0 mt-0.5 transition-colors text-white/20 group-hover:text-white/50" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 10h10M10 5l5 5-5 5" />
+                </svg>
+              </a>
             </div>
           </section>
 
