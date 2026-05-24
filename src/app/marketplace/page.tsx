@@ -575,7 +575,8 @@ export default function MarketplacePage() {
                   {
                     n: 4,
                     title: 'Map a product to the seller',
-                    body: 'In the product catalog, associate at least one SKU with the external seller ID you just created.',
+                    body: 'In the product catalog, associate at least one SKU with the external seller ID you just created. You can do this directly from the Catalog tab — fill the SKU form and click Register SKU. This requires a marketplace App Key and App Token with catalog write permissions.',
+                    link: { label: 'Go to Catalog tab', tab: 'suggest' as const },
                   },
                   {
                     n: 5,
@@ -598,7 +599,7 @@ export default function MarketplacePage() {
                     <div>
                       <p className="text-xs font-medium text-white/70">{step.title}</p>
                       <p className="text-xs text-white/35 mt-0.5 leading-relaxed">{step.body}</p>
-                      {step.link && (
+                      {step.link && 'url' in step.link && (
                         <a
                           href={step.link.url}
                           target="_blank"
@@ -609,6 +610,16 @@ export default function MarketplacePage() {
                           {step.link.label}
                           <svg className="w-3 h-3" viewBox="0 0 16 16" fill="currentColor"><path d="M3.75 2h3.5a.75.75 0 0 1 0 1.5h-3.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-3.5a.75.75 0 0 1 1.5 0v3.5A1.75 1.75 0 0 1 12.25 14h-8.5A1.75 1.75 0 0 1 2 12.25v-8.5C2 2.784 2.784 2 3.75 2zm6.854-1h4.146a.25.25 0 0 1 .25.25v4.146a.25.25 0 0 1-.427.177L13.03 4.03 9.28 7.78a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042l3.75-3.75-1.543-1.543A.25.25 0 0 1 10.604 1z" /></svg>
                         </a>
+                      )}
+                      {step.link && 'tab' in step.link && (
+                        <button
+                          onClick={() => setActiveTab(step.link!.tab as 'scenario' | 'setup' | 'suggest')}
+                          className="inline-flex items-center gap-1 text-xs mt-1 transition-opacity hover:opacity-80"
+                          style={{ color: '#F71963' }}
+                        >
+                          {step.link.label}
+                          <svg className="w-3 h-3" viewBox="0 0 16 16" fill="currentColor"><path d="M6.22 3.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 0 1 0-1.06z"/></svg>
+                        </button>
                       )}
                     </div>
                   </div>
