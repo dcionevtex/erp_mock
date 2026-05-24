@@ -29,7 +29,7 @@ const NAV_ITEMS = [
   },
   {
     label: 'Release Notes',
-    href: '/erp/release-notes',
+    href: '/release-notes',
     icon: (
       <svg className="w-5 h-5 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="10" cy="10" r="8" />

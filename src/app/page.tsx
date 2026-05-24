@@ -195,6 +195,34 @@ export default function LauncherPage() {
           {/* Divider */}
           <div className="border-t border-white/[0.06]" />
 
+          {/* Release Notes teaser */}
+          <Link
+            href="/release-notes"
+            className="group flex items-center justify-between rounded-xl border px-5 py-4 transition-all"
+            style={{ border: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.02)' }}
+            onMouseEnter={undefined}
+          >
+            <div className="flex items-center gap-3">
+              <div
+                className="shrink-0 w-8 h-8 rounded-lg flex items-center justify-center"
+                style={{ background: 'rgba(247,25,99,0.08)' }}
+              >
+                <svg className="w-4 h-4 text-white/30" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h7A2.5 2.5 0 0 1 14 2.5v10.5a.5.5 0 0 1-.777.416L8 10.101l-5.223 3.315A.5.5 0 0 1 2 13V2.5zm2.5-1A1.5 1.5 0 0 0 3 3v9.658l4.5-2.859 4.5 2.86V3A1.5 1.5 0 0 0 11.5 1.5h-7z"/>
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-white/70 group-hover:text-white/90 transition-colors">Release Notes</p>
+                <p className="text-xs text-white/30">Full changelog across all simulators</p>
+              </div>
+            </div>
+            <svg className="w-4 h-4 text-white/20 group-hover:text-white/50 transition-colors" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M5 10h10M10 5l5 5-5 5" />
+            </svg>
+          </Link>
+
+          <div className="border-t border-white/[0.06]" />
+
           {/* The Lab */}
           <section className="space-y-6">
             <div className="flex items-start gap-4">
