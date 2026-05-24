@@ -139,8 +139,8 @@ export default function MarketplacePage() {
   const [suggestCreds, setSuggestCreds] = useState({ sellerId: '', appKey: '', appToken: '' });
   const [suggestForm, setSuggestForm] = useState({
     sellerSkuId: '', productName: '', skuName: '', brandName: '',
-    categoryFullPath: '', refId: '', ean: '', imageUrl: '',
-    availableQuantity: '', salePrice: '', height: '1', width: '1', length: '1', weight: '1',
+    categoryFullPath: '', refId: '', ean: '', imageUrl: 'https://placehold.co/400x400.png',
+    availableQuantity: '99', salePrice: '99.99', currency: 'USD', height: '1', width: '1', length: '1', weight: '1',
   });
   const [suggesting, setSuggesting] = useState(false);
   const [suggestResult, setSuggestResult] = useState<MktSuggestResult | null>(null);
@@ -305,7 +305,7 @@ export default function MarketplacePage() {
             Weight: suggestForm.weight ? Number(suggestForm.weight) : undefined,
             Images: suggestForm.imageUrl ? [{ imageName: 'Main', imageUrl: suggestForm.imageUrl }] : undefined,
             Pricing: suggestForm.salePrice
-              ? { Currency: 'BRL', SalePrice: Number(suggestForm.salePrice), CurrencySymbol: 'R$' }
+              ? { Currency: suggestForm.currency || 'USD', SalePrice: Number(suggestForm.salePrice), CurrencySymbol: suggestForm.currency || 'USD' }
               : undefined,
           },
         }),
@@ -671,7 +671,8 @@ export default function MarketplacePage() {
                     { key: 'ean', label: 'EAN', placeholder: '7891234567890' },
                     { key: 'imageUrl', label: 'Image URL', placeholder: 'https://...' },
                     { key: 'availableQuantity', label: 'Stock qty', placeholder: '10' },
-                    { key: 'salePrice', label: 'Sale price (BRL)', placeholder: '99.90' },
+                    { key: 'salePrice', label: 'Sale price', placeholder: '99.99' },
+                    { key: 'currency', label: 'Currency code', placeholder: 'USD' },
                   ].map(field => (
                     <div key={field.key} className="space-y-1">
                       <label className="text-[10px] text-white/35">{field.label}</label>
