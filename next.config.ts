@@ -5,7 +5,6 @@ const nextConfig: NextConfig = {
     return [
       // Old routes moved to /erp/* — handles stale bookmarks and cached callbackUrls
       { source: '/about', destination: '/erp/about', permanent: true },
-      { source: '/release-notes', destination: '/erp/release-notes', permanent: true },
     ];
   },
 };
