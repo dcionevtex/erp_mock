@@ -697,7 +697,7 @@ export default function MarketplacePage() {
                 {/* Result */}
                 {suggestResult && (
                   <div
-                    className="rounded-lg p-3 space-y-1"
+                    className="rounded-lg p-3 space-y-2"
                     style={{
                       background: suggestResult.ok ? 'rgba(52,211,153,0.06)' : 'rgba(248,113,113,0.06)',
                       border: `1px solid ${suggestResult.ok ? 'rgba(52,211,153,0.2)' : 'rgba(248,113,113,0.2)'}`,
@@ -714,10 +714,35 @@ export default function MarketplacePage() {
                         {suggestResult.message}
                       </span>
                     </div>
+
+                    {/* VTEX error body */}
                     {suggestResult.data != null && (
-                      <pre className="text-[10px] font-mono text-white/30 mt-2 overflow-auto max-h-24 whitespace-pre-wrap break-all">
-                        {JSON.stringify(suggestResult.data, null, 2)}
-                      </pre>
+                      <div className="space-y-0.5">
+                        <p className="text-[10px] text-white/25 uppercase tracking-wider">VTEX response</p>
+                        <pre className="text-[10px] font-mono text-white/50 overflow-auto max-h-32 whitespace-pre-wrap break-all">
+                          {typeof suggestResult.data === 'string'
+                            ? suggestResult.data
+                            : JSON.stringify(suggestResult.data, null, 2)}
+                        </pre>
+                      </div>
+                    )}
+
+                    {/* Sent payload — shown on errors */}
+                    {!suggestResult.ok && suggestResult.sentPayload != null && (
+                      <div className="space-y-0.5">
+                        <p className="text-[10px] text-white/25 uppercase tracking-wider">Payload sent to VTEX</p>
+                        <pre className="text-[10px] font-mono text-white/40 overflow-auto max-h-40 whitespace-pre-wrap break-all">
+                          {JSON.stringify(suggestResult.sentPayload, null, 2)}
+                        </pre>
+                      </div>
+                    )}
+
+                    {/* URL called — shown on errors */}
+                    {!suggestResult.ok && suggestResult.sentUrl && (
+                      <div className="space-y-0.5">
+                        <p className="text-[10px] text-white/25 uppercase tracking-wider">URL called</p>
+                        <p className="text-[10px] font-mono text-white/35 break-all">{suggestResult.sentUrl}</p>
+                      </div>
                     )}
                   </div>
                 )}

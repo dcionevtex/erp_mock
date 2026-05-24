@@ -45,12 +45,12 @@ export async function POST(
   }
 
   const vtexStatus = vtexRes.status;
+  const rawText = await vtexRes.text();
   let data: unknown;
   try {
-    const text = await vtexRes.text();
-    data = text ? JSON.parse(text) : null;
+    data = rawText ? JSON.parse(rawText) : null;
   } catch {
-    data = null;
+    data = rawText || null;
   }
 
   if (vtexStatus === 200) {
@@ -61,7 +61,14 @@ export async function POST(
   }
 
   return NextResponse.json(
-    { ok: false, vtexStatus, message: `VTEX returned ${vtexStatus}`, data },
+    {
+      ok: false,
+      vtexStatus,
+      message: `VTEX returned ${vtexStatus}`,
+      data,
+      sentUrl: url,
+      sentPayload: payload,
+    },
     { status: vtexStatus >= 400 && vtexStatus < 600 ? vtexStatus : 502 },
   );
 }

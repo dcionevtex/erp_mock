@@ -98,4 +98,6 @@ export type MktSuggestResult = {
   vtexStatus: number;
   message: string;
   data?: unknown;
+  sentUrl?: string;
+  sentPayload?: unknown;
 };
