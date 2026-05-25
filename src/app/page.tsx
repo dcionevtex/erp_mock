@@ -51,6 +51,37 @@ const TOOLS = [
   },
 ];
 
+const FIELD_TOOLS = [
+  {
+    href: 'https://accounthandler.vtexdemo.shop/',
+    label: 'Account Handler',
+    description: 'Deploy one account\'s full configuration to a brand-new VTEX account in a single step. Built for spinning up demo environments without manual setup.',
+    author: 'KAI',
+    icon: (
+      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+        <polyline points="16 6 12 2 8 6" />
+        <line x1="12" y1="2" x2="12" y2="15" />
+      </svg>
+    ),
+  },
+  {
+    href: 'https://ps-proposals-ruby.vercel.app/',
+    label: 'PS Proposal Request',
+    description: 'Open a Professional Services request for quote with the SA team. Use this when a deal needs scoped delivery beyond standard implementation.',
+    author: 'SA Team',
+    icon: (
+      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+        <polyline points="14 2 14 8 20 8" />
+        <line x1="16" y1="13" x2="8" y2="13" />
+        <line x1="16" y1="17" x2="8" y2="17" />
+        <polyline points="10 9 9 9 8 9" />
+      </svg>
+    ),
+  },
+];
+
 const LAB_APPS = [
   {
     label: 'Email Translator',
@@ -219,6 +250,83 @@ export default function LauncherPage() {
                   <Link key={tool.label} href={tool.href}>{card}</Link>
                 );
               })}
+            </div>
+          </section>
+
+          {/* Field Tools */}
+          <section className="space-y-5">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2.5">
+                  <h2 className="text-sm font-semibold" style={{ color: 'rgba(255,255,255,0.7)' }}>Field Tools</h2>
+                  <span
+                    className="text-[9px] uppercase tracking-widest px-1.5 py-0.5 rounded"
+                    style={{ background: 'rgba(20,184,166,0.12)', color: 'rgba(94,234,212,0.7)' }}
+                  >
+                    Community
+                  </span>
+                </div>
+                <p className="text-xs" style={{ color: 'rgba(255,255,255,0.25)' }}>
+                  External tools built and maintained by the SE/SA team. Open in a new tab.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {FIELD_TOOLS.map((tool) => (
+                <a
+                  key={tool.label}
+                  href={tool.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group relative rounded-xl p-4 flex flex-col gap-3 transition-all"
+                  style={{
+                    background: 'rgba(20,184,166,0.04)',
+                    border: '1px solid rgba(20,184,166,0.12)',
+                  }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLElement).style.background = 'rgba(20,184,166,0.08)';
+                    (e.currentTarget as HTMLElement).style.borderColor = 'rgba(20,184,166,0.22)';
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLElement).style.background = 'rgba(20,184,166,0.04)';
+                    (e.currentTarget as HTMLElement).style.borderColor = 'rgba(20,184,166,0.12)';
+                  }}
+                >
+                  {/* External link indicator */}
+                  <svg
+                    className="absolute top-3 right-3 w-3 h-3 transition-colors"
+                    viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"
+                    style={{ color: 'rgba(94,234,212,0.25)' }}
+                  >
+                    <path d="M2 10L10 2M6 2h4v4" />
+                  </svg>
+
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="shrink-0 w-9 h-9 rounded-lg flex items-center justify-center"
+                      style={{ background: 'rgba(20,184,166,0.1)', color: 'rgba(94,234,212,0.6)' }}
+                    >
+                      {tool.icon}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-sm font-semibold" style={{ color: 'rgba(255,255,255,0.85)' }}>{tool.label}</span>
+                        <span
+                          className="text-[9px] px-1.5 py-0.5 rounded font-medium"
+                          style={{ background: 'rgba(20,184,166,0.1)', color: 'rgba(94,234,212,0.55)' }}
+                        >
+                          {tool.author}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                    {tool.description}
+                  </p>
+                </a>
+              ))}
             </div>
           </section>
 
