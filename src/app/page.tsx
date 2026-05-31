@@ -53,9 +53,9 @@ const TOOLS = [
     href: '/gift-card',
     label: 'Gift Card Provider',
     description: 'Mock the VTEX Gift Card Provider Protocol. Any customer email at checkout returns a fictional gift card with a configurable balance. VTEX calls your endpoint — no real provider needed.',
-    tag: 'Mock',
-    tagColor: 'bg-amber-500/15 text-amber-400',
-    disabled: false,
+    tag: 'Coming Soon',
+    tagColor: 'bg-white/8 text-white/30',
+    disabled: true,
     icon: (
       <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <rect x="2" y="7" width="20" height="14" rx="2" />
