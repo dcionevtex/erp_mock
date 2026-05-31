@@ -209,23 +209,26 @@ export default function GiftCardPage() {
               {serviceUrl}
             </code>
 
-            <div className="mt-3 pt-3 border-t border-white/6">
-              <p className="text-xs text-white/30 mb-1.5">Register via VTEX Hub API</p>
-              <pre className="text-[11px] font-mono text-white/40 bg-black/20 rounded-lg px-3 py-2 overflow-x-auto whitespace-pre-wrap">
-{`curl -X PUT \\
-  "https://{vtexAccount}.vtexcommercestable.com.br/api/giftcardproviders/DemoGiftCard" \\
-  -H "X-VTEX-API-AppKey: {appKey}" \\
-  -H "X-VTEX-API-AppToken: {appToken}" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "serviceUrl": "${serviceUrl}",
-    "appKey": "demo-key",
-    "appToken": "demo-token",
-    "oauthProvider": "vtex",
-    "preAuthEnabled": false,
-    "cancelEnabled": true
-  }'`}
-              </pre>
+            <div className="mt-3 pt-3 border-t border-white/6 space-y-2">
+              <p className="text-xs text-white/30">Register via VTEX Hub API</p>
+
+              <div>
+                <p className="text-[10px] text-white/20 mb-1 font-mono">PowerShell</p>
+                <pre className="text-[11px] font-mono text-white/40 bg-black/20 rounded-lg px-3 py-2 overflow-x-auto whitespace-pre">
+{`$body = '{"serviceUrl":"${serviceUrl}","appKey":"demo-key","appToken":"demo-token","oauthProvider":"vtex","preAuthEnabled":false,"cancelEnabled":true}'
+Invoke-RestMethod -Method PUT \`
+  -Uri "https://{vtexAccount}.vtexcommercestable.com.br/api/giftcardproviders/DemoGiftCard" \`
+  -Headers @{"X-VTEX-API-AppKey"="{appKey}";"X-VTEX-API-AppToken"="{appToken}";"Content-Type"="application/json"} \`
+  -Body $body`}
+                </pre>
+              </div>
+
+              <div>
+                <p className="text-[10px] text-white/20 mb-1 font-mono">bash / curl</p>
+                <pre className="text-[11px] font-mono text-white/40 bg-black/20 rounded-lg px-3 py-2 overflow-x-auto whitespace-pre">
+{`curl -X PUT "https://{vtexAccount}.vtexcommercestable.com.br/api/giftcardproviders/DemoGiftCard" -H "X-VTEX-API-AppKey: {appKey}" -H "X-VTEX-API-AppToken: {appToken}" -H "Content-Type: application/json" -d '{"serviceUrl":"${serviceUrl}","appKey":"demo-key","appToken":"demo-token","oauthProvider":"vtex","preAuthEnabled":false,"cancelEnabled":true}'`}
+                </pre>
+              </div>
             </div>
           </div>
         )}
