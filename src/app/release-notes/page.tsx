@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-type Simulator = 'platform' | 'erp' | 'ppp' | 'marketplace';
+type Simulator = 'platform' | 'erp' | 'ppp' | 'marketplace' | 'giftcard';
 
 type ReleaseEntry = {
   version: string;
@@ -15,6 +15,7 @@ const SIMULATOR_STYLE: Record<Simulator, { label: string; cls: string }> = {
   erp:         { label: 'ERP Simulator',     cls: 'bg-emerald-500/10 text-emerald-400' },
   ppp:         { label: 'Payment Provider',  cls: 'bg-violet-500/10 text-violet-400' },
   marketplace: { label: 'External Seller',   cls: 'bg-sky-500/10 text-sky-400' },
+  giftcard:    { label: 'Gift Card',          cls: 'bg-amber-500/10 text-amber-400' },
 };
 
 const CHANGE_TYPE_STYLE: Record<'feat' | 'fix' | 'chore', { label: string; color: string; bg: string }> = {
@@ -25,9 +26,23 @@ const CHANGE_TYPE_STYLE: Record<'feat' | 'fix' | 'chore', { label: string; color
 
 const RELEASES: ReleaseEntry[] = [
   {
+    version: '1.4.0',
+    date: 'May 31, 2026',
+    tag: 'latest',
+    simulators: ['giftcard'],
+    changes: [
+      { type: 'feat', text: 'Gift Card Provider mock — implements the VTEX Gift Card Provider Protocol endpoints (search, get, transaction, settlement, cancellation)' },
+      { type: 'feat', text: 'Any customer email at checkout auto-returns a fictional gift card with configurable balance (default 9999)' },
+      { type: 'feat', text: 'Account-scoped isolation — each VTEX account gets its own service URL, cards, and call log' },
+      { type: 'feat', text: 'Live call log with request/response inspector for every protocol call VTEX makes' },
+      { type: 'feat', text: 'Checkout flow diagram showing search → get card → debit → settle progression' },
+      { type: 'feat', text: 'Scenario toggle: return card (approved) or return empty (no cards at checkout)' },
+      { type: 'chore', text: 'Gift Card Provider added to the platform launcher as a new tool card' },
+    ],
+  },
+  {
     version: '1.3.0',
     date: 'May 24, 2026',
-    tag: 'latest',
     simulators: ['marketplace'],
     changes: [
       { type: 'feat', text: 'Unified Register SKU flow — Change Notification is sent first; if SKU exists (200) the flow stops; if not found (404) SKU Suggestion is sent automatically' },

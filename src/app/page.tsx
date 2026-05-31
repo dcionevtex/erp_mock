@@ -49,6 +49,22 @@ const TOOLS = [
       </svg>
     ),
   },
+  {
+    href: '/gift-card',
+    label: 'Gift Card Provider',
+    description: 'Mock the VTEX Gift Card Provider Protocol. Any customer email at checkout returns a fictional gift card with a configurable balance. VTEX calls your endpoint — no real provider needed.',
+    tag: 'Mock',
+    tagColor: 'bg-amber-500/15 text-amber-400',
+    disabled: false,
+    icon: (
+      <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2" y="7" width="20" height="14" rx="2" />
+        <path d="M16 7V5a2 2 0 0 0-4 0v2" />
+        <path d="M8 7V5a2 2 0 0 1 4 0" />
+        <path d="M12 12v4M10 14h4" />
+      </svg>
+    ),
+  },
 ];
 
 const FIELD_TOOLS = [
