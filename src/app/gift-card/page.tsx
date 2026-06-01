@@ -503,7 +503,7 @@ export default function GiftCardPage() {
                           <p className="text-[11px] text-white/30 truncate">{card.owner}</p>
                           <div className="flex items-center justify-between">
                             <p className="text-[10px] font-mono text-amber-400/60">{card.redemptionCode}</p>
-                            <p className="text-[10px] font-mono text-emerald-400/70">{card.initialBalance}</p>
+                            <p className="text-[10px] font-mono text-emerald-400/70">{config.mockBalance} {config.currencyCode}</p>
                           </div>
                         </div>
                       ))}
