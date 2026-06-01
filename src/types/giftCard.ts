@@ -5,7 +5,8 @@ export type GcScenario = 'approved' | 'empty';
 
 export type GcConfig = {
   scenario: GcScenario;
-  mockBalance: number; // stored as-is, interpreted as currency units by the store
+  mockBalance: number;
+  currencyCode: string; // e.g. "BRL", "USD" — set by operator to match the VTEX store
 };
 
 // Internal representation of a gift card stored in memory

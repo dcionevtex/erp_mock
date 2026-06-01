@@ -20,7 +20,7 @@ export async function POST(
   { params }: { params: Promise<{ account: string }> },
 ) {
   const { account } = await params;
-  const body = await request.json() as { scenario?: GcScenario; mockBalance?: number; clear?: boolean };
+  const body = await request.json() as { scenario?: GcScenario; mockBalance?: number; currencyCode?: string; clear?: boolean };
 
   if (body.clear) {
     clearAll(account);
@@ -32,6 +32,7 @@ export async function POST(
     account,
     body.scenario ?? current.scenario,
     body.mockBalance ?? current.mockBalance,
+    body.currencyCode ?? current.currencyCode,
   );
 
   return NextResponse.json({ ok: true, config: getGcConfig(account) });

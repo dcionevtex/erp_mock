@@ -47,20 +47,19 @@ function buildSearchCardResponse(card: ReturnType<typeof getCard>, balance: numb
 // transaction.href tells the Hub where to POST the debit transaction — without it,
 // "Use Card" fails with a communication error.
 // currencyCode is only included when we captured it from a prior VTEX request.
-function buildGetCardResponse(card: ReturnType<typeof getCard>, balance: number, serviceUrl: string) {
+function buildGetCardResponse(card: ReturnType<typeof getCard>, balance: number, serviceUrl: string, currencyCode: string) {
   if (!card) return null;
-  const response: Record<string, unknown> = {
+  return {
     id: card.id,
     redemptionToken: card.redemptionCode,
     redemptionCode: card.redemptionCode,
     balance,
     emissionDate: card.createdAt,
     expiringDate: card.expiryDate,
+    currencyCode,
     discount: false,
     transaction: { href: `${serviceUrl}/giftcards/${card.id}/transactions` },
   };
-  if (card.currencyCode) response.currencyCode = card.currencyCode;
-  return response;
 }
 
 // Balance = initialBalance minus value of non-cancelled transactions
@@ -195,7 +194,8 @@ export function handleGetCard(
 
   const txs = listTransactionsForCard(account, cardId);
   const balance = computeBalance(card.initialBalance, txs);
-  const body = buildGetCardResponse(card, balance, serviceUrl);
+  const { currencyCode } = getGcConfig(account);
+  const body = buildGetCardResponse(card, balance, serviceUrl, currencyCode);
 
   appendCallLog(account, {
     timestamp: now,
@@ -309,7 +309,8 @@ export function handleCreateCard(
 
   upsertCard(account, card);
 
-  const responseBody = buildGetCardResponse(card, card.initialBalance, '');
+  const { currencyCode } = getGcConfig(account);
+  const responseBody = buildGetCardResponse(card, card.initialBalance, '', currencyCode);
   appendCallLog(account, {
     timestamp: now,
     method: 'POST',

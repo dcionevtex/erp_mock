@@ -52,7 +52,7 @@ const FLOW_STEPS = [
 export default function GiftCardPage() {
   const [accountInput, setAccountInput] = useState('');
   const [account, setAccount]           = useState('');
-  const [config, setConfig]             = useState<GcConfig>({ scenario: 'approved', mockBalance: 9999 });
+  const [config, setConfig]             = useState<GcConfig>({ scenario: 'approved', mockBalance: 9999, currencyCode: 'BRL' });
   const [cards, setCards]               = useState<GiftCardRecord[]>([]);
   const [calls, setCalls]               = useState<GcCallLogEntry[]>([]);
   const [baseUrl, setBaseUrl]           = useState('');
@@ -61,6 +61,7 @@ export default function GiftCardPage() {
   const [activeTab, setActiveTab]       = useState<'scenario' | 'hub' | 'setup'>('scenario');
   const [expandedIds, setExpandedIds]   = useState<Set<string>>(new Set());
   const [balanceInput, setBalanceInput] = useState('9999');
+  const [currencyInput, setCurrencyInput] = useState('BRL');
 
   // Hub tab state
   const [hubAppKey, setHubAppKey]       = useState('');
@@ -104,6 +105,7 @@ export default function GiftCardPage() {
       if (!configInitialized.current) {
         setConfig(data.config);
         setBalanceInput(String(data.config.mockBalance));
+        setCurrencyInput(data.config.currencyCode ?? 'BRL');
         configInitialized.current = true;
       }
     } catch {
@@ -128,25 +130,19 @@ export default function GiftCardPage() {
     localStorage.setItem('gc_account', trimmed);
   }
 
-  async function setScenario(scenario: GcScenario) {
+  async function saveConfig(patch: Partial<{ scenario: GcScenario; mockBalance: number; currencyCode: string }>) {
     if (!account) return;
+    const merged = {
+      scenario: patch.scenario ?? config.scenario,
+      mockBalance: patch.mockBalance ?? (Number(balanceInput) || 9999),
+      currencyCode: patch.currencyCode ?? (currencyInput || 'BRL'),
+    };
     await fetch(`/api/gift-card/${account}/config`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ scenario, mockBalance: Number(balanceInput) || 9999 }),
+      body: JSON.stringify(merged),
     });
-    setConfig(c => ({ ...c, scenario }));
-  }
-
-  async function saveBalance() {
-    if (!account) return;
-    const val = Number(balanceInput) || 9999;
-    await fetch(`/api/gift-card/${account}/config`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ scenario: config.scenario, mockBalance: val }),
-    });
-    setConfig(c => ({ ...c, mockBalance: val }));
+    setConfig(c => ({ ...c, ...merged }));
   }
 
   async function clearAll() {
@@ -407,7 +403,7 @@ export default function GiftCardPage() {
                   ] as const).map(s => (
                     <button
                       key={s.value}
-                      onClick={() => setScenario(s.value)}
+                      onClick={() => saveConfig({ scenario: s.value })}
                       className={[
                         'w-full text-left rounded-lg border px-3 py-2.5 transition-all',
                         config.scenario === s.value
@@ -428,23 +424,35 @@ export default function GiftCardPage() {
                   ))}
                 </div>
 
-                {/* Balance */}
+                {/* Balance + Currency */}
                 <div className="space-y-2 pb-4 border-b border-white/5">
-                  <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider block">Mock balance</span>
-                  <div className="flex gap-2 items-center">
+                  <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider block">Mock balance &amp; currency</span>
+                  <div className="flex gap-2">
                     <input
                       type="number"
                       min={1}
                       value={balanceInput}
                       onChange={e => setBalanceInput(e.target.value)}
-                      onBlur={saveBalance}
-                      onKeyDown={e => e.key === 'Enter' && saveBalance()}
+                      onBlur={() => saveConfig({ mockBalance: Number(balanceInput) || 9999 })}
+                      onKeyDown={e => e.key === 'Enter' && saveConfig({ mockBalance: Number(balanceInput) || 9999 })}
+                      placeholder="Balance"
                       className="flex-1 text-sm rounded-lg px-3 py-2 outline-none font-mono focus:ring-1 focus:ring-pink-500/50"
+                      style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.8)' }}
+                    />
+                    <input
+                      type="text"
+                      value={currencyInput}
+                      onChange={e => setCurrencyInput(e.target.value.toUpperCase().slice(0, 3))}
+                      onBlur={() => saveConfig({ currencyCode: currencyInput || 'BRL' })}
+                      onKeyDown={e => e.key === 'Enter' && saveConfig({ currencyCode: currencyInput || 'BRL' })}
+                      placeholder="BRL"
+                      maxLength={3}
+                      className="w-16 text-sm rounded-lg px-3 py-2 outline-none font-mono text-center focus:ring-1 focus:ring-pink-500/50"
                       style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.8)' }}
                     />
                   </div>
                   <p className="text-[11px] text-white/20 leading-relaxed">
-                    Balance returned on every <code className="font-mono">_search</code> and <code className="font-mono">GET /&#123;id&#125;</code> call. Same email always maps to the same card ID.
+                    Balance and currency code returned on every <code className="font-mono">_search</code> and <code className="font-mono">GET /&#123;id&#125;</code> call.
                   </p>
                 </div>
 

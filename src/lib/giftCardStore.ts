@@ -48,13 +48,14 @@ function getConfigs(): Map<string, GcConfig> {
 // ── Config ────────────────────────────────────────────────────────────────────
 
 export const DEFAULT_MOCK_BALANCE = 9999;
+export const DEFAULT_CURRENCY_CODE = 'BRL';
 
 export function getGcConfig(account: string): GcConfig {
-  return getConfigs().get(account) ?? { scenario: 'approved', mockBalance: DEFAULT_MOCK_BALANCE };
+  return getConfigs().get(account) ?? { scenario: 'approved', mockBalance: DEFAULT_MOCK_BALANCE, currencyCode: DEFAULT_CURRENCY_CODE };
 }
 
-export function setGcConfig(account: string, scenario: GcScenario, mockBalance: number): void {
-  getConfigs().set(account, { scenario, mockBalance });
+export function setGcConfig(account: string, scenario: GcScenario, mockBalance: number, currencyCode: string): void {
+  getConfigs().set(account, { scenario, mockBalance, currencyCode });
 }
 
 // ── Gift cards ────────────────────────────────────────────────────────────────
