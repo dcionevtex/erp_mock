@@ -433,8 +433,7 @@ export default function GiftCardPage() {
                       min={1}
                       value={balanceInput}
                       onChange={e => setBalanceInput(e.target.value)}
-                      onBlur={() => saveConfig({ mockBalance: Number(balanceInput) || 9999 })}
-                      onKeyDown={e => e.key === 'Enter' && saveConfig({ mockBalance: Number(balanceInput) || 9999 })}
+                      onKeyDown={e => e.key === 'Enter' && saveConfig({ mockBalance: Number(balanceInput) || 9999, currencyCode: currencyInput || 'BRL' })}
                       placeholder="Balance"
                       className="flex-1 text-sm rounded-lg px-3 py-2 outline-none font-mono focus:ring-1 focus:ring-pink-500/50"
                       style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.8)' }}
@@ -443,13 +442,20 @@ export default function GiftCardPage() {
                       type="text"
                       value={currencyInput}
                       onChange={e => setCurrencyInput(e.target.value.toUpperCase().slice(0, 3))}
-                      onBlur={() => saveConfig({ currencyCode: currencyInput || 'BRL' })}
-                      onKeyDown={e => e.key === 'Enter' && saveConfig({ currencyCode: currencyInput || 'BRL' })}
+                      onKeyDown={e => e.key === 'Enter' && saveConfig({ mockBalance: Number(balanceInput) || 9999, currencyCode: currencyInput || 'BRL' })}
                       placeholder="BRL"
                       maxLength={3}
                       className="w-16 text-sm rounded-lg px-3 py-2 outline-none font-mono text-center focus:ring-1 focus:ring-pink-500/50"
                       style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.8)' }}
                     />
+                    <button
+                      onClick={() => saveConfig({ mockBalance: Number(balanceInput) || 9999, currencyCode: currencyInput || 'BRL' })}
+                      disabled={!account}
+                      className="px-3 py-2 rounded-lg text-xs font-semibold transition-all disabled:opacity-30"
+                      style={{ background: 'rgba(247,25,99,0.15)', border: '1px solid rgba(247,25,99,0.3)', color: '#F71963' }}
+                    >
+                      Set
+                    </button>
                   </div>
                   <p className="text-[11px] text-white/20 leading-relaxed">
                     Balance and currency code returned on every <code className="font-mono">_search</code> and <code className="font-mono">GET /&#123;id&#125;</code> call.
