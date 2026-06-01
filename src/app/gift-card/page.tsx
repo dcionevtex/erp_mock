@@ -58,16 +58,25 @@ export default function GiftCardPage() {
   const [baseUrl, setBaseUrl]           = useState('');
   const [copied, setCopied]             = useState(false);
   const [clearing, setClearing]         = useState(false);
-  const [activeTab, setActiveTab]       = useState<'scenario' | 'setup'>('scenario');
+  const [activeTab, setActiveTab]       = useState<'scenario' | 'hub' | 'setup'>('scenario');
   const [expandedIds, setExpandedIds]   = useState<Set<string>>(new Set());
   const [balanceInput, setBalanceInput] = useState('9999');
+
+  // Hub tab state
+  const [hubAppKey, setHubAppKey]       = useState('');
+  const [hubAppToken, setHubAppToken]   = useState('');
+  const [hubLoading, setHubLoading]     = useState(false);
+  const [hubResult, setHubResult]       = useState<{ ok: boolean; status: number; data: unknown; sentBody?: unknown } | null>(null);
+  const [hubAction, setHubAction]       = useState<'list' | 'register' | null>(null);
   const configInitialized               = useRef(false);
 
-  // Restore account from localStorage on mount
+  // Restore state from localStorage on mount
   useEffect(() => {
     const saved = localStorage.getItem('gc_account') ?? '';
     setAccountInput(saved);
     setAccount(saved);
+    setHubAppKey(localStorage.getItem('gc_hub_appkey') ?? '');
+    setHubAppToken(localStorage.getItem('gc_hub_apptoken') ?? '');
   }, []);
 
   useEffect(() => {
@@ -151,6 +160,39 @@ export default function GiftCardPage() {
     setCalls([]);
     setCards([]);
     setClearing(false);
+  }
+
+  function saveHubCreds(key: string, token: string) {
+    setHubAppKey(key);
+    setHubAppToken(token);
+    localStorage.setItem('gc_hub_appkey', key);
+    localStorage.setItem('gc_hub_apptoken', token);
+  }
+
+  async function hubCall(action: 'list' | 'register') {
+    if (!account || !hubAppKey || !hubAppToken) return;
+    setHubLoading(true);
+    setHubAction(action);
+    setHubResult(null);
+    try {
+      const res = await fetch(`/api/gift-card/${account}/hub`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action,
+          appKey: hubAppKey,
+          appToken: hubAppToken,
+          serviceUrl: baseUrl,
+          providerId: `${account}-GiftCardMock`,
+        }),
+      });
+      const data = await res.json();
+      setHubResult(data);
+    } catch (e) {
+      setHubResult({ ok: false, status: 0, data: { error: String(e) } });
+    } finally {
+      setHubLoading(false);
+    }
   }
 
   function copyBaseUrl() {
@@ -296,16 +338,16 @@ export default function GiftCardPage() {
 
           {/* Tabs */}
           <div className="flex border-b border-white/10 shrink-0">
-            {(['scenario', 'setup'] as const).map(tab => (
+            {([['scenario', 'Scenario'], ['hub', 'Hub'], ['setup', 'Setup']] as const).map(([val, label]) => (
               <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
+                key={val}
+                onClick={() => setActiveTab(val)}
                 className={[
-                  'flex-1 py-2.5 text-[11px] font-semibold transition-colors capitalize',
-                  activeTab === tab ? 'text-white/80 border-b-2 border-pink-500' : 'text-white/30 hover:text-white/50',
+                  'flex-1 py-2.5 text-[11px] font-semibold transition-colors',
+                  activeTab === val ? 'text-white/80 border-b-2 border-pink-500' : 'text-white/30 hover:text-white/50',
                 ].join(' ')}
               >
-                {tab === 'scenario' ? 'Scenario' : 'Setup'}
+                {label}
               </button>
             ))}
           </div>
@@ -427,6 +469,136 @@ export default function GiftCardPage() {
                           </div>
                         </div>
                       ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ── Hub tab ── */}
+            {activeTab === 'hub' && (
+              <div className="p-4 space-y-5">
+
+                {/* VTEX admin credentials */}
+                <div className="space-y-2 pb-4 border-b border-white/5">
+                  <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider block">VTEX Admin Credentials</span>
+                  <p className="text-[11px] text-white/25 leading-relaxed">Used to call the VTEX Gift Card Hub API on your behalf.</p>
+                  <input
+                    type="text"
+                    value={hubAppKey}
+                    onChange={e => saveHubCreds(e.target.value, hubAppToken)}
+                    placeholder="App Key"
+                    className="w-full text-xs rounded-lg px-3 py-2 outline-none focus:ring-1 focus:ring-pink-500/50 font-mono"
+                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)' }}
+                  />
+                  <input
+                    type="password"
+                    value={hubAppToken}
+                    onChange={e => saveHubCreds(hubAppKey, e.target.value)}
+                    placeholder="App Token"
+                    className="w-full text-xs rounded-lg px-3 py-2 outline-none focus:ring-1 focus:ring-pink-500/50 font-mono"
+                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)' }}
+                  />
+                  <p className="text-[10px] text-white/20">Credentials are saved in your browser only — never sent to our server except to proxy the VTEX call.</p>
+                </div>
+
+                {/* List providers */}
+                <div className="space-y-2 pb-4 border-b border-white/5">
+                  <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider block">List Providers</span>
+                  <p className="text-[11px] text-white/25 leading-relaxed">
+                    <code className="font-mono text-white/40">GET /api/giftcardproviders</code><br />
+                    Returns all gift card providers registered in your account.
+                  </p>
+                  <button
+                    onClick={() => hubCall('list')}
+                    disabled={hubLoading || !account || !hubAppKey || !hubAppToken}
+                    className="w-full py-2 rounded-lg text-xs font-semibold transition-all disabled:opacity-30 flex items-center justify-center gap-2"
+                    style={{ background: 'rgba(96,165,250,0.12)', border: '1px solid rgba(96,165,250,0.25)', color: '#60a5fa' }}
+                  >
+                    {hubLoading && hubAction === 'list' ? (
+                      <svg className="w-3.5 h-3.5 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" strokeLinecap="round"/></svg>
+                    ) : (
+                      <svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M5 10h10M10 5l5 5-5 5"/></svg>
+                    )}
+                    GET Providers
+                  </button>
+                </div>
+
+                {/* Register provider */}
+                <div className="space-y-2 pb-4 border-b border-white/5">
+                  <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider block">Register Mock Provider</span>
+                  <p className="text-[11px] text-white/25 leading-relaxed">
+                    <code className="font-mono text-white/40">PUT /api/giftcardproviders/{account ? `${account}-GiftCardMock` : '{account}-GiftCardMock'}</code>
+                  </p>
+
+                  {/* Provider details preview */}
+                  <div
+                    className="rounded-lg px-3 py-2.5 space-y-1.5 text-[11px]"
+                    style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
+                  >
+                    <div className="flex justify-between">
+                      <span className="text-white/30">Provider ID</span>
+                      <span className="font-mono text-amber-400/70">{account ? `${account}-GiftCardMock` : '—'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-white/30">serviceUrl</span>
+                      <span className="font-mono text-white/40 truncate max-w-[140px]" title={baseUrl}>{baseUrl || '—'}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-white/30">appKey (provider)</span>
+                      <span className="font-mono text-emerald-400/60">accountkey</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-white/30">appToken (provider)</span>
+                      <span className="font-mono text-emerald-400/60">accountoken</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-white/30">cancelEnabled</span>
+                      <span className="font-mono text-white/40">true</span>
+                    </div>
+                  </div>
+
+                  <p className="text-[10px] text-white/20 leading-relaxed">
+                    <span className="text-amber-400/60">accountkey</span> and <span className="text-amber-400/60">accountoken</span> are the credentials VTEX will send on every call to this mock. They are hardcoded for demo use only.
+                  </p>
+
+                  <button
+                    onClick={() => hubCall('register')}
+                    disabled={hubLoading || !account || !hubAppKey || !hubAppToken || !baseUrl}
+                    className="w-full py-2 rounded-lg text-xs font-semibold transition-all disabled:opacity-30 flex items-center justify-center gap-2"
+                    style={{ background: 'rgba(247,25,99,0.12)', border: '1px solid rgba(247,25,99,0.25)', color: '#F71963' }}
+                  >
+                    {hubLoading && hubAction === 'register' ? (
+                      <svg className="w-3.5 h-3.5 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" strokeLinecap="round"/></svg>
+                    ) : (
+                      <svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M10 3v14M3 10h14" strokeLinecap="round"/></svg>
+                    )}
+                    Register Provider
+                  </button>
+                </div>
+
+                {/* Result */}
+                {hubResult && (
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider">Response</span>
+                      <span className={`text-[11px] font-mono font-semibold ${hubResult.ok ? 'text-emerald-400' : 'text-red-400'}`}>
+                        {hubResult.status}
+                      </span>
+                    </div>
+                    {hubResult.sentBody != null && (
+                      <div>
+                        <p className="text-[10px] text-white/20 mb-1">Sent body</p>
+                        <pre className="text-[10px] font-mono text-white/35 bg-black/20 rounded-lg px-3 py-2 overflow-auto max-h-32">
+                          {JSON.stringify(hubResult.sentBody, null, 2)}
+                        </pre>
+                      </div>
+                    )}
+                    <div>
+                      <p className="text-[10px] text-white/20 mb-1">VTEX response</p>
+                      <pre className="text-[10px] font-mono text-white/45 bg-black/20 rounded-lg px-3 py-2 overflow-auto max-h-52">
+                        {JSON.stringify(hubResult.data, null, 2)}
+                      </pre>
                     </div>
                   </div>
                 )}
