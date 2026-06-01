@@ -62,6 +62,8 @@ export default function GiftCardPage() {
   const [expandedIds, setExpandedIds]   = useState<Set<string>>(new Set());
   const [balanceInput, setBalanceInput] = useState('9999');
   const [currencyInput, setCurrencyInput] = useState('BRL');
+  const [savedConfig, setSavedConfig] = useState(false);
+  const [savingConfig, setSavingConfig] = useState(false);
 
   // Hub tab state
   const [hubAppKey, setHubAppKey]       = useState('');
@@ -132,17 +134,27 @@ export default function GiftCardPage() {
 
   async function saveConfig(patch: Partial<{ scenario: GcScenario; mockBalance: number; currencyCode: string }>) {
     if (!account) return;
+    const isBalancePatch = patch.mockBalance !== undefined || patch.currencyCode !== undefined;
+    if (isBalancePatch) setSavingConfig(true);
     const merged = {
       scenario: patch.scenario ?? config.scenario,
       mockBalance: patch.mockBalance ?? (Number(balanceInput) || 9999),
       currencyCode: patch.currencyCode ?? (currencyInput || 'BRL'),
     };
-    await fetch(`/api/gift-card/${account}/config`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(merged),
-    });
-    setConfig(c => ({ ...c, ...merged }));
+    try {
+      await fetch(`/api/gift-card/${account}/config`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(merged),
+      });
+      setConfig(c => ({ ...c, ...merged }));
+      if (isBalancePatch) {
+        setSavedConfig(true);
+        setTimeout(() => setSavedConfig(false), 2000);
+      }
+    } finally {
+      if (isBalancePatch) setSavingConfig(false);
+    }
   }
 
   async function clearAll() {
@@ -451,10 +463,23 @@ export default function GiftCardPage() {
                   </div>
                   <button
                     onClick={() => saveConfig({ mockBalance: Number(balanceInput) || 9999, currencyCode: currencyInput || 'BRL' })}
-                    className="w-full py-2 rounded-lg text-xs font-semibold transition-all"
-                    style={{ background: 'rgba(247,25,99,0.15)', border: '1px solid rgba(247,25,99,0.3)', color: '#F71963' }}
+                    disabled={savingConfig}
+                    className="w-full py-2 rounded-lg text-xs font-semibold transition-all flex items-center justify-center gap-1.5 disabled:opacity-60"
+                    style={savedConfig
+                      ? { background: 'rgba(52,211,153,0.15)', border: '1px solid rgba(52,211,153,0.3)', color: '#34d399' }
+                      : { background: 'rgba(247,25,99,0.15)', border: '1px solid rgba(247,25,99,0.3)', color: '#F71963' }}
                   >
-                    Set
+                    {savingConfig ? (
+                      <>
+                        <svg className="w-3 h-3 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4" strokeLinecap="round"/></svg>
+                        Saving…
+                      </>
+                    ) : savedConfig ? (
+                      <>
+                        <svg className="w-3 h-3" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0z"/></svg>
+                        Saved
+                      </>
+                    ) : 'Set'}
                   </button>
                   <p className="text-[11px] text-white/20 leading-relaxed">
                     Balance and currency code returned on every <code className="font-mono">_search</code> and <code className="font-mono">GET /&#123;id&#125;</code> call.
