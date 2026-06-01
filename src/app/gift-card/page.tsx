@@ -448,14 +448,14 @@ export default function GiftCardPage() {
                       className="w-16 text-sm rounded-lg px-3 py-2 outline-none font-mono text-center focus:ring-1 focus:ring-pink-500/50"
                       style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.8)' }}
                     />
-                    <button
-                      onClick={() => saveConfig({ mockBalance: Number(balanceInput) || 9999, currencyCode: currencyInput || 'BRL' })}
-                      className="px-3 py-2 rounded-lg text-xs font-semibold transition-all"
-                      style={{ background: 'rgba(247,25,99,0.15)', border: '1px solid rgba(247,25,99,0.3)', color: '#F71963' }}
-                    >
-                      Set
-                    </button>
                   </div>
+                  <button
+                    onClick={() => saveConfig({ mockBalance: Number(balanceInput) || 9999, currencyCode: currencyInput || 'BRL' })}
+                    className="w-full py-2 rounded-lg text-xs font-semibold transition-all"
+                    style={{ background: 'rgba(247,25,99,0.15)', border: '1px solid rgba(247,25,99,0.3)', color: '#F71963' }}
+                  >
+                    Set
+                  </button>
                   <p className="text-[11px] text-white/20 leading-relaxed">
                     Balance and currency code returned on every <code className="font-mono">_search</code> and <code className="font-mono">GET /&#123;id&#125;</code> call.
                   </p>
