@@ -83,11 +83,14 @@ export async function POST(request: Request, { params }: RouteContext) {
   const pathname = url.pathname;
   const serviceUrl = `${url.origin}/api/gift-card/${account}`;
 
+  // Use text() + JSON.parse() instead of json() to handle VTEX's custom
+  // Content-Type: application/vnd.vtex.giftcards.v1+json without failures.
   let body: Record<string, unknown> = {};
   try {
-    body = await request.json();
+    const text = await request.text();
+    if (text) body = JSON.parse(text) as Record<string, unknown>;
   } catch {
-    // some endpoints don't require a body
+    // empty body or non-JSON — proceed with empty object
   }
 
   // POST /giftcards/_search

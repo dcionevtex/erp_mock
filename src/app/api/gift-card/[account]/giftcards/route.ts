@@ -15,7 +15,8 @@ export async function POST(
 
   let body: Record<string, unknown> = {};
   try {
-    body = await request.json();
+    const text = await request.text();
+    if (text) body = JSON.parse(text) as Record<string, unknown>;
   } catch {
     // body is optional for this endpoint
   }

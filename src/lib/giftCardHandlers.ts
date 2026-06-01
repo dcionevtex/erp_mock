@@ -58,7 +58,10 @@ function buildGetCardResponse(card: ReturnType<typeof getCard>, balance: number,
     expiringDate: card.expiryDate,
     currencyCode,
     discount: false,
-    transaction: { href: `${serviceUrl}/giftcards/${card.id}/transactions` },
+    // VTEX spec is inconsistent: inline path schema uses "transactions" (plural),
+    // component schema uses "transaction" (singular). Return both to be safe.
+    transaction:  { href: `${serviceUrl}/giftcards/${card.id}/transactions` },
+    transactions: { href: `${serviceUrl}/giftcards/${card.id}/transactions` },
   };
 }
 
@@ -363,10 +366,11 @@ export function handleCreateTransaction(
   upsertTransaction(account, tx);
 
   // Spec: required fields are cardId, id, _self.href
+  // _self.href uses a relative path per spec examples
   const responseBody = {
     cardId,
     id: txId,
-    _self: { href: `${serviceUrl}/giftcards/${cardId}/transactions/${txId}` },
+    _self: { href: `giftcards/${cardId}/transactions/${txId}` },
   };
 
   appendCallLog(account, {
