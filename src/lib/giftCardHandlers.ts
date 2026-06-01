@@ -144,7 +144,7 @@ export function handleSearch(
   }
 
   const txs = listTransactionsForCard(account, cardId);
-  const balance = computeBalance(card.initialBalance, txs);
+  const balance = computeBalance(mockBalance, txs); // always use live config value
   const responseCard = buildSearchCardResponse(card, balance, serviceUrl);
   const responseBody = balance > 0 ? [responseCard] : [];
 
@@ -196,8 +196,8 @@ export function handleGetCard(
   const card = ensureCard(account, cardId, now);
 
   const txs = listTransactionsForCard(account, cardId);
-  const balance = computeBalance(card.initialBalance, txs);
-  const { currencyCode } = getGcConfig(account);
+  const { mockBalance: liveBalance, currencyCode } = getGcConfig(account);
+  const balance = computeBalance(liveBalance, txs); // always use live config value
   const body = buildGetCardResponse(card, balance, serviceUrl, currencyCode);
 
   appendCallLog(account, {
