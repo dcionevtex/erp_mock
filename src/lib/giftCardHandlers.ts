@@ -31,18 +31,33 @@ function redemptionCode(email: string): string {
   return `DEMO-${prefix}-GC`;
 }
 
-function buildCardResponse(card: ReturnType<typeof getCard>, balance: number) {
+// Response shape for _search — spec requires: id, provider, balance, _self.href
+function buildSearchCardResponse(card: ReturnType<typeof getCard>, balance: number) {
   if (!card) return null;
   return {
     id: card.id,
+    provider: 'DemoGiftCard',
+    balance,
+    _self: { href: `giftcards/${card.id}` },
+  };
+}
+
+// Response shape for GET /{id} — spec requires: id, redemptionToken, redemptionCode,
+// balance, emissionDate, expiringDate, discount, transaction.href
+// transaction.href tells the Hub where to POST the debit transaction — without it,
+// "Use Card" fails with a communication error.
+function buildGetCardResponse(card: ReturnType<typeof getCard>, balance: number) {
+  if (!card) return null;
+  return {
+    id: card.id,
+    redemptionToken: card.redemptionCode,
     redemptionCode: card.redemptionCode,
     balance,
-    expiryDate: card.expiryDate,
-    caption: card.caption,
-    provider: 'DemoGiftCard',
-    groupName: 'DemoGiftCard',
-    inUse: false,
-    isSpecialCard: false,
+    emissionDate: card.createdAt,
+    expiringDate: card.expiryDate,
+    currencyCode: 'USD',
+    discount: false,
+    transaction: { href: `giftcards/${card.id}/transactions` },
   };
 }
 
@@ -117,7 +132,7 @@ export function handleSearch(
 
   const txs = listTransactionsForCard(account, cardId);
   const balance = computeBalance(card.initialBalance, txs);
-  const responseCard = buildCardResponse(card, balance);
+  const responseCard = buildSearchCardResponse(card, balance);
   const responseBody = balance > 0 ? [responseCard] : [];
 
   appendCallLog(account, {
@@ -168,7 +183,7 @@ export function handleGetCard(
 
   const txs = listTransactionsForCard(account, cardId);
   const balance = computeBalance(card.initialBalance, txs);
-  const body = buildCardResponse(card, balance);
+  const body = buildGetCardResponse(card, balance);
 
   appendCallLog(account, {
     timestamp: now,
@@ -180,6 +195,79 @@ export function handleGetCard(
     durationMs: Date.now() - start,
   });
 
+  return { body, status: 200 };
+}
+
+// ── List transactions for a card ──────────────────────────────────────────────
+
+export function handleListTransactions(
+  account: string,
+  cardId: string,
+  pathname: string,
+  start: number
+) {
+  const now = new Date().toISOString();
+  const txs = listTransactionsForCard(account, cardId);
+  const body = txs.map(tx => ({
+    cardId,
+    id: tx.id,
+    _self: { href: `giftcards/${cardId}/transactions/${tx.id}` },
+  }));
+
+  appendCallLog(account, {
+    timestamp: now, method: 'GET', path: pathname, endpoint: 'list-transactions',
+    responseBody: body, httpStatus: 200, durationMs: Date.now() - start,
+  });
+  return { body, status: 200 };
+}
+
+// ── Get single transaction ────────────────────────────────────────────────────
+
+export function handleGetTransaction(
+  account: string,
+  cardId: string,
+  transactionId: string,
+  pathname: string,
+  start: number
+) {
+  const now = new Date().toISOString();
+  const tx = getTransaction(account, transactionId);
+  const body = tx
+    ? {
+        value: tx.value,
+        description: tx.description,
+        date: tx.date,
+        operation: 'Debit',
+        settlement:    { href: `giftcards/${cardId}/transactions/${transactionId}/settlements` },
+        cancellation:  { href: `giftcards/${cardId}/transactions/${transactionId}/cancellations` },
+        authorization: { href: `giftcards/${cardId}/transactions/${transactionId}/authorization` },
+      }
+    : { value: 0, description: 'Debit', date: now, operation: 'Debit' };
+
+  appendCallLog(account, {
+    timestamp: now, method: 'GET', path: pathname, endpoint: 'get-transaction',
+    responseBody: body, httpStatus: 200, durationMs: Date.now() - start,
+  });
+  return { body, status: 200 };
+}
+
+// ── Get transaction authorization ─────────────────────────────────────────────
+
+export function handleGetAuthorization(
+  account: string,
+  _cardId: string,
+  transactionId: string,
+  pathname: string,
+  start: number
+) {
+  const now = new Date().toISOString();
+  const tx = getTransaction(account, transactionId);
+  const body = { oid: transactionId, value: tx?.value ?? 0, date: tx?.date ?? now };
+
+  appendCallLog(account, {
+    timestamp: now, method: 'GET', path: pathname, endpoint: 'authorization',
+    responseBody: body, httpStatus: 200, durationMs: Date.now() - start,
+  });
   return { body, status: 200 };
 }
 
@@ -208,7 +296,7 @@ export function handleCreateCard(
 
   upsertCard(account, card);
 
-  const responseBody = buildCardResponse(card, card.initialBalance);
+  const responseBody = buildGetCardResponse(card, card.initialBalance);
   appendCallLog(account, {
     timestamp: now,
     method: 'POST',
@@ -248,12 +336,11 @@ export function handleCreateTransaction(
 
   upsertTransaction(account, tx);
 
+  // Spec: required fields are cardId, id, _self.href
   const responseBody = {
+    cardId,
     id: txId,
-    giftcardId: cardId,
-    value: tx.value,
-    description: tx.description,
-    date: tx.date,
+    _self: { href: `giftcards/${cardId}/transactions/${txId}` },
   };
 
   appendCallLog(account, {

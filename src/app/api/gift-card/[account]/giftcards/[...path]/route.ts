@@ -15,6 +15,9 @@ import { NextResponse } from 'next/server';
 import {
   handleSearch,
   handleGetCard,
+  handleListTransactions,
+  handleGetTransaction,
+  handleGetAuthorization,
   handleCreateTransaction,
   handleListSettlements,
   handleCreateSettlement,
@@ -35,6 +38,24 @@ export async function GET(request: Request, { params }: RouteContext) {
   // GET /giftcards/{id}
   if (path.length === 1) {
     const r = handleGetCard(account, path[0], pathname, start);
+    return NextResponse.json(r.body, { status: r.status });
+  }
+
+  // GET /giftcards/{id}/transactions  — list all transactions for this card
+  if (path.length === 2 && path[1] === 'transactions') {
+    const r = handleListTransactions(account, path[0], pathname, start);
+    return NextResponse.json(r.body, { status: r.status });
+  }
+
+  // GET /giftcards/{id}/transactions/{txId}  — get single transaction
+  if (path.length === 3 && path[1] === 'transactions') {
+    const r = handleGetTransaction(account, path[0], path[2], pathname, start);
+    return NextResponse.json(r.body, { status: r.status });
+  }
+
+  // GET /giftcards/{id}/transactions/{txId}/authorization
+  if (path.length === 4 && path[1] === 'transactions' && path[3] === 'authorization') {
+    const r = handleGetAuthorization(account, path[0], path[2], pathname, start);
     return NextResponse.json(r.body, { status: r.status });
   }
 
