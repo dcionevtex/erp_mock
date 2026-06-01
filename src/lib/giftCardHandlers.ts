@@ -32,13 +32,13 @@ function redemptionCode(email: string): string {
 }
 
 // Response shape for _search — spec requires: id, provider, balance, _self.href
-function buildSearchCardResponse(card: ReturnType<typeof getCard>, balance: number) {
+function buildSearchCardResponse(card: ReturnType<typeof getCard>, balance: number, serviceUrl: string) {
   if (!card) return null;
   return {
     id: card.id,
     provider: 'DemoGiftCard',
     balance,
-    _self: { href: `giftcards/${card.id}` },
+    _self: { href: `${serviceUrl}/giftcards/${card.id}` },
   };
 }
 
@@ -47,7 +47,7 @@ function buildSearchCardResponse(card: ReturnType<typeof getCard>, balance: numb
 // transaction.href tells the Hub where to POST the debit transaction — without it,
 // "Use Card" fails with a communication error.
 // currencyCode is only included when we captured it from a prior VTEX request.
-function buildGetCardResponse(card: ReturnType<typeof getCard>, balance: number) {
+function buildGetCardResponse(card: ReturnType<typeof getCard>, balance: number, serviceUrl: string) {
   if (!card) return null;
   const response: Record<string, unknown> = {
     id: card.id,
@@ -57,7 +57,7 @@ function buildGetCardResponse(card: ReturnType<typeof getCard>, balance: number)
     emissionDate: card.createdAt,
     expiringDate: card.expiryDate,
     discount: false,
-    transaction: { href: `giftcards/${card.id}/transactions` },
+    transaction: { href: `${serviceUrl}/giftcards/${card.id}/transactions` },
   };
   if (card.currencyCode) response.currencyCode = card.currencyCode;
   return response;
@@ -90,20 +90,16 @@ export function handleSearch(
   account: string,
   body: GcSearchRequest,
   pathname: string,
-  start: number
+  start: number,
+  serviceUrl: string,
 ) {
   const { scenario, mockBalance } = getGcConfig(account);
 
   if (scenario === 'empty') {
     appendCallLog(account, {
-      timestamp: new Date().toISOString(),
-      method: 'POST',
-      path: pathname,
-      endpoint: 'search',
-      requestBody: body,
-      responseBody: [],
-      httpStatus: 200,
-      durationMs: Date.now() - start,
+      timestamp: new Date().toISOString(), method: 'POST', path: pathname,
+      endpoint: 'search', requestBody: body, responseBody: [],
+      httpStatus: 200, durationMs: Date.now() - start,
     });
     return { body: [], status: 200 };
   }
@@ -147,7 +143,7 @@ export function handleSearch(
 
   const txs = listTransactionsForCard(account, cardId);
   const balance = computeBalance(card.initialBalance, txs);
-  const responseCard = buildSearchCardResponse(card, balance);
+  const responseCard = buildSearchCardResponse(card, balance, serviceUrl);
   const responseBody = balance > 0 ? [responseCard] : [];
 
   appendCallLog(account, {
@@ -191,14 +187,15 @@ export function handleGetCard(
   account: string,
   cardId: string,
   pathname: string,
-  start: number
+  start: number,
+  serviceUrl: string,
 ) {
   const now = new Date().toISOString();
   const card = ensureCard(account, cardId, now);
 
   const txs = listTransactionsForCard(account, cardId);
   const balance = computeBalance(card.initialBalance, txs);
-  const body = buildGetCardResponse(card, balance);
+  const body = buildGetCardResponse(card, balance, serviceUrl);
 
   appendCallLog(account, {
     timestamp: now,
@@ -219,14 +216,15 @@ export function handleListTransactions(
   account: string,
   cardId: string,
   pathname: string,
-  start: number
+  start: number,
+  serviceUrl: string,
 ) {
   const now = new Date().toISOString();
   const txs = listTransactionsForCard(account, cardId);
   const body = txs.map(tx => ({
     cardId,
     id: tx.id,
-    _self: { href: `giftcards/${cardId}/transactions/${tx.id}` },
+    _self: { href: `${serviceUrl}/giftcards/${cardId}/transactions/${tx.id}` },
   }));
 
   appendCallLog(account, {
@@ -311,7 +309,7 @@ export function handleCreateCard(
 
   upsertCard(account, card);
 
-  const responseBody = buildGetCardResponse(card, card.initialBalance);
+  const responseBody = buildGetCardResponse(card, card.initialBalance, '');
   appendCallLog(account, {
     timestamp: now,
     method: 'POST',
@@ -333,7 +331,8 @@ export function handleCreateTransaction(
   cardId: string,
   body: GcTransactionRequest,
   pathname: string,
-  start: number
+  start: number,
+  serviceUrl: string,
 ) {
   const now = new Date().toISOString();
   const card = ensureCard(account, cardId, now);
@@ -366,7 +365,7 @@ export function handleCreateTransaction(
   const responseBody = {
     cardId,
     id: txId,
-    _self: { href: `giftcards/${cardId}/transactions/${txId}` },
+    _self: { href: `${serviceUrl}/giftcards/${cardId}/transactions/${txId}` },
   };
 
   appendCallLog(account, {

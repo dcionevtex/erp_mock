@@ -33,17 +33,19 @@ type RouteContext = { params: Promise<{ account: string; path: string[] }> };
 export async function GET(request: Request, { params }: RouteContext) {
   const start = Date.now();
   const { account, path } = await params;
-  const pathname = new URL(request.url).pathname;
+  const url = new URL(request.url);
+  const pathname = url.pathname;
+  const serviceUrl = `${url.origin}/api/gift-card/${account}`;
 
   // GET /giftcards/{id}
   if (path.length === 1) {
-    const r = handleGetCard(account, path[0], pathname, start);
+    const r = handleGetCard(account, path[0], pathname, start, serviceUrl);
     return NextResponse.json(r.body, { status: r.status });
   }
 
   // GET /giftcards/{id}/transactions  — list all transactions for this card
   if (path.length === 2 && path[1] === 'transactions') {
-    const r = handleListTransactions(account, path[0], pathname, start);
+    const r = handleListTransactions(account, path[0], pathname, start, serviceUrl);
     return NextResponse.json(r.body, { status: r.status });
   }
 
@@ -77,7 +79,9 @@ export async function GET(request: Request, { params }: RouteContext) {
 export async function POST(request: Request, { params }: RouteContext) {
   const start = Date.now();
   const { account, path } = await params;
-  const pathname = new URL(request.url).pathname;
+  const url = new URL(request.url);
+  const pathname = url.pathname;
+  const serviceUrl = `${url.origin}/api/gift-card/${account}`;
 
   let body: Record<string, unknown> = {};
   try {
@@ -88,13 +92,13 @@ export async function POST(request: Request, { params }: RouteContext) {
 
   // POST /giftcards/_search
   if (path.length === 1 && path[0] === '_search') {
-    const r = handleSearch(account, body as GcSearchRequest, pathname, start);
+    const r = handleSearch(account, body as GcSearchRequest, pathname, start, serviceUrl);
     return NextResponse.json(r.body, { status: r.status });
   }
 
   // POST /giftcards/{id}/transactions
   if (path.length === 2 && path[1] === 'transactions') {
-    const r = handleCreateTransaction(account, path[0], body as GcTransactionRequest, pathname, start);
+    const r = handleCreateTransaction(account, path[0], body as GcTransactionRequest, pathname, start, serviceUrl);
     return NextResponse.json(r.body, { status: r.status });
   }
 
