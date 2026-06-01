@@ -18,6 +18,7 @@ export type GiftCardRecord = {
   owner: string; // customer email
   account: string;
   createdAt: string;
+  currencyCode?: string; // captured from VTEX request, not assumed
 };
 
 // A debit transaction created by VTEX at checkout

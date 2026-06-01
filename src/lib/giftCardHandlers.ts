@@ -46,19 +46,21 @@ function buildSearchCardResponse(card: ReturnType<typeof getCard>, balance: numb
 // balance, emissionDate, expiringDate, discount, transaction.href
 // transaction.href tells the Hub where to POST the debit transaction — without it,
 // "Use Card" fails with a communication error.
+// currencyCode is only included when we captured it from a prior VTEX request.
 function buildGetCardResponse(card: ReturnType<typeof getCard>, balance: number) {
   if (!card) return null;
-  return {
+  const response: Record<string, unknown> = {
     id: card.id,
     redemptionToken: card.redemptionCode,
     redemptionCode: card.redemptionCode,
     balance,
     emissionDate: card.createdAt,
     expiringDate: card.expiryDate,
-    currencyCode: 'USD',
     discount: false,
     transaction: { href: `giftcards/${card.id}/transactions` },
   };
+  if (card.currencyCode) response.currencyCode = card.currencyCode;
+  return response;
 }
 
 // Balance = initialBalance minus value of non-cancelled transactions
@@ -111,10 +113,19 @@ export function handleSearch(
     body.client?.id ||
     'unknown@demo.com';
 
+  // Extract currency from wherever VTEX puts it in the request
+  const cart = body.cart as Record<string, unknown> | undefined;
+  const currencyCode =
+    (cart?.currencyCode as string | undefined) ||
+    (cart?.currency as string | undefined) ||
+    (body.currencyCode as string | undefined) ||
+    (body.currency as string | undefined) ||
+    undefined;
+
   const cardId = cardIdForEmail(account, email);
   const now = new Date().toISOString();
 
-  // Auto-create the card on first search
+  // Auto-create the card on first search; update currency if we now know it
   let card = getCard(account, cardId);
   if (!card) {
     card = {
@@ -126,8 +137,12 @@ export function handleSearch(
       owner: email,
       account,
       createdAt: now,
+      currencyCode,
     };
     upsertCard(account, card);
+  } else if (currencyCode && !card.currencyCode) {
+    upsertCard(account, { ...card, currencyCode });
+    card = getCard(account, cardId)!;
   }
 
   const txs = listTransactionsForCard(account, cardId);
@@ -321,7 +336,18 @@ export function handleCreateTransaction(
   start: number
 ) {
   const now = new Date().toISOString();
-  ensureCard(account, cardId, now); // restore card if cross-instance cold start
+  const card = ensureCard(account, cardId, now);
+
+  // Capture currency from transaction body if not already known
+  const orderInfo = body.orderInfo as Record<string, unknown> | undefined;
+  const txCurrency =
+    (body.currencyCode as string | undefined) ||
+    (orderInfo?.currencyCode as string | undefined) ||
+    ((orderInfo?.cart as Record<string, unknown> | undefined)?.currencyCode as string | undefined) ||
+    undefined;
+  if (txCurrency && !card.currencyCode) {
+    upsertCard(account, { ...card, currencyCode: txCurrency });
+  }
 
   const txId = randomUUID();
   const tx = {
