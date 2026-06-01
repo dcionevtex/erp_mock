@@ -450,8 +450,7 @@ export default function GiftCardPage() {
                     />
                     <button
                       onClick={() => saveConfig({ mockBalance: Number(balanceInput) || 9999, currencyCode: currencyInput || 'BRL' })}
-                      disabled={!account}
-                      className="px-3 py-2 rounded-lg text-xs font-semibold transition-all disabled:opacity-30"
+                      className="px-3 py-2 rounded-lg text-xs font-semibold transition-all"
                       style={{ background: 'rgba(247,25,99,0.15)', border: '1px solid rgba(247,25,99,0.3)', color: '#F71963' }}
                     >
                       Set
