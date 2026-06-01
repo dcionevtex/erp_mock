@@ -32,13 +32,13 @@ function redemptionCode(email: string): string {
 }
 
 // Response shape for _search — spec requires: id, provider, balance, _self.href
-function buildSearchCardResponse(card: ReturnType<typeof getCard>, balance: number, serviceUrl: string) {
+function buildSearchCardResponse(card: ReturnType<typeof getCard>, balance: number, _serviceUrl: string) {
   if (!card) return null;
   return {
     id: card.id,
     provider: 'DemoGiftCard',
     balance,
-    _self: { href: `${serviceUrl}/giftcards/${card.id}` },
+    _self: { href: `giftcards/${card.id}` },
   };
 }
 
@@ -60,8 +60,8 @@ function buildGetCardResponse(card: ReturnType<typeof getCard>, balance: number,
     discount: false,
     // VTEX spec is inconsistent: inline path schema uses "transactions" (plural),
     // component schema uses "transaction" (singular). Return both to be safe.
-    transaction:  { href: `${serviceUrl}/giftcards/${card.id}/transactions` },
-    transactions: { href: `${serviceUrl}/giftcards/${card.id}/transactions` },
+    transaction:  { href: `giftcards/${card.id}/transactions` },
+    transactions: { href: `giftcards/${card.id}/transactions` },
   };
 }
 
@@ -227,7 +227,7 @@ export function handleListTransactions(
   const body = txs.map(tx => ({
     cardId,
     id: tx.id,
-    _self: { href: `${serviceUrl}/giftcards/${cardId}/transactions/${tx.id}` },
+    _self: { href: `giftcards/${cardId}/transactions/${tx.id}` },
   }));
 
   appendCallLog(account, {
