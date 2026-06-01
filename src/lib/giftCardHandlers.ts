@@ -136,28 +136,35 @@ export function handleSearch(
 
 // ── Get card ──────────────────────────────────────────────────────────────────
 
+// Auto-create a card from just the cardId — used when the card is missing from this
+// instance's memory (e.g. Vercel cold start or cross-instance request after _search).
+function ensureCard(account: string, cardId: string, now: string) {
+  let card = getCard(account, cardId);
+  if (!card) {
+    const { mockBalance } = getGcConfig(account);
+    card = {
+      id: cardId,
+      redemptionCode: `DEMO-${cardId.slice(3, 9).toUpperCase()}`,
+      caption: 'Demo Gift Card',
+      initialBalance: mockBalance,
+      expiryDate: '2099-12-31T00:00:00',
+      owner: 'restored@demo.vtex',
+      account,
+      createdAt: now,
+    };
+    upsertCard(account, card);
+  }
+  return card;
+}
+
 export function handleGetCard(
   account: string,
   cardId: string,
   pathname: string,
   start: number
 ) {
-  const card = getCard(account, cardId);
   const now = new Date().toISOString();
-
-  if (!card) {
-    const body = { error: 'Gift card not found' };
-    appendCallLog(account, {
-      timestamp: now,
-      method: 'GET',
-      path: pathname,
-      endpoint: 'get-card',
-      responseBody: body,
-      httpStatus: 404,
-      durationMs: Date.now() - start,
-    });
-    return { body, status: 404 };
-  }
+  const card = ensureCard(account, cardId, now);
 
   const txs = listTransactionsForCard(account, cardId);
   const balance = computeBalance(card.initialBalance, txs);
@@ -225,23 +232,8 @@ export function handleCreateTransaction(
   pathname: string,
   start: number
 ) {
-  const card = getCard(account, cardId);
   const now = new Date().toISOString();
-
-  if (!card) {
-    const rb = { error: 'Gift card not found' };
-    appendCallLog(account, {
-      timestamp: now,
-      method: 'POST',
-      path: pathname,
-      endpoint: 'create-transaction',
-      requestBody: body,
-      responseBody: rb,
-      httpStatus: 404,
-      durationMs: Date.now() - start,
-    });
-    return { body: rb, status: 404 };
-  }
+  ensureCard(account, cardId, now); // restore card if cross-instance cold start
 
   const txId = randomUUID();
   const tx = {
@@ -318,9 +310,8 @@ export function handleCreateSettlement(
   const op = { oid: randomUUID(), value: (body.value as number) ?? 0, date: now };
   const updated = appendSettlement(account, transactionId, op);
 
-  const responseBody = updated
-    ? op
-    : { error: 'Transaction not found', oid: null, value: null, date: now };
+  // If transaction not found (cross-instance), still return a valid settlement response
+  const responseBody = op;
 
   appendCallLog(account, {
     timestamp: now,
@@ -329,11 +320,11 @@ export function handleCreateSettlement(
     endpoint: 'settle',
     requestBody: body,
     responseBody,
-    httpStatus: updated ? 200 : 404,
+    httpStatus: 200,
     durationMs: Date.now() - start,
   });
 
-  return { body: responseBody, status: updated ? 200 : 404 };
+  return { body: responseBody, status: 200 };
 }
 
 // ── List cancellations ────────────────────────────────────────────────────────
@@ -376,9 +367,8 @@ export function handleCreateCancellation(
   const op = { oid: randomUUID(), value: (body.value as number) ?? 0, date: now };
   const updated = appendCancellation(account, transactionId, op);
 
-  const responseBody = updated
-    ? op
-    : { error: 'Transaction not found', oid: null, value: null, date: now };
+  // If transaction not found (cross-instance), still return a valid cancellation response
+  const responseBody = op;
 
   appendCallLog(account, {
     timestamp: now,
@@ -387,11 +377,11 @@ export function handleCreateCancellation(
     endpoint: 'cancel',
     requestBody: body,
     responseBody,
-    httpStatus: updated ? 200 : 404,
+    httpStatus: 200,
     durationMs: Date.now() - start,
   });
 
-  return { body: responseBody, status: updated ? 200 : 404 };
+  return { body: responseBody, status: 200 };
 }
 
 export { inferEndpoint };
