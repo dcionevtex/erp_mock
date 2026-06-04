@@ -2,6 +2,129 @@
 
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import type { StatusItem } from '@/app/api/status/route';
+
+// ── VTEX Status Carousel ──────────────────────────────────────────────────────
+
+const STATUS_META: Record<StatusItem['status'], { label: string; dot: string; text: string; bg: string }> = {
+  resolved:      { label: 'Resolved',      dot: 'bg-emerald-400', text: 'text-emerald-400', bg: 'rgba(52,211,153,0.08)'  },
+  monitoring:    { label: 'Monitoring',     dot: 'bg-yellow-400',  text: 'text-yellow-400',  bg: 'rgba(250,204,21,0.08)'  },
+  investigating: { label: 'Investigating',  dot: 'bg-red-400',     text: 'text-red-400',     bg: 'rgba(248,113,113,0.08)' },
+  identified:    { label: 'Identified',     dot: 'bg-orange-400',  text: 'text-orange-400',  bg: 'rgba(251,146,60,0.08)'  },
+  maintenance:   { label: 'Maintenance',    dot: 'bg-violet-400',  text: 'text-violet-400',  bg: 'rgba(167,139,250,0.08)' },
+  update:        { label: 'Update',         dot: 'bg-sky-400',     text: 'text-sky-400',     bg: 'rgba(56,189,248,0.08)'  },
+  unknown:       { label: 'Incident',       dot: 'bg-white/40',    text: 'text-white/50',    bg: 'rgba(255,255,255,0.04)' },
+};
+
+function formatDate(raw: string): string {
+  try {
+    const d = new Date(raw);
+    const diff = Date.now() - d.getTime();
+    if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+    if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  } catch { return ''; }
+}
+
+function stripBrackets(title: string): string {
+  return title.replace(/^\[.*?\]\s*/, '').trim();
+}
+
+function StatusCarousel() {
+  const [items, setItems]       = useState<StatusItem[]>([]);
+  const [idx, setIdx]           = useState(0);
+  const [loading, setLoading]   = useState(true);
+  const [paused, setPaused]     = useState(false);
+  const timerRef                = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    fetch('/api/status')
+      .then(r => r.json())
+      .then((d: { items: StatusItem[] }) => { setItems(d.items ?? []); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
+
+  const next = useCallback(() => setIdx(i => (i + 1) % Math.max(items.length, 1)), [items.length]);
+  const prev = useCallback(() => setIdx(i => (i - 1 + Math.max(items.length, 1)) % Math.max(items.length, 1)), [items.length]);
+
+  useEffect(() => {
+    if (paused || items.length <= 1) return;
+    timerRef.current = setInterval(next, 6000);
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [next, paused, items.length]);
+
+  if (loading) return (
+    <div className="h-16 rounded-xl border border-white/6 flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.02)' }}>
+      <span className="text-xs text-white/20">Loading platform status…</span>
+    </div>
+  );
+
+  if (items.length === 0) return (
+    <div className="h-14 rounded-xl border border-emerald-500/15 flex items-center gap-3 px-4" style={{ background: 'rgba(52,211,153,0.04)' }}>
+      <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0 animate-pulse" />
+      <span className="text-sm font-medium text-emerald-400">All systems operational</span>
+      <a href="https://status.vtex.com" target="_blank" rel="noopener noreferrer" className="ml-auto text-[11px] text-white/20 hover:text-white/50 transition-colors">status.vtex.com ↗</a>
+    </div>
+  );
+
+  const item = items[idx];
+  const meta = STATUS_META[item.status];
+
+  return (
+    <div
+      className="rounded-xl border border-white/8 overflow-hidden"
+      style={{ background: 'rgba(255,255,255,0.02)' }}
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
+      {/* Header strip */}
+      <div className="flex items-center justify-between px-4 py-2 border-b border-white/5">
+        <div className="flex items-center gap-2">
+          <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${meta.dot}`} />
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-white/30">VTEX Platform Status</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <a href="https://status.vtex.com" target="_blank" rel="noopener noreferrer" className="text-[10px] text-white/20 hover:text-white/50 transition-colors">status.vtex.com ↗</a>
+          {items.length > 1 && (
+            <div className="flex items-center gap-1">
+              <button onClick={prev} className="w-5 h-5 flex items-center justify-center rounded text-white/20 hover:text-white/60 transition-colors">
+                <svg className="w-3 h-3" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 4l-6 6 6 6"/></svg>
+              </button>
+              <span className="text-[10px] text-white/20 tabular-nums">{idx + 1}/{items.length}</span>
+              <button onClick={next} className="w-5 h-5 flex items-center justify-center rounded text-white/20 hover:text-white/60 transition-colors">
+                <svg className="w-3 h-3" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M8 4l6 6-6 6"/></svg>
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Incident card */}
+      <a href={item.link || 'https://status.vtex.com'} target="_blank" rel="noopener noreferrer" className="block px-4 py-3 hover:bg-white/[0.02] transition-colors">
+        <div className="flex items-start gap-3">
+          <span className={`shrink-0 mt-0.5 text-[10px] font-semibold px-1.5 py-0.5 rounded ${meta.text}`} style={{ background: meta.bg }}>
+            {meta.label}
+          </span>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-white/80 truncate">{stripBrackets(item.title)}</p>
+            <p className="text-[11px] text-white/30 mt-0.5 line-clamp-1">{item.summary}</p>
+          </div>
+          <span className="shrink-0 text-[11px] text-white/20 mt-0.5">{formatDate(item.pubDate)}</span>
+        </div>
+      </a>
+
+      {/* Dot indicators */}
+      {items.length > 1 && (
+        <div className="flex items-center justify-center gap-1 pb-2">
+          {items.map((_, i) => (
+            <button key={i} onClick={() => setIdx(i)} className={`rounded-full transition-all ${i === idx ? 'w-4 h-1.5 bg-white/40' : 'w-1.5 h-1.5 bg-white/15 hover:bg-white/30'}`} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 const TOOLS = [
   {
@@ -223,6 +346,9 @@ export default function LauncherPage() {
       {/* Content */}
       <main className="flex-1 flex flex-col items-center px-6 py-16">
         <div className="w-full max-w-2xl space-y-14">
+
+          {/* Platform Status */}
+          <StatusCarousel />
 
           {/* Integration Simulators */}
           <section className="space-y-6">
