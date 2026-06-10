@@ -628,6 +628,42 @@ export default function LauncherPage() {
                   <path d="M5 10h10M10 5l5 5-5 5" />
                 </svg>
               </a>
+
+              {/* VTEX Solution Design Document Skill */}
+              <a
+                href="https://github.com/dcionevtex/Se-design-document"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-start gap-4 rounded-xl border p-5 transition-all"
+                style={{ border: '1px solid rgba(247,25,99,0.15)', background: 'rgba(247,25,99,0.04)' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(247,25,99,0.08)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(247,25,99,0.3)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(247,25,99,0.04)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(247,25,99,0.15)'; }}
+              >
+                <div
+                  className="shrink-0 w-12 h-12 rounded-lg flex items-center justify-center text-lg"
+                  style={{ background: 'rgba(247,25,99,0.1)' }}
+                >
+                  📐
+                </div>
+                <div className="flex-1 min-w-0 space-y-1.5">
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-sm font-semibold text-white/90">Solution Design Document</span>
+                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded" style={{ background: 'rgba(247,25,99,0.12)', color: '#F71963' }}>Skill</span>
+                  </div>
+                  <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                    Complete toolkit for creating VTEX Solution Design Documents (SDDs). Includes the 5-step workflow, discovery gap analysis, 11-section canonical structure, architecture decision register format, and module design rules.
+                  </p>
+                  <div className="flex items-center gap-1.5 pt-0.5">
+                    <svg className="w-3 h-3" viewBox="0 0 16 16" fill="currentColor" style={{ color: 'rgba(255,255,255,0.25)' }}>
+                      <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+                    </svg>
+                    <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.25)' }}>dcionevtex/Se-design-document</span>
+                  </div>
+                </div>
+                <svg className="w-4 h-4 shrink-0 mt-0.5 transition-colors text-white/20 group-hover:text-white/50" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 10h10M10 5l5 5-5 5" />
+                </svg>
+              </a>
             </div>
           </section>
 
