@@ -17,9 +17,11 @@ interface OrderRowProps {
   credsConfigured?: boolean;
   selected?: boolean;
   onSelect?: (id: string) => void;
+  visibleCols?: Set<string>;
 }
 
-export function OrderRow({ order, onAction, configAccount, credsConfigured, selected = false, onSelect }: OrderRowProps) {
+export function OrderRow({ order, onAction, configAccount, credsConfigured, selected = false, onSelect, visibleCols }: OrderRowProps) {
+  const col = (key: string) => !visibleCols || visibleCols.has(key);
   const [modalOpen, setModalOpen] = useState(false);
 
   function fmt(iso?: string) {
@@ -57,29 +59,29 @@ export function OrderRow({ order, onAction, configAccount, credsConfigured, sele
           />
         </td>
         <td className="px-3 py-2 whitespace-nowrap"><StatusBadge status={order.erpStatus} /></td>
-        <td className="px-3 py-2 text-xs font-medium text-muted-foreground whitespace-nowrap">{order.account ?? '—'}</td>
-        <td className="px-3 py-2 font-mono text-xs max-w-[140px] truncate" title={order.orderId}>{order.orderId}</td>
-        <td className="px-3 py-2 text-xs text-muted-foreground">{order.sequence ?? '—'}</td>
-        <td className="px-3 py-2 text-xs text-muted-foreground">{order.vtexStatus ?? '—'}</td>
-        <td className="px-3 py-2">
+        {col('account')       && <td className="px-3 py-2 text-xs font-medium text-muted-foreground whitespace-nowrap">{order.account ?? '—'}</td>}
+        {col('orderId')        && <td className="px-3 py-2 font-mono text-xs max-w-[140px] truncate" title={order.orderId}>{order.orderId}</td>}
+        {col('seq')            && <td className="px-3 py-2 text-xs text-muted-foreground">{order.sequence ?? '—'}</td>}
+        {col('vtexStatus')     && <td className="px-3 py-2 text-xs text-muted-foreground">{order.vtexStatus ?? '—'}</td>}
+        {col('src')            && <td className="px-3 py-2">
           <span className={cn(
             'text-xs font-medium px-1.5 py-0.5 rounded',
             order.source === 'HOOK' ? 'bg-blue-50 text-blue-600' : 'bg-orange-50 text-orange-600',
           )}>
             {order.source}
           </span>
-        </td>
-        <td className="px-3 py-2 text-xs max-w-[120px] truncate">{order.customerName ?? '—'}</td>
-        <td className="px-3 py-2 text-xs text-muted-foreground max-w-[130px] truncate">{order.customerEmailMasked ?? '—'}</td>
-        <td className="px-3 py-2 text-xs text-right">{fmtCurrency(order.totalValue)}</td>
-        <td className="px-3 py-2 text-xs text-center">{order.itemCount ?? '—'}</td>
-        <td className="px-3 py-2 text-xs text-muted-foreground max-w-[100px] truncate">{order.shippingSummary ?? '—'}</td>
-        <td className="px-3 py-2 text-xs text-muted-foreground max-w-[100px] truncate">{order.paymentSummary ?? '—'}</td>
-        <td className="px-3 py-2 whitespace-nowrap"><StatusBadge status={order.startHandlingStatus} /></td>
-        <td className="px-3 py-2 whitespace-nowrap"><StatusBadge status={order.invoiceStatus} /></td>
-        <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">{fmt(order.receivedAt)}</td>
-        <td className="px-3 py-2 text-xs text-center">{order.attempts}</td>
-        <td className="px-3 py-2 text-xs text-destructive max-w-[140px] truncate" title={order.errorMessage}>{order.errorMessage ?? '—'}</td>
+        </td>}
+        {col('customer')       && <td className="px-3 py-2 text-xs max-w-[120px] truncate">{order.customerName ?? '—'}</td>}
+        {col('email')          && <td className="px-3 py-2 text-xs text-muted-foreground max-w-[130px] truncate">{order.customerEmailMasked ?? '—'}</td>}
+        {col('total')          && <td className="px-3 py-2 text-xs text-right">{fmtCurrency(order.totalValue)}</td>}
+        {col('items')          && <td className="px-3 py-2 text-xs text-center">{order.itemCount ?? '—'}</td>}
+        {col('shipping')       && <td className="px-3 py-2 text-xs text-muted-foreground max-w-[100px] truncate">{order.shippingSummary ?? '—'}</td>}
+        {col('payment')        && <td className="px-3 py-2 text-xs text-muted-foreground max-w-[100px] truncate">{order.paymentSummary ?? '—'}</td>}
+        {col('startHandling')  && <td className="px-3 py-2 whitespace-nowrap"><StatusBadge status={order.startHandlingStatus} /></td>}
+        {col('invoice')        && <td className="px-3 py-2 whitespace-nowrap"><StatusBadge status={order.invoiceStatus} /></td>}
+        {col('received')       && <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">{fmt(order.receivedAt)}</td>}
+        {col('attempts')       && <td className="px-3 py-2 text-xs text-center">{order.attempts}</td>}
+        {col('error')          && <td className="px-3 py-2 text-xs text-destructive max-w-[140px] truncate" title={order.errorMessage}>{order.errorMessage ?? '—'}</td>}
         <td className="px-3 py-2 text-center">
           {/* open icon */}
           <svg className="w-3.5 h-3.5 text-muted-foreground inline-block" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">

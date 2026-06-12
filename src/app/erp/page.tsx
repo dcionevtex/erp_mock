@@ -12,6 +12,29 @@ type Tab = 'inbox' | 'events';
 type SortKey = 'receivedAt_desc' | 'receivedAt_asc';
 const PAGE_SIZE = 50;
 
+const ALL_COLS = [
+  { key: 'account',       label: 'Account' },
+  { key: 'orderId',       label: 'Order ID' },
+  { key: 'seq',           label: 'Seq' },
+  { key: 'vtexStatus',    label: 'VTEX Status' },
+  { key: 'src',           label: 'Source' },
+  { key: 'customer',      label: 'Customer' },
+  { key: 'email',         label: 'Email' },
+  { key: 'total',         label: 'Total' },
+  { key: 'items',         label: 'Items' },
+  { key: 'shipping',      label: 'Shipping' },
+  { key: 'payment',       label: 'Payment' },
+  { key: 'startHandling', label: 'Start Handling' },
+  { key: 'invoice',       label: 'Invoice' },
+  { key: 'received',      label: 'Received' },
+  { key: 'attempts',      label: 'Attempts' },
+  { key: 'error',         label: 'Error' },
+] as const;
+
+type ColKey = typeof ALL_COLS[number]['key'];
+
+const DEFAULT_COLS: ColKey[] = ['orderId', 'customer', 'total', 'startHandling', 'invoice', 'received', 'error'];
+
 export default function DashboardPage() {
   const [orders, setOrders] = useState<ErpOrderRecord[]>([]);
   const [events, setEvents] = useState<EventLogEntry[]>([]);
@@ -27,6 +50,8 @@ export default function DashboardPage() {
   const [orderPage, setOrderPage] = useState(1);
   const [eventPage, setEventPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [visibleCols, setVisibleCols] = useState<Set<ColKey>>(new Set(DEFAULT_COLS));
+  const [showColPicker, setShowColPicker] = useState(false);
 
   const fetchOrders = useCallback(async () => {
     try {
@@ -337,6 +362,48 @@ export default function DashboardPage() {
               >
                 Refresh
               </button>
+
+              <div className="relative">
+                <button
+                  onClick={() => setShowColPicker(v => !v)}
+                  className="px-3 py-1.5 text-xs border border-border rounded hover:bg-muted transition-colors flex items-center gap-1.5"
+                >
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor"><path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zm8 0A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm-8 8A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm8 0A1.5 1.5 0 0 1 10.5 9h3A1.5 1.5 0 0 1 15 10.5v3A1.5 1.5 0 0 1 13.5 15h-3A1.5 1.5 0 0 1 9 13.5v-3z"/></svg>
+                  Columns
+                  <span className="text-muted-foreground">({visibleCols.size + 1}/{ALL_COLS.length + 1})</span>
+                </button>
+                {showColPicker && (
+                  <div className="absolute right-0 top-full mt-1 z-50 rounded-lg border border-border shadow-lg p-3 w-52 bg-background">
+                    <p className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wide">Toggle columns</p>
+                    <div className="space-y-1.5">
+                      {ALL_COLS.map(col => (
+                        <label key={col.key} className="flex items-center gap-2 text-sm cursor-pointer hover:text-foreground transition-colors text-muted-foreground">
+                          <input
+                            type="checkbox"
+                            checked={visibleCols.has(col.key)}
+                            onChange={() => {
+                              setVisibleCols(prev => {
+                                const next = new Set(prev);
+                                if (next.has(col.key)) next.delete(col.key);
+                                else next.add(col.key);
+                                return next;
+                              });
+                            }}
+                            className="w-3.5 h-3.5 rounded accent-primary"
+                          />
+                          {col.label}
+                        </label>
+                      ))}
+                    </div>
+                    <button
+                      onClick={() => setVisibleCols(new Set(DEFAULT_COLS))}
+                      className="mt-3 w-full text-xs text-muted-foreground hover:text-foreground transition-colors border-t border-border pt-2"
+                    >
+                      Reset to default
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Bulk action bar */}
@@ -380,7 +447,7 @@ export default function DashboardPage() {
             ) : (
               <>
               <div className="overflow-x-auto rounded-lg border border-border">
-                <table className="w-full min-w-[1200px] text-sm">
+                <table className="w-full text-sm">
                   <thead className="bg-muted/50">
                     <tr className="text-left text-xs text-muted-foreground uppercase tracking-wide">
                       <th className="pl-3 pr-1 py-2 w-8">
@@ -396,22 +463,22 @@ export default function DashboardPage() {
                         />
                       </th>
                       <th className="px-3 py-2 font-medium">Status</th>
-                      <th className="px-3 py-2 font-medium">Account</th>
-                      <th className="px-3 py-2 font-medium">Order ID</th>
-                      <th className="px-3 py-2 font-medium">Seq</th>
-                      <th className="px-3 py-2 font-medium">VTEX Status</th>
-                      <th className="px-3 py-2 font-medium">Src</th>
-                      <th className="px-3 py-2 font-medium">Customer</th>
-                      <th className="px-3 py-2 font-medium">Email</th>
-                      <th className="px-3 py-2 font-medium text-right">Total</th>
-                      <th className="px-3 py-2 font-medium text-center">Items</th>
-                      <th className="px-3 py-2 font-medium">Shipping</th>
-                      <th className="px-3 py-2 font-medium">Payment</th>
-                      <th className="px-3 py-2 font-medium" title="Start Handling Status">Start Handling</th>
-                      <th className="px-3 py-2 font-medium">Invoice</th>
-                      <th className="px-3 py-2 font-medium">Received</th>
-                      <th className="px-3 py-2 font-medium text-center">Attempts</th>
-                      <th className="px-3 py-2 font-medium">Error</th>
+                      {visibleCols.has('account')       && <th className="px-3 py-2 font-medium">Account</th>}
+                      {visibleCols.has('orderId')        && <th className="px-3 py-2 font-medium">Order ID</th>}
+                      {visibleCols.has('seq')            && <th className="px-3 py-2 font-medium">Seq</th>}
+                      {visibleCols.has('vtexStatus')     && <th className="px-3 py-2 font-medium">VTEX Status</th>}
+                      {visibleCols.has('src')            && <th className="px-3 py-2 font-medium">Source</th>}
+                      {visibleCols.has('customer')       && <th className="px-3 py-2 font-medium">Customer</th>}
+                      {visibleCols.has('email')          && <th className="px-3 py-2 font-medium">Email</th>}
+                      {visibleCols.has('total')          && <th className="px-3 py-2 font-medium text-right">Total</th>}
+                      {visibleCols.has('items')          && <th className="px-3 py-2 font-medium text-center">Items</th>}
+                      {visibleCols.has('shipping')       && <th className="px-3 py-2 font-medium">Shipping</th>}
+                      {visibleCols.has('payment')        && <th className="px-3 py-2 font-medium">Payment</th>}
+                      {visibleCols.has('startHandling')  && <th className="px-3 py-2 font-medium" title="Start Handling Status">Start Handling</th>}
+                      {visibleCols.has('invoice')        && <th className="px-3 py-2 font-medium">Invoice</th>}
+                      {visibleCols.has('received')       && <th className="px-3 py-2 font-medium">Received</th>}
+                      {visibleCols.has('attempts')       && <th className="px-3 py-2 font-medium text-center">Attempts</th>}
+                      {visibleCols.has('error')          && <th className="px-3 py-2 font-medium">Error</th>}
                       <th className="px-3 py-2"></th>
                     </tr>
                   </thead>
@@ -425,6 +492,7 @@ export default function DashboardPage() {
                         credsConfigured={config !== null && (config.appTokenConfigured ?? false)}
                         selected={selectedIds.has(order.id)}
                         onSelect={toggleSelectId}
+                        visibleCols={visibleCols}
                       />
                     ))}
                   </tbody>
