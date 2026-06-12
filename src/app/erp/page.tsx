@@ -407,10 +407,10 @@ export default function DashboardPage() {
                       <th className="px-3 py-2 font-medium text-center">Items</th>
                       <th className="px-3 py-2 font-medium">Shipping</th>
                       <th className="px-3 py-2 font-medium">Payment</th>
-                      <th className="px-3 py-2 font-medium">SH Status</th>
+                      <th className="px-3 py-2 font-medium" title="Start Handling Status">Start Handling</th>
                       <th className="px-3 py-2 font-medium">Invoice</th>
                       <th className="px-3 py-2 font-medium">Received</th>
-                      <th className="px-3 py-2 font-medium text-center">Tries</th>
+                      <th className="px-3 py-2 font-medium text-center">Attempts</th>
                       <th className="px-3 py-2 font-medium">Error</th>
                       <th className="px-3 py-2"></th>
                     </tr>

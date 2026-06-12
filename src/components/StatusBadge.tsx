@@ -6,19 +6,19 @@ import type { ErpStatus, StartHandlingStatus, InvoiceStatus } from '@/types';
 type Status = ErpStatus | StartHandlingStatus | InvoiceStatus;
 
 const COLOR_MAP: Record<string, string> = {
-  RECEIVED:               'bg-slate-100 text-slate-700',
+  RECEIVED:               'bg-slate-100 text-slate-600',
   PROCESSING:             'bg-blue-100 text-blue-700',
-  ERP_ACCEPTED:           'bg-yellow-100 text-yellow-700',
-  START_HANDLING_SUCCESS: 'bg-green-100 text-green-700',
-  START_HANDLING_ERROR:   'bg-red-100 text-red-700',
-  ERROR:                  'bg-red-100 text-red-700',
+  ERP_ACCEPTED:           'bg-amber-100 text-amber-700',
+  START_HANDLING_SUCCESS: 'bg-green-500 text-white font-semibold',
+  START_HANDLING_ERROR:   'bg-red-500 text-white font-semibold',
+  ERROR:                  'bg-red-500 text-white font-semibold',
   DUPLICATE_IGNORED:      'bg-gray-100 text-gray-500',
   MANUALLY_RESOLVED:      'bg-purple-100 text-purple-700',
   CANCELLED:              'bg-orange-100 text-orange-700',
   NOT_STARTED:            'bg-slate-100 text-slate-500',
-  SUCCESS:                'bg-green-100 text-green-700',
-  INVOICED:               'bg-emerald-100 text-emerald-700',
-  INVOICE_ERROR:          'bg-red-100 text-red-700',
+  SUCCESS:                'bg-green-500 text-white font-semibold',
+  INVOICED:               'bg-emerald-500 text-white font-semibold',
+  INVOICE_ERROR:          'bg-red-500 text-white font-semibold',
   NOT_SENT:               'bg-slate-100 text-slate-500',
 };
 

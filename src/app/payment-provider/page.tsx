@@ -342,7 +342,7 @@ export default function PaymentProviderPage() {
         <div className="flex flex-col items-center justify-center min-w-0">
           {account ? (
             <>
-              <span className="text-[10px] text-white/25 uppercase tracking-widest">Test suite base URL</span>
+              <span className="text-xs text-white/25 uppercase tracking-widest">Test suite base URL</span>
               <div className="flex items-center gap-2 mt-0.5">
                 <span className="text-xs font-mono text-white/50 truncate max-w-xs">{baseUrl}</span>
                 <button
@@ -395,7 +395,7 @@ export default function PaymentProviderPage() {
               >
                 <div className="flex items-center gap-1.5">
                   <span className={[
-                    'w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0',
+                    'w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0',
                     step.status === 'passed' ? 'bg-emerald-500/20 text-emerald-400' :
                     step.status === 'failed' ? 'bg-red-500/20 text-red-400' :
                     'bg-white/5 text-white/30',
@@ -411,7 +411,7 @@ export default function PaymentProviderPage() {
                     {step.label}
                   </span>
                 </div>
-                <span className="text-[10px] text-white/20 font-mono">{step.sub}</span>
+                <span className="text-xs text-white/20 font-mono">{step.sub}</span>
               </button>
               {i < flowSteps.length - 1 && (
                 <svg className="w-4 h-4 text-white/10 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -433,13 +433,13 @@ export default function PaymentProviderPage() {
           <div className="flex border-b border-white/10 shrink-0">
             <button
               onClick={() => setShowSetup(false)}
-              className={['flex-1 px-3 py-2.5 text-[11px] font-semibold transition-colors', !showSetup ? 'text-white/80 border-b-2 border-pink-500' : 'text-white/30 hover:text-white/50'].join(' ')}
+              className={['flex-1 px-3 py-2.5 text-xs font-semibold transition-colors', !showSetup ? 'text-white/80 border-b-2 border-[#F71963]' : 'text-white/30 hover:text-white/50'].join(' ')}
             >
               Scenario
             </button>
             <button
               onClick={() => setShowSetup(true)}
-              className={['flex-1 px-3 py-2.5 text-[11px] font-semibold transition-colors', showSetup ? 'text-white/80 border-b-2 border-pink-500' : 'text-white/30 hover:text-white/50'].join(' ')}
+              className={['flex-1 px-3 py-2.5 text-xs font-semibold transition-colors', showSetup ? 'text-white/80 border-b-2 border-[#F71963]' : 'text-white/30 hover:text-white/50'].join(' ')}
             >
               Setup guide
             </button>
@@ -450,7 +450,7 @@ export default function PaymentProviderPage() {
             <div className="flex-1 px-5 py-5 space-y-6 overflow-auto">
               <div className="space-y-1">
                 <p className="text-xs font-semibold text-white/70">How to run the VTEX PPP test suite</p>
-                <p className="text-[11px] text-white/35 leading-relaxed">
+                <p className="text-xs text-white/35 leading-relaxed">
                   Connect the official VTEX Payment Provider Test Suite app to this simulator in a few steps.
                 </p>
               </div>
@@ -494,18 +494,18 @@ export default function PaymentProviderPage() {
                 },
               ].map(step => (
                 <div key={step.n} className="flex gap-3">
-                  <span className="w-5 h-5 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold text-white/40 flex items-center justify-center shrink-0 mt-0.5">
+                  <span className="w-5 h-5 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-white/40 flex items-center justify-center shrink-0 mt-0.5">
                     {step.n}
                   </span>
                   <div className="space-y-1 min-w-0">
                     <p className="text-xs font-semibold text-white/70">{step.title}</p>
-                    <p className="text-[11px] text-white/40 leading-relaxed">{step.body}</p>
+                    <p className="text-xs text-white/40 leading-relaxed">{step.body}</p>
                     {step.link && (
                       <a
                         href={step.link.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-[11px] text-pink-400/70 hover:text-pink-400 transition-colors"
+                        className="inline-flex items-center gap-1 text-xs text-pink-400/70 hover:text-pink-400 transition-colors"
                       >
                         {step.link.label}
                         <svg className="w-2.5 h-2.5" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -516,7 +516,7 @@ export default function PaymentProviderPage() {
                     {step.extra === 'copy-url' && (
                       <button
                         onClick={copyBaseUrl}
-                        className="inline-flex items-center gap-1.5 text-[11px] font-mono text-white/40 bg-white/5 hover:bg-white/8 border border-white/10 rounded px-2 py-1 transition-colors mt-1 max-w-full"
+                        className="inline-flex items-center gap-1.5 text-xs font-mono text-white/40 bg-white/5 hover:bg-white/8 border border-white/10 rounded px-2 py-1 transition-colors mt-1 max-w-full"
                       >
                         <svg className="w-3 h-3 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                           <rect x="7" y="7" width="11" height="11" rx="1.5" />
@@ -531,7 +531,7 @@ export default function PaymentProviderPage() {
 
               {/* Reference links */}
               <div className="pt-2 border-t border-white/5 space-y-2">
-                <p className="text-[10px] font-semibold text-white/25 uppercase tracking-wider">Official references</p>
+                <p className="text-xs font-semibold text-white/25 uppercase tracking-wider">Official references</p>
                 {[
                   { label: 'Payment Provider Test Suite app', href: 'https://apps.vtex.com/vtex-payment-provider-test-suite/p' },
                   { label: 'Payment Provider Protocol overview', href: 'https://developers.vtex.com/docs/guides/payment-provider-protocol' },
@@ -543,7 +543,7 @@ export default function PaymentProviderPage() {
                     href={l.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 text-[11px] text-white/30 hover:text-white/60 transition-colors"
+                    className="flex items-center gap-1.5 text-xs text-white/30 hover:text-white/60 transition-colors"
                   >
                     <svg className="w-3 h-3 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M5 10h10M10 5l5 5-5 5" />
@@ -559,7 +559,13 @@ export default function PaymentProviderPage() {
 
             {/* Account input */}
             <div className="space-y-2 pb-3 border-b border-white/5">
-              <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider block">VTEX Account</span>
+              {!account && (
+                <div className="rounded-lg px-3 py-2 mb-1 flex items-center gap-2" style={{ background: 'rgba(247,25,99,0.06)', border: '1px solid rgba(247,25,99,0.25)' }}>
+                  <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 16 16" fill="#F71963"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm.75 3.5v4a.75.75 0 0 1-1.5 0v-4a.75.75 0 0 1 1.5 0zm0 6.5a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0z"/></svg>
+                  <span className="text-xs font-semibold" style={{ color: '#F71963' }}>Start here — enter your account name</span>
+                </div>
+              )}
+              <span className="text-xs font-semibold text-white/30 uppercase tracking-wider block">VTEX Account</span>
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -576,7 +582,7 @@ export default function PaymentProviderPage() {
                   className="px-3 py-2 rounded-lg text-xs font-semibold transition-all disabled:opacity-30"
                   style={{ background: 'rgba(247,25,99,0.15)', border: '1px solid rgba(247,25,99,0.3)', color: '#F71963' }}
                 >
-                  Set
+                  Connect
                 </button>
               </div>
               {account && (
@@ -584,13 +590,13 @@ export default function PaymentProviderPage() {
                   className="rounded-lg px-3 py-2 space-y-1"
                   style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
                 >
-                  <p className="text-[10px] text-white/25">Base URL for VTEX test suite</p>
+                  <p className="text-xs text-white/25">Base URL for VTEX test suite</p>
                   <p className="text-xs font-mono break-all" style={{ color: 'rgba(255,255,255,0.6)' }}>{baseUrl}</p>
                 </div>
               )}
             </div>
 
-            <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider block">Response scenario</span>
+            <span className="text-xs font-semibold text-white/30 uppercase tracking-wider block">Response scenario</span>
             <div className="space-y-1.5">
               {SCENARIOS.map(s => (
                 <button
@@ -612,11 +618,11 @@ export default function PaymentProviderPage() {
                     ].join(' ')} />
                     <span className="text-xs font-medium">{SCENARIO_LABELS[s]}</span>
                     {SCENARIO_SOON[s] && (
-                      <span className="text-[9px] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded bg-white/5 text-white/25 border border-white/10 ml-auto">soon</span>
+                      <span className="text-xs font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded bg-white/5 text-white/25 border border-white/10 ml-auto">soon</span>
                     )}
                   </div>
                   {config.scenario === s && (
-                    <p className="text-[11px] mt-1.5 ml-3.5 leading-relaxed opacity-80">{SCENARIO_DESC[s]}</p>
+                    <p className="text-xs mt-1.5 ml-3.5 leading-relaxed opacity-80">{SCENARIO_DESC[s]}</p>
                   )}
                 </button>
               ))}
@@ -628,12 +634,12 @@ export default function PaymentProviderPage() {
             {contextDoc ? (
               <div className="space-y-4">
                 <div className="flex items-center justify-between gap-2">
-                  <code className="text-[11px] font-mono text-white/40 bg-white/5 px-2 py-1 rounded">{contextDoc.title}</code>
+                  <code className="text-xs font-mono text-white/40 bg-white/5 px-2 py-1 rounded">{contextDoc.title}</code>
                   <a
                     href={contextDoc.docUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="shrink-0 flex items-center gap-1 text-[10px] font-medium text-white/30 hover:text-pink-400 transition-colors"
+                    className="shrink-0 flex items-center gap-1 text-xs font-medium text-white/30 hover:text-pink-400 transition-colors"
                   >
                     VTEX docs
                     <svg className="w-3 h-3" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -642,38 +648,38 @@ export default function PaymentProviderPage() {
                   </a>
                 </div>
                 <div className="space-y-1.5">
-                  <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider block">What this call does</span>
+                  <span className="text-xs font-semibold text-white/30 uppercase tracking-wider block">What this call does</span>
                   <p className="text-xs text-white/50 leading-relaxed">{contextDoc.what}</p>
                 </div>
                 <div className="space-y-1.5">
-                  <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider block">Why it exists</span>
+                  <span className="text-xs font-semibold text-white/30 uppercase tracking-wider block">Why it exists</span>
                   <p className="text-xs text-white/50 leading-relaxed">{contextDoc.why}</p>
                 </div>
                 <div className="space-y-2">
-                  <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider block">Key fields</span>
+                  <span className="text-xs font-semibold text-white/30 uppercase tracking-wider block">Key fields</span>
                   {contextDoc.keyFields.map(f => (
                     <div key={f.field} className="space-y-0.5">
-                      <code className="text-[10px] font-mono text-white/60">{f.field}</code>
-                      <p className="text-[11px] text-white/35 leading-relaxed">{f.desc}</p>
+                      <code className="text-xs font-mono text-white/60">{f.field}</code>
+                      <p className="text-xs text-white/35 leading-relaxed">{f.desc}</p>
                     </div>
                   ))}
                 </div>
                 {contextDoc.expectedResponse && (
                   <div className="space-y-1.5">
-                    <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider block">Expected response</span>
+                    <span className="text-xs font-semibold text-white/30 uppercase tracking-wider block">Expected response</span>
                     <p className="text-xs text-white/50 leading-relaxed">{contextDoc.expectedResponse}</p>
                   </div>
                 )}
               </div>
             ) : (
               <div className="space-y-2">
-                <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider block">Protocol reference</span>
+                <span className="text-xs font-semibold text-white/30 uppercase tracking-wider block">Protocol reference</span>
                 <p className="text-xs text-white/25 leading-relaxed">
                   Click any call in the log to see an explanation of what that endpoint does, why it exists in the protocol, and what VTEX expects in the response.
                 </p>
                 <div className="mt-4 space-y-2">
                   {Object.values(ENDPOINT_DOCS).map(doc => (
-                    <div key={doc.title} className="text-[11px] text-white/20 py-1 border-b border-white/5">
+                    <div key={doc.title} className="text-xs text-white/20 py-1 border-b border-white/5">
                       <code className="font-mono">{doc.title}</code>
                     </div>
                   ))}
@@ -713,15 +719,15 @@ export default function PaymentProviderPage() {
                       className="flex items-center gap-3 px-5 py-3 cursor-pointer"
                       onClick={() => { setSelectedKey(call.id); toggleExpand(call.id); }}
                     >
-                      <span className={`shrink-0 text-[10px] font-bold font-mono px-1.5 py-0.5 rounded ${methodColor(call.method)}`}>
+                      <span className={`shrink-0 text-xs font-bold font-mono px-1.5 py-0.5 rounded ${methodColor(call.method)}`}>
                         {call.method}
                       </span>
                       <span className="text-xs font-mono text-white/60 flex-1 truncate">{call.path}</span>
                       <span className={`text-xs font-mono shrink-0 ${statusColor(call.httpStatus)}`}>
                         {call.httpStatus}
                       </span>
-                      <span className="text-[11px] text-white/20 shrink-0">{call.durationMs}ms</span>
-                      <span className="text-[11px] text-white/20 shrink-0 hidden sm:block">{relativeTime(call.timestamp)}</span>
+                      <span className="text-xs text-white/20 shrink-0">{call.durationMs}ms</span>
+                      <span className="text-xs text-white/20 shrink-0 hidden sm:block">{relativeTime(call.timestamp)}</span>
                       <svg
                         className={['w-3.5 h-3.5 text-white/20 shrink-0 transition-transform', expanded ? 'rotate-90' : ''].join(' ')}
                         viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
@@ -732,14 +738,14 @@ export default function PaymentProviderPage() {
                     {expanded && (
                       <div className="px-5 pb-4 grid sm:grid-cols-2 gap-3">
                         <div className="space-y-1.5">
-                          <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider">Request</span>
-                          <pre className="text-[11px] font-mono text-white/50 bg-white/5 rounded p-3 overflow-auto max-h-48 whitespace-pre-wrap break-all">
+                          <span className="text-xs font-semibold text-white/30 uppercase tracking-wider">Request</span>
+                          <pre className="text-xs font-mono text-white/50 bg-white/5 rounded p-3 overflow-auto max-h-48 whitespace-pre-wrap break-all">
                             {call.requestBody ? JSON.stringify(call.requestBody, null, 2) : '—'}
                           </pre>
                         </div>
                         <div className="space-y-1.5">
-                          <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider">Response</span>
-                          <pre className="text-[11px] font-mono text-white/50 bg-white/5 rounded p-3 overflow-auto max-h-48 whitespace-pre-wrap break-all">
+                          <span className="text-xs font-semibold text-white/30 uppercase tracking-wider">Response</span>
+                          <pre className="text-xs font-mono text-white/50 bg-white/5 rounded p-3 overflow-auto max-h-48 whitespace-pre-wrap break-all">
                             {call.responseBody ? JSON.stringify(call.responseBody, null, 2) : '—'}
                           </pre>
                         </div>

@@ -251,7 +251,7 @@ export default function GiftCardPage() {
         <div className="flex flex-col items-center justify-center min-w-0">
           {account ? (
             <>
-              <span className="text-[10px] text-white/25 uppercase tracking-widest">Provider service URL</span>
+              <span className="text-xs text-white/25 uppercase tracking-widest">Provider service URL</span>
               <div className="flex items-center gap-2 mt-0.5">
                 <span className="text-xs font-mono text-white/50 truncate max-w-xs">{baseUrl}</span>
                 <button
@@ -309,7 +309,7 @@ export default function GiftCardPage() {
                 <div className="flex flex-col items-center gap-1 px-3 py-1.5 rounded-lg">
                   <div className="flex items-center gap-1.5">
                     <span className={[
-                      'w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0',
+                      'w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shrink-0',
                       st === 'passed' ? 'bg-emerald-500/20 text-emerald-400' :
                       st === 'failed' ? 'bg-red-500/20 text-red-400' :
                       'bg-white/5 text-white/30',
@@ -325,7 +325,7 @@ export default function GiftCardPage() {
                       {step.label}
                     </span>
                   </div>
-                  <span className="text-[10px] text-white/20 font-mono">{step.sub}</span>
+                  <span className="text-xs text-white/20 font-mono">{step.sub}</span>
                 </div>
                 {i < FLOW_STEPS.length - 1 && (
                   <svg className="w-4 h-4 text-white/10 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -351,8 +351,8 @@ export default function GiftCardPage() {
                 key={val}
                 onClick={() => setActiveTab(val)}
                 className={[
-                  'flex-1 py-2.5 text-[11px] font-semibold transition-colors',
-                  activeTab === val ? 'text-white/80 border-b-2 border-pink-500' : 'text-white/30 hover:text-white/50',
+                  'flex-1 py-2.5 text-xs font-semibold transition-colors',
+                  activeTab === val ? 'text-white/80 border-b-2 border-[#F71963]' : 'text-white/30 hover:text-white/50',
                 ].join(' ')}
               >
                 {label}
@@ -368,7 +368,13 @@ export default function GiftCardPage() {
 
                 {/* Account */}
                 <div className="space-y-2 pb-4 border-b border-white/5">
-                  <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider block">VTEX Account</span>
+                  {!account && (
+                    <div className="rounded-lg px-3 py-2 mb-1 flex items-center gap-2" style={{ background: 'rgba(247,25,99,0.06)', border: '1px solid rgba(247,25,99,0.25)' }}>
+                      <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 16 16" fill="#F71963"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm.75 3.5v4a.75.75 0 0 1-1.5 0v-4a.75.75 0 0 1 1.5 0zm0 6.5a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0z"/></svg>
+                      <span className="text-xs font-semibold" style={{ color: '#F71963' }}>Start here — enter your account name</span>
+                    </div>
+                  )}
+                  <span className="text-xs font-semibold text-white/30 uppercase tracking-wider block">VTEX Account</span>
                   <div className="flex gap-2">
                     <input
                       type="text"
@@ -385,7 +391,7 @@ export default function GiftCardPage() {
                       className="px-3 py-2 rounded-lg text-xs font-semibold transition-all disabled:opacity-30"
                       style={{ background: 'rgba(247,25,99,0.15)', border: '1px solid rgba(247,25,99,0.3)', color: '#F71963' }}
                     >
-                      Set
+                      Connect
                     </button>
                   </div>
                   {account && (
@@ -393,11 +399,11 @@ export default function GiftCardPage() {
                       className="rounded-lg px-3 py-2 space-y-1"
                       style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
                     >
-                      <p className="text-[10px] text-white/25">Register this as the provider serviceUrl in VTEX Hub</p>
+                      <p className="text-xs text-white/25">Register this as the provider serviceUrl in VTEX Hub</p>
                       <p className="text-xs font-mono break-all" style={{ color: 'rgba(255,255,255,0.5)' }}>{baseUrl}</p>
                       <button
                         onClick={copyBaseUrl}
-                        className="inline-flex items-center gap-1.5 text-[11px] font-mono text-white/40 bg-white/5 hover:bg-white/8 border border-white/10 rounded px-2 py-1 transition-colors mt-1"
+                        className="inline-flex items-center gap-1.5 text-xs font-mono text-white/40 bg-white/5 hover:bg-white/8 border border-white/10 rounded px-2 py-1 transition-colors mt-1"
                       >
                         <svg className="w-3 h-3 shrink-0" viewBox="0 0 16 16" fill="currentColor"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"/><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"/></svg>
                         {copied ? 'Copied!' : 'Copy URL'}
@@ -408,7 +414,7 @@ export default function GiftCardPage() {
 
                 {/* Scenario */}
                 <div className="space-y-2 pb-4 border-b border-white/5">
-                  <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider block">Response scenario</span>
+                  <span className="text-xs font-semibold text-white/30 uppercase tracking-wider block">Response scenario</span>
                   {([
                     { value: 'approved' as GcScenario, label: 'Return card', dot: 'bg-emerald-400', color: 'text-emerald-400', desc: 'Any customer email returns a gift card with the configured balance.' },
                     { value: 'empty'    as GcScenario, label: 'No cards',    dot: 'bg-white/20',   color: 'text-white/40',   desc: 'Search returns an empty array — the gift card option does not appear at checkout.' },
@@ -430,7 +436,7 @@ export default function GiftCardPage() {
                         <span className="text-xs font-medium">{s.label}</span>
                       </div>
                       {config.scenario === s.value && (
-                        <p className="text-[11px] mt-1.5 ml-3.5 leading-relaxed opacity-70">{s.desc}</p>
+                        <p className="text-xs mt-1.5 ml-3.5 leading-relaxed opacity-70">{s.desc}</p>
                       )}
                     </button>
                   ))}
@@ -438,7 +444,7 @@ export default function GiftCardPage() {
 
                 {/* Balance + Currency */}
                 <div className="space-y-2 pb-4 border-b border-white/5">
-                  <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider block">Mock balance &amp; currency</span>
+                  <span className="text-xs font-semibold text-white/30 uppercase tracking-wider block">Mock balance &amp; currency</span>
                   <div className="flex gap-2">
                     <input
                       type="number"
@@ -481,7 +487,7 @@ export default function GiftCardPage() {
                       </>
                     ) : 'Set'}
                   </button>
-                  <p className="text-[11px] text-white/20 leading-relaxed">
+                  <p className="text-xs text-white/20 leading-relaxed">
                     Balance and currency code returned on every <code className="font-mono">_search</code> and <code className="font-mono">GET /&#123;id&#125;</code> call.
                   </p>
                 </div>
@@ -489,7 +495,7 @@ export default function GiftCardPage() {
                 {/* Active cards */}
                 {cards.length > 0 && (
                   <div className="space-y-2">
-                    <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider block">
+                    <span className="text-xs font-semibold text-white/30 uppercase tracking-wider block">
                       Active cards <span className="text-white/20 normal-case tracking-normal ml-1">{cards.length}</span>
                     </span>
                     <div className="space-y-1.5">
@@ -499,11 +505,11 @@ export default function GiftCardPage() {
                           className="rounded-lg px-3 py-2 space-y-0.5"
                           style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
                         >
-                          <p className="text-[11px] font-mono text-white/50 truncate">{card.id}</p>
-                          <p className="text-[11px] text-white/30 truncate">{card.owner}</p>
+                          <p className="text-xs font-mono text-white/50 truncate">{card.id}</p>
+                          <p className="text-xs text-white/30 truncate">{card.owner}</p>
                           <div className="flex items-center justify-between">
-                            <p className="text-[10px] font-mono text-amber-400/60">{card.redemptionCode}</p>
-                            <p className="text-[10px] font-mono text-emerald-400/70">{config.mockBalance} {config.currencyCode}</p>
+                            <p className="text-xs font-mono text-amber-400/60">{card.redemptionCode}</p>
+                            <p className="text-xs font-mono text-emerald-400/70">{config.mockBalance} {config.currencyCode}</p>
                           </div>
                         </div>
                       ))}
@@ -519,8 +525,8 @@ export default function GiftCardPage() {
 
                 {/* VTEX admin credentials */}
                 <div className="space-y-2 pb-4 border-b border-white/5">
-                  <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider block">VTEX Admin Credentials</span>
-                  <p className="text-[11px] text-white/25 leading-relaxed">Used to call the VTEX Gift Card Hub API on your behalf.</p>
+                  <span className="text-xs font-semibold text-white/30 uppercase tracking-wider block">VTEX Admin Credentials</span>
+                  <p className="text-xs text-white/25 leading-relaxed">Used to call the VTEX Gift Card Hub API on your behalf.</p>
                   <input
                     type="text"
                     value={hubAppKey}
@@ -537,13 +543,13 @@ export default function GiftCardPage() {
                     className="w-full text-xs rounded-lg px-3 py-2 outline-none focus:ring-1 focus:ring-pink-500/50 font-mono"
                     style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)' }}
                   />
-                  <p className="text-[10px] text-white/20">Credentials are saved in your browser only — never sent to our server except to proxy the VTEX call.</p>
+                  <p className="text-xs text-white/20">Credentials are saved in your browser only — never sent to our server except to proxy the VTEX call.</p>
                 </div>
 
                 {/* List providers */}
                 <div className="space-y-2 pb-4 border-b border-white/5">
-                  <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider block">List Providers</span>
-                  <p className="text-[11px] text-white/25 leading-relaxed">
+                  <span className="text-xs font-semibold text-white/30 uppercase tracking-wider block">List Providers</span>
+                  <p className="text-xs text-white/25 leading-relaxed">
                     <code className="font-mono text-white/40">GET /api/giftcardproviders</code><br />
                     Returns all gift card providers registered in your account.
                   </p>
@@ -564,14 +570,14 @@ export default function GiftCardPage() {
 
                 {/* Register provider */}
                 <div className="space-y-2 pb-4 border-b border-white/5">
-                  <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider block">Register Mock Provider</span>
-                  <p className="text-[11px] text-white/25 leading-relaxed">
+                  <span className="text-xs font-semibold text-white/30 uppercase tracking-wider block">Register Mock Provider</span>
+                  <p className="text-xs text-white/25 leading-relaxed">
                     <code className="font-mono text-white/40">PUT /api/giftcardproviders/{account ? `${account}-GiftCardMock` : '{account}-GiftCardMock'}</code>
                   </p>
 
                   {/* Provider details preview */}
                   <div
-                    className="rounded-lg px-3 py-2.5 space-y-1.5 text-[11px]"
+                    className="rounded-lg px-3 py-2.5 space-y-1.5 text-xs"
                     style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
                   >
                     <div className="flex justify-between">
@@ -596,7 +602,7 @@ export default function GiftCardPage() {
                     </div>
                   </div>
 
-                  <p className="text-[10px] text-white/20 leading-relaxed">
+                  <p className="text-xs text-white/20 leading-relaxed">
                     <span className="text-amber-400/60">accountkey</span> and <span className="text-amber-400/60">accountoken</span> are the credentials VTEX will send on every call to this mock. They are hardcoded for demo use only.
                   </p>
 
@@ -619,22 +625,22 @@ export default function GiftCardPage() {
                 {hubResult && (
                   <div className="space-y-1.5">
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-semibold text-white/30 uppercase tracking-wider">Response</span>
-                      <span className={`text-[11px] font-mono font-semibold ${hubResult.ok ? 'text-emerald-400' : 'text-red-400'}`}>
+                      <span className="text-xs font-semibold text-white/30 uppercase tracking-wider">Response</span>
+                      <span className={`text-xs font-mono font-semibold ${hubResult.ok ? 'text-emerald-400' : 'text-red-400'}`}>
                         {hubResult.status}
                       </span>
                     </div>
                     {hubResult.sentBody != null && (
                       <div>
-                        <p className="text-[10px] text-white/20 mb-1">Sent body</p>
-                        <pre className="text-[10px] font-mono text-white/35 bg-black/20 rounded-lg px-3 py-2 overflow-auto max-h-32">
+                        <p className="text-xs text-white/20 mb-1">Sent body</p>
+                        <pre className="text-xs font-mono text-white/35 bg-black/20 rounded-lg px-3 py-2 overflow-auto max-h-32">
                           {JSON.stringify(hubResult.sentBody, null, 2)}
                         </pre>
                       </div>
                     )}
                     <div>
-                      <p className="text-[10px] text-white/20 mb-1">VTEX response</p>
-                      <pre className="text-[10px] font-mono text-white/45 bg-black/20 rounded-lg px-3 py-2 overflow-auto max-h-52">
+                      <p className="text-xs text-white/20 mb-1">VTEX response</p>
+                      <pre className="text-xs font-mono text-white/45 bg-black/20 rounded-lg px-3 py-2 overflow-auto max-h-52">
                         {JSON.stringify(hubResult.data, null, 2)}
                       </pre>
                     </div>
@@ -648,7 +654,7 @@ export default function GiftCardPage() {
               <div className="p-4 space-y-6">
                 <div className="space-y-1">
                   <p className="text-xs font-semibold text-white/70">How to register the provider in VTEX</p>
-                  <p className="text-[11px] text-white/35 leading-relaxed">
+                  <p className="text-xs text-white/35 leading-relaxed">
                     Register this app as an external gift card provider in your VTEX account using the Gift Card Hub API.
                   </p>
                 </div>
@@ -681,12 +687,12 @@ export default function GiftCardPage() {
                   },
                 ].map(step => (
                   <div key={step.n} className="flex gap-3">
-                    <span className="w-5 h-5 rounded-full bg-white/5 border border-white/10 text-[10px] font-bold text-white/40 flex items-center justify-center shrink-0 mt-0.5">
+                    <span className="w-5 h-5 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-white/40 flex items-center justify-center shrink-0 mt-0.5">
                       {step.n}
                     </span>
                     <div className="space-y-1 min-w-0">
                       <p className="text-xs font-semibold text-white/70">{step.title}</p>
-                      <p className="text-[11px] text-white/40 leading-relaxed">{step.body}</p>
+                      <p className="text-xs text-white/40 leading-relaxed">{step.body}</p>
                     </div>
                   </div>
                 ))}
@@ -694,11 +700,11 @@ export default function GiftCardPage() {
                 {/* Registration commands */}
                 {account && (
                   <div className="space-y-3 pt-2 border-t border-white/5">
-                    <p className="text-[10px] font-semibold text-white/25 uppercase tracking-wider">Registration command</p>
+                    <p className="text-xs font-semibold text-white/25 uppercase tracking-wider">Registration command</p>
 
                     <div>
-                      <p className="text-[10px] text-white/20 mb-1 font-mono">PowerShell</p>
-                      <pre className="text-[10px] font-mono text-white/40 bg-black/20 rounded-lg px-3 py-2 overflow-x-auto whitespace-pre">
+                      <p className="text-xs text-white/20 mb-1 font-mono">PowerShell</p>
+                      <pre className="text-xs font-mono text-white/40 bg-black/20 rounded-lg px-3 py-2 overflow-x-auto whitespace-pre">
 {`$body = '{"serviceUrl":"${baseUrl}","appKey":"demo-key","appToken":"demo-token","oauthProvider":"vtex","preAuthEnabled":false,"cancelEnabled":true}'
 Invoke-RestMethod -Method PUT \`
   -Uri "https://{account}.vtexcommercestable.com.br/api/giftcardproviders/DemoGiftCard" \`
@@ -708,8 +714,8 @@ Invoke-RestMethod -Method PUT \`
                     </div>
 
                     <div>
-                      <p className="text-[10px] text-white/20 mb-1 font-mono">bash / curl</p>
-                      <pre className="text-[10px] font-mono text-white/40 bg-black/20 rounded-lg px-3 py-2 overflow-x-auto whitespace-pre">
+                      <p className="text-xs text-white/20 mb-1 font-mono">bash / curl</p>
+                      <pre className="text-xs font-mono text-white/40 bg-black/20 rounded-lg px-3 py-2 overflow-x-auto whitespace-pre">
 {`curl -X PUT "https://{account}.vtexcommercestable.com.br/api/giftcardproviders/DemoGiftCard" -H "X-VTEX-API-AppKey: {appKey}" -H "X-VTEX-API-AppToken: {appToken}" -H "Content-Type: application/json" -d '{"serviceUrl":"${baseUrl}","appKey":"demo-key","appToken":"demo-token","oauthProvider":"vtex","preAuthEnabled":false,"cancelEnabled":true}'`}
                       </pre>
                     </div>
@@ -718,7 +724,7 @@ Invoke-RestMethod -Method PUT \`
 
                 {/* Reference links */}
                 <div className="pt-2 border-t border-white/5 space-y-2">
-                  <p className="text-[10px] font-semibold text-white/25 uppercase tracking-wider">Official references</p>
+                  <p className="text-xs font-semibold text-white/25 uppercase tracking-wider">Official references</p>
                   {[
                     { label: 'Gift Card Provider Protocol — API reference', href: 'https://developers.vtex.com/docs/api-reference/giftcard-provider-protocol' },
                     { label: 'How to integrate an external gift card provider', href: 'https://help.vtex.com/docs/tutorials/how-to-integrate-an-external-gift-card-provider-with-vtex' },
@@ -729,7 +735,7 @@ Invoke-RestMethod -Method PUT \`
                       href={l.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 text-[11px] text-white/30 hover:text-white/60 transition-colors"
+                      className="flex items-center gap-1.5 text-xs text-white/30 hover:text-white/60 transition-colors"
                     >
                       <svg className="w-3 h-3 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M5 10h10M10 5l5 5-5 5" />
@@ -771,18 +777,18 @@ Invoke-RestMethod -Method PUT \`
                       className="flex items-center gap-3 px-5 py-3 cursor-pointer"
                       onClick={() => toggleExpand(call.id)}
                     >
-                      <span className={`shrink-0 text-[10px] font-bold font-mono px-1.5 py-0.5 rounded ${methodColor(call.method)}`}>
+                      <span className={`shrink-0 text-xs font-bold font-mono px-1.5 py-0.5 rounded ${methodColor(call.method)}`}>
                         {call.method}
                       </span>
                       <span className="text-xs font-mono text-white/60 flex-1 truncate">{call.path}</span>
-                      <span className="text-[11px] text-white/30 shrink-0 font-mono bg-white/5 px-1.5 py-0.5 rounded">
+                      <span className="text-xs text-white/30 shrink-0 font-mono bg-white/5 px-1.5 py-0.5 rounded">
                         {endpointLabel(call.endpoint)}
                       </span>
                       <span className={`shrink-0 text-xs font-mono font-semibold ${statusColor(call.httpStatus)}`}>
                         {call.httpStatus}
                       </span>
-                      <span className="shrink-0 text-[11px] text-white/25">{call.durationMs}ms</span>
-                      <span className="shrink-0 text-[11px] text-white/20 w-16 text-right">{relativeTime(call.timestamp)}</span>
+                      <span className="shrink-0 text-xs text-white/25">{call.durationMs}ms</span>
+                      <span className="shrink-0 text-xs text-white/20 w-16 text-right">{relativeTime(call.timestamp)}</span>
                       <svg
                         className={`w-3.5 h-3.5 shrink-0 text-white/20 transition-transform ${expanded ? 'rotate-180' : ''}`}
                         viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2"
@@ -793,14 +799,14 @@ Invoke-RestMethod -Method PUT \`
                     {expanded && (
                       <div className="px-5 pb-4 grid grid-cols-2 gap-3">
                         <div>
-                          <p className="text-[10px] text-white/25 mb-1 uppercase tracking-wider">Request body</p>
-                          <pre className="text-[11px] font-mono text-white/50 bg-black/20 rounded-lg p-3 overflow-auto max-h-52">
+                          <p className="text-xs text-white/25 mb-1 uppercase tracking-wider">Request body</p>
+                          <pre className="text-xs font-mono text-white/50 bg-black/20 rounded-lg p-3 overflow-auto max-h-52">
                             {JSON.stringify(call.requestBody ?? null, null, 2)}
                           </pre>
                         </div>
                         <div>
-                          <p className="text-[10px] text-white/25 mb-1 uppercase tracking-wider">Response body</p>
-                          <pre className="text-[11px] font-mono text-white/50 bg-black/20 rounded-lg p-3 overflow-auto max-h-52">
+                          <p className="text-xs text-white/25 mb-1 uppercase tracking-wider">Response body</p>
+                          <pre className="text-xs font-mono text-white/50 bg-black/20 rounded-lg p-3 overflow-auto max-h-52">
                             {JSON.stringify(call.responseBody ?? null, null, 2)}
                           </pre>
                         </div>

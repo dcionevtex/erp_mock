@@ -26,9 +26,22 @@ const CHANGE_TYPE_STYLE: Record<'feat' | 'fix' | 'chore', { label: string; color
 
 const RELEASES: ReleaseEntry[] = [
   {
+    version: '1.5.0',
+    date: 'June 12, 2026',
+    tag: 'latest',
+    simulators: ['platform', 'ppp', 'marketplace', 'giftcard', 'erp'],
+    changes: [
+      { type: 'feat', text: 'Beta simulators (PPP, External Seller, Gift Card) now show a pink "Start here" callout above the account input on first load when no account is configured' },
+      { type: 'feat', text: 'Account commit button label changed from "Set" to "Connect" across all Beta simulators for clarity' },
+      { type: 'fix', text: 'Replaced 250+ sub-pixel font sizes (text-[10px], text-[11px], text-[9px]) with text-xs (12px minimum) across PPP, External Seller, Gift Card, and ERP order row — panel content is now readable on all display sizes' },
+      { type: 'fix', text: 'Active tab border now uses the VTEX Rebel Pink token (#F71963) instead of Tailwind border-pink-500 across all Beta simulators' },
+      { type: 'fix', text: 'StatusBadge: ERROR, START_HANDLING_ERROR, INVOICE_ERROR now use solid red fill (bg-red-500 text-white) to stand out in the order table; SUCCESS and INVOICED use solid green fill' },
+      { type: 'fix', text: 'ERP table column "SH Status" renamed to "Start Handling" and "Tries" renamed to "Attempts" for clarity during demos' },
+    ],
+  },
+  {
     version: '1.4.0',
     date: 'May 31, 2026',
-    tag: 'latest',
     simulators: ['giftcard'],
     changes: [
       { type: 'feat', text: 'Gift Card Provider mock — implements the VTEX Gift Card Provider Protocol endpoints (search, get, transaction, settlement, cancellation)' },

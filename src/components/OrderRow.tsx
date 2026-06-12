@@ -264,15 +264,15 @@ function OrderDetailModal({
                 <Field label="Payment" value={order.paymentSummary} />
                 <Field label="Shipping" value={order.shippingSummary} />
                 <div className="flex flex-col gap-1">
-                  <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide">ERP Status</span>
+                  <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">ERP Status</span>
                   <StatusBadge status={order.erpStatus} />
                 </div>
                 <div className="flex flex-col gap-1">
-                  <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide">SH Status</span>
+                  <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">SH Status</span>
                   <StatusBadge status={order.startHandlingStatus} />
                 </div>
                 <div className="flex flex-col gap-1">
-                  <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide">Invoice</span>
+                  <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Invoice</span>
                   <StatusBadge status={order.invoiceStatus} />
                 </div>
               </div>
@@ -305,14 +305,14 @@ function OrderDetailModal({
               <table className="w-full text-xs">
                 <thead>
                   <tr className="text-left border-b border-border">
-                    <th className="pb-2 pr-3 font-semibold text-muted-foreground uppercase tracking-wide text-[10px] w-10" />
-                    <th className="pb-2 pr-4 font-semibold text-muted-foreground uppercase tracking-wide text-[10px]">SKU</th>
-                    <th className="pb-2 pr-4 font-semibold text-muted-foreground uppercase tracking-wide text-[10px]">Product ID</th>
-                    <th className="pb-2 pr-4 font-semibold text-muted-foreground uppercase tracking-wide text-[10px]">Name</th>
-                    <th className="pb-2 pr-4 font-semibold text-muted-foreground uppercase tracking-wide text-[10px] text-right">Qty</th>
-                    <th className="pb-2 pr-4 font-semibold text-muted-foreground uppercase tracking-wide text-[10px] text-right">Unit Price</th>
-                    <th className="pb-2 pr-4 font-semibold text-muted-foreground uppercase tracking-wide text-[10px] text-right">Selling Price</th>
-                    <th className="pb-2 font-semibold text-muted-foreground uppercase tracking-wide text-[10px] text-right">Total</th>
+                    <th className="pb-2 pr-3 font-semibold text-muted-foreground uppercase tracking-wide text-xs w-10" />
+                    <th className="pb-2 pr-4 font-semibold text-muted-foreground uppercase tracking-wide text-xs">SKU</th>
+                    <th className="pb-2 pr-4 font-semibold text-muted-foreground uppercase tracking-wide text-xs">Product ID</th>
+                    <th className="pb-2 pr-4 font-semibold text-muted-foreground uppercase tracking-wide text-xs">Name</th>
+                    <th className="pb-2 pr-4 font-semibold text-muted-foreground uppercase tracking-wide text-xs text-right">Qty</th>
+                    <th className="pb-2 pr-4 font-semibold text-muted-foreground uppercase tracking-wide text-xs text-right">Unit Price</th>
+                    <th className="pb-2 pr-4 font-semibold text-muted-foreground uppercase tracking-wide text-xs text-right">Selling Price</th>
+                    <th className="pb-2 font-semibold text-muted-foreground uppercase tracking-wide text-xs text-right">Total</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -353,7 +353,7 @@ function OrderDetailModal({
               <div className="space-y-4">
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-8 gap-y-4">
                   <div className="flex flex-col gap-1">
-                    <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide">Status</span>
+                    <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Status</span>
                     <StatusBadge status={order.invoiceStatus} />
                   </div>
                   <Field label="Invoice Number" value={order.invoiceNumber} mono />
@@ -362,7 +362,7 @@ function OrderDetailModal({
                   {order.invoiceTracking?.courier && <Field label="Carrier" value={order.invoiceTracking.courier} />}
                   {order.invoiceTracking?.trackingUrl && (
                     <div className="flex flex-col gap-0.5 min-w-0">
-                      <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Tracking URL</span>
+                      <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Tracking URL</span>
                       <a href={order.invoiceTracking.trackingUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline truncate">
                         {order.invoiceTracking.trackingUrl}
                       </a>
@@ -378,18 +378,18 @@ function OrderDetailModal({
                       </button>
                     ) : (
                       <form onSubmit={handleUpdateTracking} className="space-y-3">
-                        <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wide">Update Tracking Info</p>
+                        <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Update Tracking Info</p>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                           <div className="flex flex-col gap-1">
-                            <label className="text-[11px] text-muted-foreground">Carrier</label>
+                            <label className="text-xs text-muted-foreground">Carrier</label>
                             <input type="text" placeholder="e.g. Correios" value={trackingForm.courier} onChange={(e) => setTrackingForm((f) => ({ ...f, courier: e.target.value }))} className="rounded border border-input bg-background px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring" />
                           </div>
                           <div className="flex flex-col gap-1">
-                            <label className="text-[11px] text-muted-foreground">Tracking Number</label>
+                            <label className="text-xs text-muted-foreground">Tracking Number</label>
                             <input type="text" placeholder="e.g. BR123456789BR" value={trackingForm.trackingNumber} onChange={(e) => setTrackingForm((f) => ({ ...f, trackingNumber: e.target.value }))} className="rounded border border-input bg-background px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring" />
                           </div>
                           <div className="flex flex-col gap-1">
-                            <label className="text-[11px] text-muted-foreground">Tracking URL (optional)</label>
+                            <label className="text-xs text-muted-foreground">Tracking URL (optional)</label>
                             <input type="url" placeholder="https://..." value={trackingForm.trackingUrl} onChange={(e) => setTrackingForm((f) => ({ ...f, trackingUrl: e.target.value }))} className="rounded border border-input bg-background px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring" />
                           </div>
                         </div>
@@ -540,7 +540,7 @@ function InfoCard({ title, children, className }: { title: string; children: Rea
   return (
     <div className={cn('rounded-lg border border-border bg-card overflow-hidden', className)}>
       <div className="px-4 py-2.5 border-b border-border bg-muted/30">
-        <h4 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">{title}</h4>
+        <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{title}</h4>
       </div>
       <div className="p-4">{children}</div>
     </div>
@@ -557,7 +557,7 @@ function CollapsibleCard({ title, tag, children }: { title: string; tag?: string
         className="w-full flex items-center justify-between px-4 py-2.5 bg-muted/30 border-b border-border hover:bg-muted/50 transition-colors text-left gap-2"
       >
         <div className="flex items-center gap-2">
-          <h4 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">{title}</h4>
+          <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{title}</h4>
           {tag && (
             <span className="text-[9px] font-mono font-semibold px-1.5 py-0.5 rounded bg-muted border border-border text-muted-foreground">
               {tag}
@@ -579,7 +579,7 @@ function CollapsibleCard({ title, tag, children }: { title: string; tag?: string
 function Field({ label, value, mono }: { label: string; value: React.ReactNode; mono?: boolean }) {
   return (
     <div className="flex flex-col gap-0.5 min-w-0">
-      <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">{label}</span>
+      <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{label}</span>
       <span className={cn('text-sm font-medium text-foreground truncate', mono && 'font-mono text-xs')}>
         {value ?? '—'}
       </span>
@@ -589,7 +589,7 @@ function Field({ label, value, mono }: { label: string; value: React.ReactNode; 
 
 function JsonViewer({ data, maxHeight = 'max-h-48' }: { data: unknown; maxHeight?: string }) {
   return (
-    <pre className={cn('text-[11px] leading-relaxed bg-muted/60 rounded-md p-3 overflow-auto font-mono', maxHeight)}>
+    <pre className={cn('text-xs leading-relaxed bg-muted/60 rounded-md p-3 overflow-auto font-mono', maxHeight)}>
       {JSON.stringify(data, null, 2)}
     </pre>
   );
@@ -610,11 +610,11 @@ function TimelineEntry({ entry, last }: { entry: ErpTimelineEntry; last: boolean
       <span className={cn('mt-1 h-3 w-3 rounded-full shrink-0 ring-2', style.dot)} />
       <div className="flex flex-col gap-0.5 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-[10px] font-mono font-medium text-foreground">{entry.step}</span>
-          <span className="text-[10px] text-muted-foreground">{new Date(entry.timestamp).toLocaleTimeString()}</span>
+          <span className="text-xs font-mono font-medium text-foreground">{entry.step}</span>
+          <span className="text-xs text-muted-foreground">{new Date(entry.timestamp).toLocaleTimeString()}</span>
         </div>
         {entry.message && (
-          <span className={cn('text-[11px] leading-snug', style.icon)}>{entry.message}</span>
+          <span className={cn('text-xs leading-snug', style.icon)}>{entry.message}</span>
         )}
       </div>
     </li>

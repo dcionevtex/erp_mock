@@ -350,7 +350,7 @@ export default function MarketplacePage() {
         <div className="flex flex-col items-center justify-center min-w-0">
           {account ? (
             <>
-              <span className="text-[10px] text-white/25 uppercase tracking-widest">Fulfillment URL</span>
+              <span className="text-xs text-white/25 uppercase tracking-widest">Fulfillment URL</span>
               <div className="flex items-center gap-2 mt-0.5">
                 <span className="text-xs font-mono text-white/50 break-all text-center">{baseUrl}</span>
                 <button
@@ -404,7 +404,7 @@ export default function MarketplacePage() {
                 onClick={() => setActiveTab(val)}
                 className={[
                   'flex-1 py-3 text-xs font-medium transition-colors',
-                  activeTab === val ? 'text-white/80 border-b-2 border-pink-500' : 'text-white/30 hover:text-white/50',
+                  activeTab === val ? 'text-white/80 border-b-2 border-[#F71963]' : 'text-white/30 hover:text-white/50',
                 ].join(' ')}
               >
                 {label}
@@ -418,7 +418,13 @@ export default function MarketplacePage() {
 
                 {/* Account config */}
                 <div className="space-y-2">
-                  <p className="text-[10px] uppercase tracking-widest text-white/25">VTEX Account</p>
+                  {!account && (
+                    <div className="rounded-lg px-3 py-2 mb-1 flex items-center gap-2" style={{ background: 'rgba(247,25,99,0.06)', border: '1px solid rgba(247,25,99,0.25)' }}>
+                      <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 16 16" fill="#F71963"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm.75 3.5v4a.75.75 0 0 1-1.5 0v-4a.75.75 0 0 1 1.5 0zm0 6.5a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0z"/></svg>
+                      <span className="text-xs font-semibold" style={{ color: '#F71963' }}>Start here — enter your account name</span>
+                    </div>
+                  )}
+                  <p className="text-xs uppercase tracking-widest text-white/25">VTEX Account</p>
                   <div className="flex gap-2">
                     <input
                       type="text"
@@ -435,7 +441,7 @@ export default function MarketplacePage() {
                       className="px-3 py-2 rounded-lg text-xs font-semibold transition-all disabled:opacity-30"
                       style={{ background: 'rgba(247,25,99,0.15)', border: '1px solid rgba(247,25,99,0.3)', color: '#F71963' }}
                     >
-                      Set
+                      Connect
                     </button>
                   </div>
                   {account && (
@@ -443,7 +449,7 @@ export default function MarketplacePage() {
                       className="rounded-lg px-3 py-2 space-y-1"
                       style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
                     >
-                      <p className="text-[10px] text-white/25">Fulfillment URL to register in VTEX</p>
+                      <p className="text-xs text-white/25">Fulfillment URL to register in VTEX</p>
                       <p className="text-xs font-mono break-all" style={{ color: 'rgba(255,255,255,0.6)' }}>{baseUrl}</p>
                       <button
                         onClick={copyUrl}
@@ -492,7 +498,7 @@ export default function MarketplacePage() {
                     </a>
                   </div>
 
-                  <p className="text-[10px] uppercase tracking-widest text-white/25">Simulation Scenario</p>
+                  <p className="text-xs uppercase tracking-widest text-white/25">Simulation Scenario</p>
                   <div className="space-y-1.5">
                     {SCENARIOS.map(s => (
                       <button
@@ -514,7 +520,7 @@ export default function MarketplacePage() {
                           <div className="flex items-center gap-2">
                             <p className={`text-xs font-semibold ${s.color}`}>{s.label}</p>
                             {s.comingSoon && (
-                              <span className="text-[9px] uppercase tracking-widest px-1.5 py-0.5 rounded border border-white/10 text-white/30">Coming Soon</span>
+                              <span className="text-xs uppercase tracking-widest px-1.5 py-0.5 rounded border border-white/10 text-white/30">Coming Soon</span>
                             )}
                           </div>
                           <p className="text-xs text-white/30 mt-0.5 leading-relaxed">{s.description}</p>
@@ -526,7 +532,7 @@ export default function MarketplacePage() {
 
                 {/* Endpoint reference */}
                 <div className="space-y-2">
-                  <p className="text-[10px] uppercase tracking-widest text-white/25">Endpoints</p>
+                  <p className="text-xs uppercase tracking-widest text-white/25">Endpoints</p>
                   <div className="space-y-1">
                     {Object.entries(ENDPOINT_DOCS).map(([key, doc]) => (
                       <div
@@ -535,10 +541,10 @@ export default function MarketplacePage() {
                         style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}
                       >
                         <div className="flex items-center gap-2">
-                          <span className={`text-[10px] font-bold font-mono ${ENDPOINT_COLORS[key]}`}>{doc.method}</span>
-                          <span className="text-[10px] font-mono text-white/40 truncate">{doc.pathTemplate}</span>
+                          <span className={`text-xs font-bold font-mono ${ENDPOINT_COLORS[key]}`}>{doc.method}</span>
+                          <span className="text-xs font-mono text-white/40 truncate">{doc.pathTemplate}</span>
                         </div>
-                        <p className="text-[10px] text-white/25 mt-0.5">{doc.label}</p>
+                        <p className="text-xs text-white/25 mt-0.5">{doc.label}</p>
                       </div>
                     ))}
                   </div>
@@ -591,7 +597,7 @@ export default function MarketplacePage() {
                 ].map(step => (
                   <div key={step.n} className="flex gap-3">
                     <span
-                      className="shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold mt-0.5"
+                      className="shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold mt-0.5"
                       style={{ background: 'rgba(247,25,99,0.15)', color: '#F71963' }}
                     >
                       {step.n}
@@ -626,7 +632,7 @@ export default function MarketplacePage() {
                 ))}
 
                 <div className="pt-2 border-t border-white/08 space-y-1.5">
-                  <p className="text-[10px] uppercase tracking-widest text-white/25">Reference</p>
+                  <p className="text-xs uppercase tracking-widest text-white/25">Reference</p>
                   {[
                     { label: 'External Seller Fulfillment API', url: 'https://developers.vtex.com/docs/api-reference/marketplace-protocol-external-seller-fulfillment' },
                     { label: 'Marketplace Protocol overview', url: 'https://developers.vtex.com/docs/guides/external-seller-integration-guide' },
@@ -653,8 +659,8 @@ export default function MarketplacePage() {
 
                 {/* Credentials */}
                 <div className="space-y-2">
-                  <p className="text-[10px] uppercase tracking-widest text-white/25">Credentials</p>
-                  <p className="text-[11px] text-white/30 leading-relaxed">
+                  <p className="text-xs uppercase tracking-widest text-white/25">Credentials</p>
+                  <p className="text-xs text-white/30 leading-relaxed">
                     Stored locally. Forwarded to VTEX — never persisted on our server.
                   </p>
                   {[
@@ -664,7 +670,7 @@ export default function MarketplacePage() {
                     { key: 'appToken', label: 'App Token', placeholder: '••••••••', type: 'password' },
                   ].map(field => (
                     <div key={field.key} className="space-y-1">
-                      <label className="text-[10px] text-white/35">{field.label}</label>
+                      <label className="text-xs text-white/35">{field.label}</label>
                       <input
                         type={field.type}
                         value={suggestCreds[field.key as keyof typeof suggestCreds]}
@@ -679,7 +685,7 @@ export default function MarketplacePage() {
 
                 {/* SKU data */}
                 <div className="space-y-2">
-                  <p className="text-[10px] uppercase tracking-widest text-white/25">SKU data</p>
+                  <p className="text-xs uppercase tracking-widest text-white/25">SKU data</p>
                   {[
                     { key: 'sellerSkuId', label: 'Seller SKU ID *', placeholder: 'SKU-001' },
                     { key: 'productName', label: 'Product Name *', placeholder: 'My Product' },
@@ -694,7 +700,7 @@ export default function MarketplacePage() {
                     { key: 'currency', label: 'Currency code', placeholder: 'USD' },
                   ].map(field => (
                     <div key={field.key} className="space-y-1">
-                      <label className="text-[10px] text-white/35">{field.label}</label>
+                      <label className="text-xs text-white/35">{field.label}</label>
                       <input
                         type="text"
                         value={suggestForm[field.key as keyof typeof suggestForm]}
@@ -708,7 +714,7 @@ export default function MarketplacePage() {
 
                   {/* Dimensions row */}
                   <div>
-                    <label className="text-[10px] text-white/35 block mb-1">Dimensions (cm / kg)</label>
+                    <label className="text-xs text-white/35 block mb-1">Dimensions (cm / kg)</label>
                     <div className="grid grid-cols-4 gap-1.5">
                       {[
                         { key: 'height', placeholder: 'H' },
@@ -741,7 +747,7 @@ export default function MarketplacePage() {
                 </button>
 
                 {!account && (
-                  <p className="text-[11px] text-white/30 text-center">Set the marketplace account in the Scenario tab first.</p>
+                  <p className="text-xs text-white/30 text-center">Set the marketplace account in the Scenario tab first.</p>
                 )}
 
                 {/* Step-by-step result */}
@@ -757,10 +763,10 @@ export default function MarketplacePage() {
                         }}
                       >
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] text-white/30 font-medium">Step {i + 1}</span>
-                          <span className="text-[10px] text-white/50">{step.label}</span>
+                          <span className="text-xs text-white/30 font-medium">Step {i + 1}</span>
+                          <span className="text-xs text-white/50">{step.label}</span>
                           <span
-                            className="ml-auto text-[10px] font-bold font-mono px-1.5 py-0.5 rounded"
+                            className="ml-auto text-xs font-bold font-mono px-1.5 py-0.5 rounded"
                             style={{
                               color: step.ok ? '#34d399' : step.vtexStatus === 404 ? '#fbbf24' : '#f87171',
                               background: 'rgba(255,255,255,0.05)',
@@ -773,12 +779,12 @@ export default function MarketplacePage() {
                           {step.message}
                         </p>
                         {step.data != null && (
-                          <pre className="text-[10px] font-mono text-white/40 overflow-auto max-h-28 whitespace-pre-wrap break-all">
+                          <pre className="text-xs font-mono text-white/40 overflow-auto max-h-28 whitespace-pre-wrap break-all">
                             {typeof step.data === 'string' ? step.data : JSON.stringify(step.data, null, 2)}
                           </pre>
                         )}
                         {!step.ok && step.sentUrl && (
-                          <p className="text-[10px] font-mono text-white/30 break-all">{step.sentUrl}</p>
+                          <p className="text-xs font-mono text-white/30 break-all">{step.sentUrl}</p>
                         )}
                       </div>
                     ))}
@@ -796,7 +802,7 @@ export default function MarketplacePage() {
                       href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 text-[11px] transition-opacity hover:opacity-80"
+                      className="flex items-center gap-1.5 text-xs transition-opacity hover:opacity-80"
                       style={{ color: 'rgba(255,255,255,0.25)' }}
                     >
                       <svg className="w-3 h-3 shrink-0" viewBox="0 0 16 16" fill="currentColor"><path d="M3.75 2h3.5a.75.75 0 0 1 0 1.5h-3.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-3.5a.75.75 0 0 1 1.5 0v3.5A1.75 1.75 0 0 1 12.25 14h-8.5A1.75 1.75 0 0 1 2 12.25v-8.5C2 2.784 2.784 2 3.75 2zm6.854-1h4.146a.25.25 0 0 1 .25.25v4.146a.25.25 0 0 1-.427.177L13.03 4.03 9.28 7.78a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042l3.75-3.75-1.543-1.543A.25.25 0 0 1 10.604 1z" /></svg>
@@ -820,10 +826,10 @@ export default function MarketplacePage() {
                 return (
                   <div key={key} className="flex items-center gap-2">
                     <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
-                      <span className={`text-[10px] font-bold font-mono ${ENDPOINT_COLORS[key]}`}>{doc.method}</span>
-                      <span className="text-[10px] text-white/40">{doc.label}</span>
+                      <span className={`text-xs font-bold font-mono ${ENDPOINT_COLORS[key]}`}>{doc.method}</span>
+                      <span className="text-xs text-white/40">{doc.label}</span>
                       {count > 0 && (
-                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${ENDPOINT_COLORS[key]}`} style={{ background: 'rgba(255,255,255,0.06)' }}>
+                        <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${ENDPOINT_COLORS[key]}`} style={{ background: 'rgba(255,255,255,0.06)' }}>
                           {count}
                         </span>
                       )}
@@ -863,7 +869,7 @@ export default function MarketplacePage() {
                         className="w-full flex items-center gap-3 px-5 py-3 text-left transition-colors hover:bg-white/[0.02]"
                       >
                         {/* Method badge */}
-                        <span className={`shrink-0 text-[10px] font-bold font-mono px-1.5 py-0.5 rounded border ${METHOD_COLORS[call.method] ?? 'bg-white/10 text-white/40 border-white/10'}`}>
+                        <span className={`shrink-0 text-xs font-bold font-mono px-1.5 py-0.5 rounded border ${METHOD_COLORS[call.method] ?? 'bg-white/10 text-white/40 border-white/10'}`}>
                           {call.method}
                         </span>
 
@@ -875,7 +881,7 @@ export default function MarketplacePage() {
                             </span>
                             <span className="text-xs text-white/25 font-mono truncate hidden sm:block">{call.path}</span>
                           </div>
-                          <p className="text-[10px] text-white/25 mt-0.5">
+                          <p className="text-xs text-white/25 mt-0.5">
                             {new Date(call.timestamp).toLocaleTimeString()}
                             {call.orderId && <> · <span className="font-mono">{call.orderId}</span></>}
                           </p>
@@ -883,10 +889,10 @@ export default function MarketplacePage() {
 
                         {/* Status + duration */}
                         <div className="flex items-center gap-2 shrink-0">
-                          <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${call.httpStatus < 300 ? 'bg-emerald-500/15 text-emerald-400' : 'bg-red-500/15 text-red-400'}`}>
+                          <span className={`text-xs font-bold px-1.5 py-0.5 rounded ${call.httpStatus < 300 ? 'bg-emerald-500/15 text-emerald-400' : 'bg-red-500/15 text-red-400'}`}>
                             {call.httpStatus}
                           </span>
-                          <span className="text-[10px] text-white/20">{call.durationMs}ms</span>
+                          <span className="text-xs text-white/20">{call.durationMs}ms</span>
                           <svg
                             className={`w-3.5 h-3.5 text-white/20 transition-transform ${expanded ? 'rotate-180' : ''}`}
                             viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
@@ -919,7 +925,7 @@ export default function MarketplacePage() {
                           {/* Request */}
                           {call.requestBody != null && (
                             <div className="space-y-1.5">
-                              <p className="text-[10px] uppercase tracking-widest text-white/25">Request body</p>
+                              <p className="text-xs uppercase tracking-widest text-white/25">Request body</p>
                               <div className="rounded-lg p-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
                                 <JsonBlock data={call.requestBody} />
                               </div>
@@ -928,7 +934,7 @@ export default function MarketplacePage() {
 
                           {/* Response */}
                           <div className="space-y-1.5">
-                            <p className="text-[10px] uppercase tracking-widest text-white/25">Response body</p>
+                            <p className="text-xs uppercase tracking-widest text-white/25">Response body</p>
                             <div className="rounded-lg p-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
                               <JsonBlock data={call.responseBody} />
                             </div>
