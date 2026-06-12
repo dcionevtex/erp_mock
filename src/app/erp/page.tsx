@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { OrderRow } from '@/components/OrderRow';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { Footer } from '@/components/Footer';
 import { InlineSetup } from '@/components/InlineSetup';
 import { AppShell } from '@/components/AppShell';
@@ -437,11 +438,11 @@ export default function DashboardPage() {
 
             {/* Orders table */}
             {orders.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 text-muted-foreground text-sm gap-2">
-                <span className="text-3xl">📭</span>
-                <p>No orders received yet.</p>
-                <p className="text-xs">
-                  Send a POST to the Hook URL above, or click &quot;Poll Feed Now&quot; to fetch from VTEX Feed.
+              <div className="flex flex-col items-center justify-center py-16 text-muted-foreground gap-3">
+                <span className="text-4xl">📭</span>
+                <p className="text-base font-medium text-foreground">No orders received yet</p>
+                <p className="text-sm text-center max-w-sm leading-relaxed">
+                  Send a POST to the Hook URL above, or click <strong>Poll Feed Now</strong> to pull from VTEX Feed.
                 </p>
               </div>
             ) : (
@@ -484,16 +485,17 @@ export default function DashboardPage() {
                   </thead>
                   <tbody>
                     {pagedOrders.map((order) => (
-                      <OrderRow
-                        key={order.id}
-                        order={order}
-                        onAction={handleAction}
-                        configAccount={config?.account ?? undefined}
-                        credsConfigured={config !== null && (config.appTokenConfigured ?? false)}
-                        selected={selectedIds.has(order.id)}
-                        onSelect={toggleSelectId}
-                        visibleCols={visibleCols}
-                      />
+                      <ErrorBoundary key={order.id}>
+                        <OrderRow
+                          order={order}
+                          onAction={handleAction}
+                          configAccount={config?.account ?? undefined}
+                          credsConfigured={config !== null && (config.appTokenConfigured ?? false)}
+                          selected={selectedIds.has(order.id)}
+                          onSelect={toggleSelectId}
+                          visibleCols={visibleCols}
+                        />
+                      </ErrorBoundary>
                     ))}
                   </tbody>
                 </table>
