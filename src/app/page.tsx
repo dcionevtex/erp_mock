@@ -665,6 +665,85 @@ export default function LauncherPage() {
                 </svg>
               </a>
 
+              {/* VTEX Developer MCP */}
+              <a
+                href="https://developers.vtex.com/docs/guides/vtex-developer-mcp"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-start gap-4 rounded-xl border p-5 transition-all"
+                style={{ border: '1px solid rgba(247,25,99,0.15)', background: 'rgba(247,25,99,0.04)' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(247,25,99,0.08)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(247,25,99,0.3)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(247,25,99,0.04)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(247,25,99,0.15)'; }}
+              >
+                <div
+                  className="shrink-0 w-12 h-12 rounded-lg flex items-center justify-center"
+                  style={{ background: 'rgba(247,25,99,0.1)' }}
+                >
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'rgba(247,25,99,0.7)' }}>
+                    <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
+                    <path d="M11 8v6M8 11h6" />
+                  </svg>
+                </div>
+                <div className="flex-1 min-w-0 space-y-1.5">
+                  <div className="flex items-center gap-2.5 flex-wrap">
+                    <span className="text-sm font-semibold text-white/90">VTEX Developer MCP</span>
+                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded" style={{ background: 'rgba(247,25,99,0.12)', color: '#F71963' }}>MCP</span>
+                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded" style={{ background: 'rgba(251,191,36,0.1)', color: '#fbbf24' }}>Suggested</span>
+                  </div>
+                  <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                    Official VTEX MCP server. Connects Claude to 3,000+ VTEX Help Center and Developer Portal articles plus the full API Reference at runtime — search docs, fetch full guides, and pull endpoint specs without leaving your session.
+                  </p>
+                  <div className="flex items-center gap-1.5 pt-0.5">
+                    <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'rgba(255,255,255,0.25)' }}>
+                      <rect x="1" y="1" width="14" height="14" rx="2" /><path d="M4 5h8M4 8h6M4 11h4" />
+                    </svg>
+                    <span className="font-mono text-[11px]" style={{ color: 'rgba(255,255,255,0.25)' }}>npx -y @vtex/developer-mcp</span>
+                  </div>
+                </div>
+                <svg className="w-4 h-4 shrink-0 mt-0.5 transition-colors text-white/20 group-hover:text-white/50" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 10h10M10 5l5 5-5 5" />
+                </svg>
+              </a>
+
+              {/* VTEX Skills */}
+              <a
+                href="https://developers.vtex.com/docs/guides/vtex-skills"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-start gap-4 rounded-xl border p-5 transition-all"
+                style={{ border: '1px solid rgba(247,25,99,0.15)', background: 'rgba(247,25,99,0.04)' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(247,25,99,0.08)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(247,25,99,0.3)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(247,25,99,0.04)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(247,25,99,0.15)'; }}
+              >
+                <div
+                  className="shrink-0 w-12 h-12 rounded-lg flex items-center justify-center"
+                  style={{ background: 'rgba(247,25,99,0.1)' }}
+                >
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'rgba(247,25,99,0.7)' }}>
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                  </svg>
+                </div>
+                <div className="flex-1 min-w-0 space-y-1.5">
+                  <div className="flex items-center gap-2.5 flex-wrap">
+                    <span className="text-sm font-semibold text-white/90">VTEX Skills</span>
+                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded" style={{ background: 'rgba(247,25,99,0.12)', color: '#F71963' }}>Skill</span>
+                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded" style={{ background: 'rgba(251,191,36,0.1)', color: '#fbbf24' }}>Suggested</span>
+                  </div>
+                  <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                    Official VTEX skill catalog. Loads persistent platform context into Claude before a task starts — covers FastStore, VTEX IO, Marketplace, Payment Provider Protocol, Headless frontend, Commerce architecture, and Sales App tracks.
+                  </p>
+                  <div className="flex items-center gap-1.5 pt-0.5">
+                    <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'rgba(255,255,255,0.25)' }}>
+                      <rect x="1" y="1" width="14" height="14" rx="2" /><path d="M4 5h8M4 8h6M4 11h4" />
+                    </svg>
+                    <span className="font-mono text-[11px]" style={{ color: 'rgba(255,255,255,0.25)' }}>npx skills add vtex/skills</span>
+                  </div>
+                </div>
+                <svg className="w-4 h-4 shrink-0 mt-0.5 transition-colors text-white/20 group-hover:text-white/50" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 10h10M10 5l5 5-5 5" />
+                </svg>
+              </a>
+
               {/* NotebookLM MCP */}
               <a
                 href="https://mcp.directory/servers/notebooklm"
