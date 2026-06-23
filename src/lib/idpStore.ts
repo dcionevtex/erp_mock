@@ -86,25 +86,28 @@ export function consumeCode(account: string, code: string): IdpCode | null {
 }
 
 // ── Tokens ───────────────────────────────────────────────────────────────────
+// Tokens are stateless: user info is encoded inside the token value itself.
+// This survives Vercel cold starts — no memory lookup needed.
 
-export function issueToken(account: string, data: IdpToken): string {
-  const map = tokensMap();
-  if (!map.has(account)) map.set(account, new Map());
-  const token = randomUUID().replace(/-/g, '');
-  map.get(account)!.set(token, data);
-  return token;
+export function issueToken(_account: string, data: IdpToken): string {
+  const payload = {
+    email: data.email,
+    name: data.name,
+    userId: data.userId,
+    exp: data.createdAt + 60 * 60 * 1000,
+  };
+  return Buffer.from(JSON.stringify(payload)).toString('base64url');
 }
 
-export function lookupToken(account: string, token: string): IdpToken | null {
-  const accountTokens = tokensMap().get(account);
-  if (!accountTokens) return null;
-  const entry = accountTokens.get(token);
-  if (!entry) return null;
-  if (Date.now() - entry.createdAt > 60 * 60 * 1000) {
-    accountTokens.delete(token);
+export function lookupToken(_account: string, token: string): IdpToken | null {
+  try {
+    const raw = Buffer.from(token, 'base64url').toString('utf8');
+    const payload = JSON.parse(raw) as { email: string; name: string; userId: string; exp: number };
+    if (Date.now() > payload.exp) return null;
+    return { email: payload.email, name: payload.name, userId: payload.userId, createdAt: payload.exp - 60 * 60 * 1000 };
+  } catch {
     return null;
   }
-  return entry;
 }
 
 // ── Call log ─────────────────────────────────────────────────────────────────
