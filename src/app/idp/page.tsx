@@ -432,15 +432,17 @@ export default function IdpPage() {
                   </p>
                 </div>
 
-                {[
-                  { n: 1, title: 'Set your account', body: 'Enter your VTEX account name in the Config tab. This generates unique endpoint URLs and credentials for your account.' },
+                {([
+                  { n: 1, title: 'Set your account', body: 'Enter your VTEX account name in the Config tab. This generates stable endpoint URLs and credentials for your account.' },
                   { n: 2, title: 'Open VTEX Admin', body: 'Go to Admin → Store Settings → People → Authentication (or Account Settings → Authentication, depending on your version).', link: { label: 'VTEX OAuth2 guide', url: 'https://developers.vtex.com/docs/guides/login-integration-guide-webstore-oauth2' } },
-                  { n: 3, title: 'Add a new OAuth2 provider', body: 'Click "Add new" under OAuth2 providers. Set a name like "Demo IDP".' },
-                  { n: 4, title: 'Paste the endpoint URLs', body: 'Fill in Authorization URL, Token URL, and User Info URL from the Config tab. Set the Client ID and Client Secret.' },
-                  { n: 5, title: 'Configure field names', body: 'Set User ID field to "userId", Email field to "email", and Name field to "name". These match exactly what our userinfo endpoint returns.' },
-                  { n: 6, title: 'Save and test', body: 'Save the configuration. Open your VTEX storefront login, select the new provider, and you should be redirected to our mock IDP login page.' },
-                  { n: 7, title: 'Pick a test user and log in', body: 'Click any test user on the login page or enter the email/password manually. The call log on the right will show each step of the OAuth2 handshake as VTEX calls our endpoints.' },
-                ].map(step => (
+                  { n: 3, title: 'Add a new OAuth2 provider', body: 'Click "Add new" under OAuth2 providers. Give it any name (e.g. "Demo IDP"). Paste the Client ID and Client Secret from the Config tab.' },
+                  { n: 4, title: 'Step 2 — Authorization Code', body: 'Paste the Authorization URL. VTEX pre-fills client_id, state, and redirect_uri automatically. No changes needed — click Next.' },
+                  { n: 5, title: 'Step 3 — Token exchange', body: 'Paste the Token URL. Select application/x-www-form-urlencoded. Response keys: access_token and expires_in. Click Next.' },
+                  { n: 6, title: 'Step 4 — User Info', body: 'Paste the User Info URL. Leave the access token toggle OFF (Bearer header). Set the response field keys exactly as below — capitalization matters.' },
+                  { n: 7, title: 'User Info field mapping', body: '', fields: [['User email', 'email'], ['User ID', 'userId'], ['Username', 'name']] },
+                  { n: 8, title: 'No Master Data profile needed', body: 'VTEX creates the shopper session on the fly. The email does not need to exist as a customer profile in Master Data before logging in.' },
+                  { n: 9, title: 'Test it', body: 'Open your storefront login, select the provider, and type any email. The call log on the right shows every OAuth2 step in real time.' },
+                ] as Array<{ n: number; title: string; body: string; link?: { label: string; url: string }; fields?: string[][] }>).map(step => (
                   <div key={step.n} className="flex gap-3">
                     <span
                       className="shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold mt-0.5"
@@ -448,9 +450,19 @@ export default function IdpPage() {
                     >
                       {step.n}
                     </span>
-                    <div>
+                    <div className="flex-1 min-w-0">
                       <p className="text-xs font-medium text-white/70">{step.title}</p>
-                      <p className="text-xs text-white/35 mt-0.5 leading-relaxed">{step.body}</p>
+                      {step.body && <p className="text-xs text-white/35 mt-0.5 leading-relaxed">{step.body}</p>}
+                      {step.fields && (
+                        <div className="mt-1.5 space-y-1">
+                          {step.fields.map(([label, key]) => (
+                            <div key={key} className="flex items-center gap-2 text-xs">
+                              <span className="text-white/30 w-24 shrink-0">{label}</span>
+                              <span className="font-mono px-1.5 py-0.5 rounded text-emerald-400" style={{ background: 'rgba(52,211,153,0.08)' }}>{key}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                       {step.link && (
                         <a
                           href={step.link.url}

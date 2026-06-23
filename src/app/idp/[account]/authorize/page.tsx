@@ -141,7 +141,7 @@ export default function AuthorizePage() {
               required
               value={email}
               onChange={e => setEmail(e.target.value)}
-              placeholder="user@example.com"
+              placeholder="john.doe@testemail.com"
               className="w-full text-sm rounded-xl px-4 py-3 outline-none focus:ring-2"
               style={{
                 background: 'rgba(255,255,255,0.05)',
