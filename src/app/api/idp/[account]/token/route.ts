@@ -10,9 +10,9 @@ export async function POST(
   const { account } = await params;
   const start = Date.now();
 
-  // Accept both JSON and application/x-www-form-urlencoded (VTEX sends form-encoded)
-  let clientId: string, clientSecret: string, code: string, grantType: string;
+  let clientId = '', clientSecret = '', code = '', grantType = '';
   const contentType = req.headers.get('content-type') ?? '';
+
   try {
     if (contentType.includes('application/json')) {
       const body = await req.json() as Record<string, string>;
@@ -27,11 +27,31 @@ export async function POST(
       code = (form.get('code') as string | null) ?? '';
       grantType = (form.get('grant_type') as string | null) ?? '';
     }
-  } catch {
-    return NextResponse.json({ error: 'invalid_request', error_description: 'Could not parse request' }, { status: 400 });
+  } catch (e) {
+    appendIdpCall(account, {
+      endpoint: 'token',
+      method: 'POST',
+      account,
+      success: false,
+      statusCode: 400,
+      details: `Body parse error (content-type: ${contentType}): ${String(e)}`,
+    });
+    return NextResponse.json({ error: 'invalid_request', error_description: 'Could not parse request body' }, { status: 400 });
   }
 
-  if (grantType !== 'authorization_code') {
+  // Log every token attempt immediately — so we can see what VTEX sends even on failure
+  const received = `grant_type=${grantType || '(empty)'} client_id=${clientId || '(empty)'} code=${code ? code.slice(0, 8) + '…' : '(empty)'}`;
+
+  // grant_type is optional — we're a mock, accept anything or nothing
+  if (grantType && grantType !== 'authorization_code') {
+    appendIdpCall(account, {
+      endpoint: 'token',
+      method: 'POST',
+      account,
+      success: false,
+      statusCode: 400,
+      details: `Unsupported grant_type: ${grantType}. Received: ${received}`,
+    });
     return NextResponse.json({ error: 'unsupported_grant_type' }, { status: 400 });
   }
 
@@ -44,7 +64,7 @@ export async function POST(
       account,
       success: false,
       statusCode: 401,
-      details: 'Invalid client credentials',
+      details: `Invalid credentials. Received clientId="${clientId}". Expected "${config.clientId}". ${received}`,
     });
     return NextResponse.json({ error: 'invalid_client', error_description: 'Invalid client_id or client_secret' }, { status: 401 });
   }
@@ -57,7 +77,7 @@ export async function POST(
       account,
       success: false,
       statusCode: 400,
-      details: 'Invalid or expired code',
+      details: `Invalid or expired code: ${code ? code.slice(0, 8) + '…' : '(empty)'}. ${received}`,
     });
     return NextResponse.json({ error: 'invalid_grant', error_description: 'Code is invalid or expired' }, { status: 400 });
   }
