@@ -52,8 +52,10 @@ export async function GET(
   });
 
   return NextResponse.json({
+    sub: tokenEntry.userId,
     userId: tokenEntry.userId,
     email: tokenEntry.email,
+    email_verified: true,
     name: tokenEntry.name,
   });
 }
