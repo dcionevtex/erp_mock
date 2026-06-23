@@ -14,7 +14,6 @@ export default function AuthorizePage() {
 
   const [config, setConfig] = useState<IdpConfig | null>(null);
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -24,10 +23,8 @@ export default function AuthorizePage() {
       .catch(() => null);
   }, [account]);
 
-  function quickLogin(userEmail: string, userPassword: string) {
+  function quickLogin(userEmail: string) {
     setEmail(userEmail);
-    setPassword(userPassword);
-    // Submit the form after state update
     setTimeout(() => {
       const form = document.getElementById('idp-form') as HTMLFormElement | null;
       form?.submit();
@@ -57,7 +54,7 @@ export default function AuthorizePage() {
             <svg className="w-3 h-3" viewBox="0 0 16 16" fill="currentColor">
               <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm.75 3.5v4a.75.75 0 0 1-1.5 0v-4a.75.75 0 0 1 1.5 0zm0 6.5a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0z" />
             </svg>
-            Mock IDP — demo only
+            Any email works — no password needed
           </div>
         </div>
 
@@ -82,7 +79,7 @@ export default function AuthorizePage() {
                 <button
                   key={user.email}
                   type="button"
-                  onClick={() => quickLogin(user.email, user.password)}
+                  onClick={() => quickLogin(user.email)}
                   className="w-full flex items-center gap-3 rounded-xl px-4 py-3 text-left transition-all"
                   style={{
                     background: 'rgba(255,255,255,0.04)',
@@ -119,7 +116,7 @@ export default function AuthorizePage() {
         {/* Divider */}
         <div className="flex items-center gap-3">
           <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.08)' }} />
-          <span className="text-[10px] text-white/25">or enter manually</span>
+          <span className="text-[10px] text-white/25">or type any email</span>
           <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.08)' }} />
         </div>
 
@@ -154,26 +151,6 @@ export default function AuthorizePage() {
             />
           </div>
 
-          <div className="space-y-1">
-            <label className="text-[10px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.35)' }}>
-              Password
-            </label>
-            <input
-              type="password"
-              name="password"
-              required
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full text-sm rounded-xl px-4 py-3 outline-none focus:ring-2"
-              style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                color: 'rgba(255,255,255,0.8)',
-              }}
-            />
-          </div>
-
           <button
             type="submit"
             disabled={submitting}
@@ -185,8 +162,8 @@ export default function AuthorizePage() {
         </form>
 
         <p className="text-center text-[10px]" style={{ color: 'rgba(255,255,255,0.2)' }}>
-          This is a simulated identity provider for VTEX demos.
-          <br />No real credentials are verified.
+          Simulated identity provider for VTEX demos.
+          <br />Any email is accepted — no password required.
         </p>
       </div>
     </div>

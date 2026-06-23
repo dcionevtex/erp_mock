@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getIdpConfig, issueCode, appendIdpCall } from '@/lib/idpStore';
+import { issueCode, appendIdpCall } from '@/lib/idpStore';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,42 +10,31 @@ export async function POST(
   const { account } = await params;
   const start = Date.now();
 
-  let email: string, password: string, state: string, redirectUri: string;
+  let email: string, state: string, redirectUri: string;
   try {
     const form = await req.formData();
-    email = (form.get('email') as string | null) ?? '';
-    password = (form.get('password') as string | null) ?? '';
+    email = ((form.get('email') as string | null) ?? '').trim();
     state = (form.get('state') as string | null) ?? '';
     redirectUri = (form.get('redirect_uri') as string | null) ?? '';
   } catch {
     return NextResponse.json({ error: 'Invalid form data' }, { status: 400 });
   }
 
-  const config = getIdpConfig(account);
-  const user = config.users.find(u => u.email === email && u.password === password);
-
-  if (!user) {
-    appendIdpCall(account, {
-      endpoint: 'authorize',
-      method: 'POST',
-      account,
-      email,
-      success: false,
-      statusCode: 401,
-      details: 'Invalid credentials',
-    });
-    // Redirect back to login page with error
+  if (!email) {
     const loginUrl = new URL(`/idp/${account}/authorize`, req.url);
     loginUrl.searchParams.set('state', state);
     loginUrl.searchParams.set('redirect_uri', redirectUri);
-    loginUrl.searchParams.set('error', 'Invalid email or password');
+    loginUrl.searchParams.set('error', 'Email is required');
     return NextResponse.redirect(loginUrl, { status: 302 });
   }
 
+  // Any email accepted — derive a display name from the local part
+  const name = email.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+
   const code = issueCode(account, {
-    email: user.email,
-    name: user.name,
-    userId: user.email, // use email as userId for simplicity
+    email,
+    name,
+    userId: email,
     state,
     redirectUri,
     createdAt: Date.now(),
@@ -55,10 +44,10 @@ export async function POST(
     endpoint: 'authorize',
     method: 'POST',
     account,
-    email: user.email,
+    email,
     success: true,
     statusCode: 302,
-    details: `Code issued for ${user.name} (${Math.round(Date.now() - start)}ms)`,
+    details: `Code issued for ${name} (${Math.round(Date.now() - start)}ms)`,
   });
 
   const callback = new URL(redirectUri);
