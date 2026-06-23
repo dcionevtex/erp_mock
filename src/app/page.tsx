@@ -360,7 +360,7 @@ export default function LauncherPage() {
 
       {/* Content */}
       <main className="flex-1 flex flex-col items-center px-6 py-16">
-        <div className="w-full max-w-2xl space-y-14">
+        <div className="w-full max-w-3xl space-y-10">
 
           {/* Platform Status */}
           <StatusCarousel />
@@ -374,42 +374,40 @@ export default function LauncherPage() {
               </p>
             </div>
 
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {TOOLS.map((tool) => {
                 const card = (
                   <div
                     className={[
-                      'group rounded-xl border p-5 transition-all duration-150',
+                      'group h-full rounded-xl border p-4 transition-all duration-150 flex flex-col',
                       tool.disabled
                         ? 'border-white/5 opacity-50 cursor-not-allowed'
                         : 'border-white/10 hover:border-white/20 hover:bg-white/[0.03] cursor-pointer',
                     ].join(' ')}
                   >
-                    <div className="flex items-start gap-4">
+                    <div className="flex items-start justify-between mb-3">
                       <div
-                        className="shrink-0 w-12 h-12 rounded-lg flex items-center justify-center text-white/50"
+                        className="w-10 h-10 rounded-lg flex items-center justify-center [&>svg]:w-5 [&>svg]:h-5 text-white/50"
                         style={{ background: 'rgba(247,25,99,0.08)' }}
                       >
                         {tool.icon}
                       </div>
-                      <div className="flex-1 min-w-0 space-y-1.5">
-                        <div className="flex items-center gap-2.5">
-                          <span className="text-sm font-semibold text-white/90">{tool.label}</span>
-                          <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${tool.tagColor}`}>
-                            {tool.tag}
-                          </span>
-                        </div>
-                        <p className="text-xs text-white/40 leading-relaxed">{tool.description}</p>
-                      </div>
-                      {!tool.disabled && (
+                      <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${tool.tagColor}`}>
+                        {tool.tag}
+                      </span>
+                    </div>
+                    <p className="text-sm font-semibold text-white/90 mb-1.5">{tool.label}</p>
+                    <p className="text-xs text-white/40 leading-relaxed line-clamp-3 flex-1">{tool.description}</p>
+                    {!tool.disabled && (
+                      <div className="mt-3 flex justify-end">
                         <svg
-                          className="w-4 h-4 shrink-0 text-white/20 group-hover:text-white/50 transition-colors mt-0.5"
+                          className="w-3.5 h-3.5 text-white/20 group-hover:text-white/50 transition-colors"
                           viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
                         >
                           <path d="M5 10h10M10 5l5 5-5 5" />
                         </svg>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 );
 
@@ -607,41 +605,33 @@ export default function LauncherPage() {
               </div>
             </div>
 
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* VTEX Brand Skill */}
               <a
                 href="https://github.com/dcionevtex/vtex-brand-skill"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex items-start gap-4 rounded-xl border p-5 transition-all"
+                className="group flex flex-col rounded-xl border p-4 transition-all"
                 style={{ border: '1px solid rgba(247,25,99,0.15)', background: 'rgba(247,25,99,0.04)' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(247,25,99,0.08)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(247,25,99,0.3)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(247,25,99,0.04)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(247,25,99,0.15)'; }}
               >
-                <div
-                  className="shrink-0 w-12 h-12 rounded-lg flex items-center justify-center text-lg"
-                  style={{ background: 'rgba(247,25,99,0.1)' }}
-                >
-                  🎨
-                </div>
-                <div className="flex-1 min-w-0 space-y-1.5">
-                  <div className="flex items-center gap-2.5">
-                    <span className="text-sm font-semibold text-white/90">VTEX Brand</span>
-                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded" style={{ background: 'rgba(247,25,99,0.12)', color: '#F71963' }}>Skill</span>
+                <div className="flex items-start justify-between mb-3">
+                  <div className="shrink-0 w-10 h-10 rounded-lg flex items-center justify-center text-base" style={{ background: 'rgba(247,25,99,0.1)' }}>
+                    🎨
                   </div>
-                  <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                    Gives Claude the complete VTEX brand system — Rebel Pink, typography, logo rules, and voice guidelines. Generates branded PowerPoint presentations and Marp slides from a single prompt.
-                  </p>
-                  <div className="flex items-center gap-1.5 pt-0.5">
-                    <svg className="w-3 h-3" viewBox="0 0 16 16" fill="currentColor" style={{ color: 'rgba(255,255,255,0.25)' }}>
-                      <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
-                    </svg>
-                    <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.25)' }}>dcionevtex/vtex-brand-skill</span>
-                  </div>
+                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded" style={{ background: 'rgba(247,25,99,0.12)', color: '#F71963' }}>Skill</span>
                 </div>
-                <svg className="w-4 h-4 shrink-0 mt-0.5 transition-colors text-white/20 group-hover:text-white/50" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M5 10h10M10 5l5 5-5 5" />
-                </svg>
+                <p className="text-sm font-semibold text-white/90 mb-1.5">VTEX Brand</p>
+                <p className="text-xs leading-relaxed line-clamp-3 flex-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                  Gives Claude the complete VTEX brand system — Rebel Pink, typography, logo rules, and voice guidelines. Generates branded PowerPoint presentations and Marp slides from a single prompt.
+                </p>
+                <div className="flex items-center gap-1.5 mt-3">
+                  <svg className="w-3 h-3 shrink-0" viewBox="0 0 16 16" fill="currentColor" style={{ color: 'rgba(255,255,255,0.25)' }}>
+                    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+                  </svg>
+                  <span className="text-[11px] truncate" style={{ color: 'rgba(255,255,255,0.25)' }}>dcionevtex/vtex-brand-skill</span>
+                </div>
               </a>
 
               {/* VTEX Solution Design Document Skill */}
@@ -649,35 +639,27 @@ export default function LauncherPage() {
                 href="https://github.com/dcionevtex/Se-design-document"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex items-start gap-4 rounded-xl border p-5 transition-all"
+                className="group flex flex-col rounded-xl border p-4 transition-all"
                 style={{ border: '1px solid rgba(247,25,99,0.15)', background: 'rgba(247,25,99,0.04)' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(247,25,99,0.08)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(247,25,99,0.3)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(247,25,99,0.04)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(247,25,99,0.15)'; }}
               >
-                <div
-                  className="shrink-0 w-12 h-12 rounded-lg flex items-center justify-center text-lg"
-                  style={{ background: 'rgba(247,25,99,0.1)' }}
-                >
-                  📐
-                </div>
-                <div className="flex-1 min-w-0 space-y-1.5">
-                  <div className="flex items-center gap-2.5">
-                    <span className="text-sm font-semibold text-white/90">Solution Design Document</span>
-                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded" style={{ background: 'rgba(247,25,99,0.12)', color: '#F71963' }}>Skill</span>
+                <div className="flex items-start justify-between mb-3">
+                  <div className="shrink-0 w-10 h-10 rounded-lg flex items-center justify-center text-base" style={{ background: 'rgba(247,25,99,0.1)' }}>
+                    📐
                   </div>
-                  <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                    Complete toolkit for creating VTEX Solution Design Documents (SDDs). Includes the 5-step workflow, discovery gap analysis, 11-section canonical structure, architecture decision register format, and module design rules.
-                  </p>
-                  <div className="flex items-center gap-1.5 pt-0.5">
-                    <svg className="w-3 h-3" viewBox="0 0 16 16" fill="currentColor" style={{ color: 'rgba(255,255,255,0.25)' }}>
-                      <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
-                    </svg>
-                    <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.25)' }}>dcionevtex/Se-design-document</span>
-                  </div>
+                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded" style={{ background: 'rgba(247,25,99,0.12)', color: '#F71963' }}>Skill</span>
                 </div>
-                <svg className="w-4 h-4 shrink-0 mt-0.5 transition-colors text-white/20 group-hover:text-white/50" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M5 10h10M10 5l5 5-5 5" />
-                </svg>
+                <p className="text-sm font-semibold text-white/90 mb-1.5">Solution Design Document</p>
+                <p className="text-xs leading-relaxed line-clamp-3 flex-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                  Complete toolkit for creating VTEX Solution Design Documents (SDDs). Includes the 5-step workflow, discovery gap analysis, 11-section canonical structure, architecture decision register format, and module design rules.
+                </p>
+                <div className="flex items-center gap-1.5 mt-3">
+                  <svg className="w-3 h-3 shrink-0" viewBox="0 0 16 16" fill="currentColor" style={{ color: 'rgba(255,255,255,0.25)' }}>
+                    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+                  </svg>
+                  <span className="text-[11px] truncate" style={{ color: 'rgba(255,255,255,0.25)' }}>dcionevtex/Se-design-document</span>
+                </div>
               </a>
 
               {/* VTEX Developer MCP */}
@@ -685,39 +667,33 @@ export default function LauncherPage() {
                 href="https://developers.vtex.com/docs/guides/vtex-developer-mcp"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex items-start gap-4 rounded-xl border p-5 transition-all"
+                className="group flex flex-col rounded-xl border p-4 transition-all"
                 style={{ border: '1px solid rgba(247,25,99,0.15)', background: 'rgba(247,25,99,0.04)' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(247,25,99,0.08)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(247,25,99,0.3)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(247,25,99,0.04)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(247,25,99,0.15)'; }}
               >
-                <div
-                  className="shrink-0 w-12 h-12 rounded-lg flex items-center justify-center"
-                  style={{ background: 'rgba(247,25,99,0.1)' }}
-                >
-                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'rgba(247,25,99,0.7)' }}>
-                    <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
-                    <path d="M11 8v6M8 11h6" />
-                  </svg>
-                </div>
-                <div className="flex-1 min-w-0 space-y-1.5">
-                  <div className="flex items-center gap-2.5 flex-wrap">
-                    <span className="text-sm font-semibold text-white/90">VTEX Developer MCP</span>
-                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded" style={{ background: 'rgba(247,25,99,0.12)', color: '#F71963' }}>MCP</span>
-                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded" style={{ background: 'rgba(251,191,36,0.1)', color: '#fbbf24' }}>Suggested</span>
-                  </div>
-                  <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                    Official VTEX MCP server. Connects Claude to 3,000+ VTEX Help Center and Developer Portal articles plus the full API Reference at runtime — search docs, fetch full guides, and pull endpoint specs without leaving your session.
-                  </p>
-                  <div className="flex items-center gap-1.5 pt-0.5">
-                    <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'rgba(255,255,255,0.25)' }}>
-                      <rect x="1" y="1" width="14" height="14" rx="2" /><path d="M4 5h8M4 8h6M4 11h4" />
+                <div className="flex items-start justify-between mb-3">
+                  <div className="shrink-0 w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: 'rgba(247,25,99,0.1)' }}>
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'rgba(247,25,99,0.7)' }}>
+                      <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
+                      <path d="M11 8v6M8 11h6" />
                     </svg>
-                    <span className="font-mono text-[11px]" style={{ color: 'rgba(255,255,255,0.25)' }}>npx -y @vtex/developer-mcp</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded" style={{ background: 'rgba(247,25,99,0.12)', color: '#F71963' }}>MCP</span>
+                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded" style={{ background: 'rgba(247,25,99,0.1)', color: '#F71963' }}>Official</span>
                   </div>
                 </div>
-                <svg className="w-4 h-4 shrink-0 mt-0.5 transition-colors text-white/20 group-hover:text-white/50" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M5 10h10M10 5l5 5-5 5" />
-                </svg>
+                <p className="text-sm font-semibold text-white/90 mb-1.5">VTEX Developer MCP</p>
+                <p className="text-xs leading-relaxed line-clamp-3 flex-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                  Official VTEX MCP server. Connects Claude to 3,000+ VTEX Help Center and Developer Portal articles plus the full API Reference at runtime — search docs, fetch full guides, and pull endpoint specs without leaving your session.
+                </p>
+                <div className="flex items-center gap-1.5 mt-3">
+                  <svg className="w-3 h-3 shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'rgba(255,255,255,0.25)' }}>
+                    <rect x="1" y="1" width="14" height="14" rx="2" /><path d="M4 5h8M4 8h6M4 11h4" />
+                  </svg>
+                  <span className="font-mono text-[11px] truncate" style={{ color: 'rgba(255,255,255,0.25)' }}>npx -y @vtex/developer-mcp</span>
+                </div>
               </a>
 
               {/* VTEX Skills */}
@@ -725,38 +701,32 @@ export default function LauncherPage() {
                 href="https://developers.vtex.com/docs/guides/vtex-skills"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex items-start gap-4 rounded-xl border p-5 transition-all"
+                className="group flex flex-col rounded-xl border p-4 transition-all"
                 style={{ border: '1px solid rgba(247,25,99,0.15)', background: 'rgba(247,25,99,0.04)' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(247,25,99,0.08)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(247,25,99,0.3)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(247,25,99,0.04)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(247,25,99,0.15)'; }}
               >
-                <div
-                  className="shrink-0 w-12 h-12 rounded-lg flex items-center justify-center"
-                  style={{ background: 'rgba(247,25,99,0.1)' }}
-                >
-                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'rgba(247,25,99,0.7)' }}>
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                  </svg>
-                </div>
-                <div className="flex-1 min-w-0 space-y-1.5">
-                  <div className="flex items-center gap-2.5 flex-wrap">
-                    <span className="text-sm font-semibold text-white/90">VTEX Skills</span>
-                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded" style={{ background: 'rgba(247,25,99,0.12)', color: '#F71963' }}>Skill</span>
-                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded" style={{ background: 'rgba(251,191,36,0.1)', color: '#fbbf24' }}>Suggested</span>
-                  </div>
-                  <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                    Official VTEX skill catalog. Loads persistent platform context into Claude before a task starts — covers FastStore, VTEX IO, Marketplace, Payment Provider Protocol, Headless frontend, Commerce architecture, and Sales App tracks.
-                  </p>
-                  <div className="flex items-center gap-1.5 pt-0.5">
-                    <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'rgba(255,255,255,0.25)' }}>
-                      <rect x="1" y="1" width="14" height="14" rx="2" /><path d="M4 5h8M4 8h6M4 11h4" />
+                <div className="flex items-start justify-between mb-3">
+                  <div className="shrink-0 w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: 'rgba(247,25,99,0.1)' }}>
+                    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'rgba(247,25,99,0.7)' }}>
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                     </svg>
-                    <span className="font-mono text-[11px]" style={{ color: 'rgba(255,255,255,0.25)' }}>npx skills add vtex/skills</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded" style={{ background: 'rgba(247,25,99,0.12)', color: '#F71963' }}>Skill</span>
+                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded" style={{ background: 'rgba(247,25,99,0.1)', color: '#F71963' }}>Official</span>
                   </div>
                 </div>
-                <svg className="w-4 h-4 shrink-0 mt-0.5 transition-colors text-white/20 group-hover:text-white/50" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M5 10h10M10 5l5 5-5 5" />
-                </svg>
+                <p className="text-sm font-semibold text-white/90 mb-1.5">VTEX Skills</p>
+                <p className="text-xs leading-relaxed line-clamp-3 flex-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                  Official VTEX skill catalog. Loads persistent platform context into Claude before a task starts — covers FastStore, VTEX IO, Marketplace, Payment Provider Protocol, Headless frontend, Commerce architecture, and Sales App tracks.
+                </p>
+                <div className="flex items-center gap-1.5 mt-3">
+                  <svg className="w-3 h-3 shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'rgba(255,255,255,0.25)' }}>
+                    <rect x="1" y="1" width="14" height="14" rx="2" /><path d="M4 5h8M4 8h6M4 11h4" />
+                  </svg>
+                  <span className="font-mono text-[11px] truncate" style={{ color: 'rgba(255,255,255,0.25)' }}>npx skills add vtex/skills</span>
+                </div>
               </a>
 
               {/* NotebookLM MCP */}
@@ -764,36 +734,30 @@ export default function LauncherPage() {
                 href="https://mcp.directory/servers/notebooklm"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex items-start gap-4 rounded-xl border p-5 transition-all"
+                className="group flex flex-col rounded-xl border p-4 transition-all"
                 style={{ border: '1px solid rgba(66,133,244,0.18)', background: 'rgba(66,133,244,0.04)' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(66,133,244,0.09)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(66,133,244,0.35)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(66,133,244,0.04)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(66,133,244,0.18)'; }}
               >
-                <div
-                  className="shrink-0 w-12 h-12 rounded-lg flex items-center justify-center text-lg"
-                  style={{ background: 'rgba(66,133,244,0.1)' }}
-                >
-                  📓
-                </div>
-                <div className="flex-1 min-w-0 space-y-1.5">
-                  <div className="flex items-center gap-2.5">
-                    <span className="text-sm font-semibold text-white/90">NotebookLM</span>
+                <div className="flex items-start justify-between mb-3">
+                  <div className="shrink-0 w-10 h-10 rounded-lg flex items-center justify-center text-base" style={{ background: 'rgba(66,133,244,0.1)' }}>
+                    📓
+                  </div>
+                  <div className="flex items-center gap-1.5">
                     <span className="text-[10px] font-medium px-1.5 py-0.5 rounded" style={{ background: 'rgba(66,133,244,0.15)', color: '#60a5fa' }}>MCP</span>
                     <span className="text-[10px] font-medium px-1.5 py-0.5 rounded" style={{ background: 'rgba(251,191,36,0.1)', color: '#fbbf24' }}>Suggested</span>
                   </div>
-                  <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                    MCP server for Google NotebookLM. Lets Claude create and query NotebookLM notebooks directly — useful for turning RFP documents, discovery transcripts, or architecture notes into a searchable AI knowledge base mid-session.
-                  </p>
-                  <div className="flex items-center gap-1.5 pt-0.5">
-                    <svg className="w-3 h-3" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'rgba(255,255,255,0.25)' }}>
-                      <path d="M2 2h12v12H2z" /><path d="M5 6h6M5 9h4" />
-                    </svg>
-                    <span className="text-[11px]" style={{ color: 'rgba(255,255,255,0.25)' }}>mcp.directory/servers/notebooklm</span>
-                  </div>
                 </div>
-                <svg className="w-4 h-4 shrink-0 mt-0.5 transition-colors text-white/20 group-hover:text-white/50" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M5 10h10M10 5l5 5-5 5" />
-                </svg>
+                <p className="text-sm font-semibold text-white/90 mb-1.5">NotebookLM</p>
+                <p className="text-xs leading-relaxed line-clamp-3 flex-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                  MCP server for Google NotebookLM. Lets Claude create and query NotebookLM notebooks directly — useful for turning RFP documents, discovery transcripts, or architecture notes into a searchable AI knowledge base mid-session.
+                </p>
+                <div className="flex items-center gap-1.5 mt-3">
+                  <svg className="w-3 h-3 shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'rgba(255,255,255,0.25)' }}>
+                    <path d="M2 2h12v12H2z" /><path d="M5 6h6M5 9h4" />
+                  </svg>
+                  <span className="text-[11px] truncate" style={{ color: 'rgba(255,255,255,0.25)' }}>mcp.directory/servers/notebooklm</span>
+                </div>
               </a>
             </div>
           </section>
