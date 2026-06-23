@@ -1,5 +1,12 @@
-import { randomUUID } from 'crypto';
+import { randomUUID, createHash } from 'crypto';
 import type { IdpConfig, IdpCode, IdpToken, IdpCallLogEntry } from '@/types/idp';
+
+// Derive a stable secret from the account name — survives Vercel cold starts
+// without needing a database. Reset via the dashboard regenerates and stores
+// a random override in the in-memory map.
+function stableSecret(account: string): string {
+  return createHash('sha256').update(`vtex-idp-secret:${account}`).digest('hex').slice(0, 32);
+}
 
 declare global {
   var __idpConfig: Map<string, IdpConfig> | undefined;
@@ -24,7 +31,7 @@ function callLogMap(): Map<string, IdpCallLogEntry[]> {
 function defaultConfig(account: string): IdpConfig {
   return {
     clientId: `idp-${account}`,
-    clientSecret: randomUUID().replace(/-/g, ''),
+    clientSecret: stableSecret(account),
     users: [
       { email: `admin@${account}.com`, name: 'Admin User', password: 'demo123' },
       { email: `buyer@${account}.com`, name: 'Test Buyer', password: 'demo123' },
