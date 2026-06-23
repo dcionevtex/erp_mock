@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-type Simulator = 'platform' | 'erp' | 'ppp' | 'marketplace' | 'giftcard';
+type Simulator = 'platform' | 'erp' | 'ppp' | 'marketplace' | 'giftcard' | 'idp';
 
 type ReleaseEntry = {
   version: string;
@@ -16,6 +16,7 @@ const SIMULATOR_STYLE: Record<Simulator, { label: string; cls: string }> = {
   ppp:         { label: 'Payment Provider',  cls: 'bg-violet-500/10 text-violet-400' },
   marketplace: { label: 'External Seller',   cls: 'bg-sky-500/10 text-sky-400' },
   giftcard:    { label: 'Gift Card',          cls: 'bg-amber-500/10 text-amber-400' },
+  idp:         { label: 'External IDP',      cls: 'bg-violet-500/10 text-violet-300' },
 };
 
 const CHANGE_TYPE_STYLE: Record<'feat' | 'fix' | 'chore', { label: string; color: string; bg: string }> = {
@@ -26,9 +27,25 @@ const CHANGE_TYPE_STYLE: Record<'feat' | 'fix' | 'chore', { label: string; color
 
 const RELEASES: ReleaseEntry[] = [
   {
+    version: '1.6.0',
+    date: 'June 23, 2026',
+    tag: 'latest',
+    simulators: ['idp'],
+    changes: [
+      { type: 'feat', text: 'External IDP Simulator — full OAuth 2.0 Authorization Code flow mock. VTEX storefronts can now point their Authentication settings at this simulator and complete a real login handshake.' },
+      { type: 'feat', text: 'Three compliant endpoints: Authorization URL (login page + redirect), Token URL (code → access token exchange), and User Info URL (returns userId, email, name)' },
+      { type: 'feat', text: 'Account-scoped isolation — each VTEX account gets its own client_id, client_secret, test users, and call log' },
+      { type: 'feat', text: 'Login page at /idp/[account]/authorize — dark-themed, shows test users as one-click buttons with quick-login support' },
+      { type: 'feat', text: 'Live call log in the dashboard shows every authorize, token exchange, and userinfo request with email, status code, and expandable details' },
+      { type: 'feat', text: 'Test user management — add and remove users from the dashboard; changes reflect immediately on the login page' },
+      { type: 'feat', text: 'Client secret regeneration — reset the OAuth client_secret from the Config tab without losing users or call history' },
+      { type: 'feat', text: 'Setup guide with step-by-step instructions for configuring the IDP in VTEX Admin → Authentication → OAuth2' },
+      { type: 'chore', text: 'External IDP Simulator added to the platform launcher as a new tool card' },
+    ],
+  },
+  {
     version: '1.5.0',
     date: 'June 12, 2026',
-    tag: 'latest',
     simulators: ['platform', 'ppp', 'marketplace', 'giftcard', 'erp'],
     changes: [
       { type: 'feat', text: 'Beta simulators (PPP, External Seller, Gift Card) now show a pink "Start here" callout above the account input on first load when no account is configured' },

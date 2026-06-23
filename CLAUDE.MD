@@ -20,6 +20,7 @@ The launcher at `/` is the entry point. It links to four live simulators plus co
 | Payment Provider Protocol | `/payment-provider` | Live | PPP endpoints (create, cancel, refund, settlement), account-scoped, scenario toggles |
 | External Seller Simulator | `/marketplace` | Beta | Fulfillment simulation, order placement, cancellation, SKU registration via Change Notification + Suggestions flow |
 | Gift Card Provider | `/gift-card` | Beta | Gift Card Provider Protocol endpoints, fictional card auto-return, transaction lifecycle |
+| External IDP Simulator | `/idp` | New | OAuth 2.0 Authorization Code flow mock; VTEX storefronts authenticate against it via the Authentication admin |
 
 ### Shared platform features
 
@@ -237,19 +238,19 @@ Key behavior:
 
 Every meaningful set of changes must add an entry to the `RELEASES` array in `src/app/release-notes/page.tsx`.
 
-**Current baseline: `1.4.0`**
-
 Version rules:
 - `PATCH` (x.x.+1) — bug fixes, small improvements to existing features
 - `MINOR` (x.+1.0) — new self-contained features or significant UX changes
 - `MAJOR` (+1.0.0) — new simulator or full architectural redesign
 
-Simulator tags available: `'platform' | 'erp' | 'ppp' | 'marketplace' | 'giftcard'`
+Simulator tags available: `'platform' | 'erp' | 'ppp' | 'marketplace' | 'giftcard' | 'idp'`
 
 How to update:
 1. Remove `tag: 'latest'` from the previous top entry
 2. Prepend a new entry with new version, today's date, `tag: 'latest'`, correct simulators, and changes
 3. Commit: `chore: update release notes to vX.Y.Z`
+
+**Current baseline: `1.6.0`**
 
 ---
 

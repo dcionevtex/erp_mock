@@ -188,6 +188,21 @@ const TOOLS = [
       </svg>
     ),
   },
+  {
+    href: '/idp',
+    label: 'External IDP Simulator',
+    description: 'Mock an OAuth 2.0 identity provider for VTEX storefront login. Configure client credentials, manage test users, and watch every step of the authorization code flow — authorize, token exchange, and userinfo — in a live call log.',
+    tag: 'New',
+    tagColor: 'bg-violet-500/15 text-violet-400',
+    disabled: false,
+    icon: (
+      <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+        <circle cx="12" cy="16" r="1" fill="currentColor" />
+      </svg>
+    ),
+  },
 ];
 
 const FIELD_TOOLS = [

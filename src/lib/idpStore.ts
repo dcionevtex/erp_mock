@@ -1,0 +1,128 @@
+import { randomUUID } from 'crypto';
+import type { IdpConfig, IdpCode, IdpToken, IdpCallLogEntry } from '@/types/idp';
+
+declare global {
+  var __idpConfig: Map<string, IdpConfig> | undefined;
+  var __idpCodes: Map<string, Map<string, IdpCode>> | undefined;
+  var __idpTokens: Map<string, Map<string, IdpToken>> | undefined;
+  var __idpCallLog: Map<string, IdpCallLogEntry[]> | undefined;
+}
+
+function cfgMap(): Map<string, IdpConfig> {
+  return (globalThis.__idpConfig ??= new Map());
+}
+function codesMap(): Map<string, Map<string, IdpCode>> {
+  return (globalThis.__idpCodes ??= new Map());
+}
+function tokensMap(): Map<string, Map<string, IdpToken>> {
+  return (globalThis.__idpTokens ??= new Map());
+}
+function callLogMap(): Map<string, IdpCallLogEntry[]> {
+  return (globalThis.__idpCallLog ??= new Map());
+}
+
+function defaultConfig(account: string): IdpConfig {
+  return {
+    clientId: `idp-${account}`,
+    clientSecret: randomUUID().replace(/-/g, ''),
+    users: [
+      { email: `admin@${account}.com`, name: 'Admin User', password: 'demo123' },
+      { email: `buyer@${account}.com`, name: 'Test Buyer', password: 'demo123' },
+    ],
+  };
+}
+
+// ── Config ──────────────────────────────────────────────────────────────────
+
+export function getIdpConfig(account: string): IdpConfig {
+  if (!cfgMap().has(account)) cfgMap().set(account, defaultConfig(account));
+  return cfgMap().get(account)!;
+}
+
+export function setIdpUsers(account: string, users: IdpConfig['users']): IdpConfig {
+  const cfg = getIdpConfig(account);
+  const updated = { ...cfg, users };
+  cfgMap().set(account, updated);
+  return updated;
+}
+
+export function resetIdpSecret(account: string): IdpConfig {
+  const cfg = getIdpConfig(account);
+  const updated = { ...cfg, clientSecret: randomUUID().replace(/-/g, '') };
+  cfgMap().set(account, updated);
+  return updated;
+}
+
+// ── Auth codes ───────────────────────────────────────────────────────────────
+
+export function issueCode(account: string, data: IdpCode): string {
+  const map = codesMap();
+  if (!map.has(account)) map.set(account, new Map());
+  // >64 chars per VTEX spec (single-use authorization code)
+  const code = randomUUID().replace(/-/g, '') + randomUUID().replace(/-/g, '');
+  const accountCodes = map.get(account)!;
+  accountCodes.set(code, data);
+  // Prune expired codes
+  const cutoff = Date.now() - 5 * 60 * 1000;
+  accountCodes.forEach((v, k) => { if (v.createdAt < cutoff) accountCodes.delete(k); });
+  return code;
+}
+
+export function consumeCode(account: string, code: string): IdpCode | null {
+  const accountCodes = codesMap().get(account);
+  if (!accountCodes) return null;
+  const entry = accountCodes.get(code);
+  if (!entry) return null;
+  accountCodes.delete(code); // single-use
+  if (Date.now() - entry.createdAt > 5 * 60 * 1000) return null; // expired
+  return entry;
+}
+
+// ── Tokens ───────────────────────────────────────────────────────────────────
+
+export function issueToken(account: string, data: IdpToken): string {
+  const map = tokensMap();
+  if (!map.has(account)) map.set(account, new Map());
+  const token = randomUUID().replace(/-/g, '');
+  map.get(account)!.set(token, data);
+  return token;
+}
+
+export function lookupToken(account: string, token: string): IdpToken | null {
+  const accountTokens = tokensMap().get(account);
+  if (!accountTokens) return null;
+  const entry = accountTokens.get(token);
+  if (!entry) return null;
+  if (Date.now() - entry.createdAt > 60 * 60 * 1000) {
+    accountTokens.delete(token);
+    return null;
+  }
+  return entry;
+}
+
+// ── Call log ─────────────────────────────────────────────────────────────────
+
+export function appendIdpCall(
+  account: string,
+  entry: Omit<IdpCallLogEntry, 'id' | 'timestamp'>,
+): IdpCallLogEntry {
+  const map = callLogMap();
+  if (!map.has(account)) map.set(account, []);
+  const full: IdpCallLogEntry = {
+    ...entry,
+    id: randomUUID(),
+    timestamp: new Date().toISOString(),
+  };
+  const log = map.get(account)!;
+  log.push(full);
+  if (log.length > 200) log.splice(0, log.length - 200);
+  return full;
+}
+
+export function listIdpCalls(account: string): IdpCallLogEntry[] {
+  return callLogMap().get(account) ?? [];
+}
+
+export function clearIdpCalls(account: string): void {
+  callLogMap().set(account, []);
+}
