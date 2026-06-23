@@ -528,58 +528,6 @@ export default function LauncherPage() {
 
           <div className="border-t border-white/[0.06]" />
 
-          {/* The Lab */}
-          <section className="space-y-6">
-            <div className="flex items-start gap-4">
-              <div
-                className="shrink-0 w-12 h-12 rounded-lg flex items-center justify-center"
-                style={{ background: 'rgba(124,58,237,0.12)', border: '1px solid rgba(167,139,250,0.15)' }}
-              >
-                <PixelFlask />
-              </div>
-              <div className="space-y-1">
-                <div className="flex items-center gap-2.5">
-                  <h2 className="text-lg font-semibold" style={{ color: '#c4b5fd' }}>The Lab</h2>
-                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded" style={{ background: 'rgba(124,58,237,0.15)', color: '#a78bfa' }}>
-                    Experimental
-                  </span>
-                </div>
-                <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                  Not every useful thing needs to be a full simulator. The Lab is where small, focused utilities live — the kind of tool you build because you needed it on a demo and it was too good not to keep.
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {LAB_APPS.map((app) => (
-                <div
-                  key={app.label}
-                  className="rounded-xl p-4 space-y-3"
-                  style={{
-                    background: 'rgba(124,58,237,0.05)',
-                    border: '1px dashed rgba(167,139,250,0.15)',
-                  }}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-lg">{app.icon}</span>
-                    <span
-                      className="text-[9px] uppercase tracking-widest px-1.5 py-0.5 rounded"
-                      style={{ background: 'rgba(124,58,237,0.2)', color: 'rgba(167,139,250,0.6)' }}
-                    >
-                      Soon
-                    </span>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-xs font-semibold" style={{ color: 'rgba(196,181,253,0.7)' }}>{app.label}</p>
-                    <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.25)' }}>{app.description}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <div className="border-t border-white/[0.06]" />
-
           {/* Claude Skills */}
           <section className="space-y-6">
             <div className="flex items-start gap-4">
@@ -759,6 +707,58 @@ export default function LauncherPage() {
                   <span className="text-[11px] truncate" style={{ color: 'rgba(255,255,255,0.25)' }}>mcp.directory/servers/notebooklm</span>
                 </div>
               </a>
+            </div>
+          </section>
+
+          <div className="border-t border-white/[0.06]" />
+
+          {/* The Lab */}
+          <section className="space-y-6">
+            <div className="flex items-start gap-4">
+              <div
+                className="shrink-0 w-12 h-12 rounded-lg flex items-center justify-center"
+                style={{ background: 'rgba(124,58,237,0.12)', border: '1px solid rgba(167,139,250,0.15)' }}
+              >
+                <PixelFlask />
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2.5">
+                  <h2 className="text-lg font-semibold" style={{ color: '#c4b5fd' }}>The Lab</h2>
+                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded" style={{ background: 'rgba(124,58,237,0.15)', color: '#a78bfa' }}>
+                    Experimental
+                  </span>
+                </div>
+                <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                  Not every useful thing needs to be a full simulator. The Lab is where small, focused utilities live — the kind of tool you build because you needed it on a demo and it was too good not to keep.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {LAB_APPS.map((app) => (
+                <div
+                  key={app.label}
+                  className="rounded-xl p-4 space-y-3"
+                  style={{
+                    background: 'rgba(124,58,237,0.05)',
+                    border: '1px dashed rgba(167,139,250,0.15)',
+                  }}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg">{app.icon}</span>
+                    <span
+                      className="text-[9px] uppercase tracking-widest px-1.5 py-0.5 rounded"
+                      style={{ background: 'rgba(124,58,237,0.2)', color: 'rgba(167,139,250,0.6)' }}
+                    >
+                      Soon
+                    </span>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs font-semibold" style={{ color: 'rgba(196,181,253,0.7)' }}>{app.label}</p>
+                    <p className="text-[11px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.25)' }}>{app.description}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </section>
 
