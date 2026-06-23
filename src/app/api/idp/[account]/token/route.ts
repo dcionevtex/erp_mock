@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getIdpConfig, consumeCode, issueToken, appendIdpCall } from '@/lib/idpStore';
+import { consumeCode, issueToken, appendIdpCall } from '@/lib/idpStore';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,35 +39,7 @@ export async function POST(
     return NextResponse.json({ error: 'invalid_request', error_description: 'Could not parse request body' }, { status: 400 });
   }
 
-  // Log every token attempt immediately — so we can see what VTEX sends even on failure
   const received = `grant_type=${grantType || '(empty)'} client_id=${clientId || '(empty)'} code=${code ? code.slice(0, 8) + '…' : '(empty)'}`;
-
-  // grant_type is optional — we're a mock, accept anything or nothing
-  if (grantType && grantType !== 'authorization_code') {
-    appendIdpCall(account, {
-      endpoint: 'token',
-      method: 'POST',
-      account,
-      success: false,
-      statusCode: 400,
-      details: `Unsupported grant_type: ${grantType}. Received: ${received}`,
-    });
-    return NextResponse.json({ error: 'unsupported_grant_type' }, { status: 400 });
-  }
-
-  const config = getIdpConfig(account);
-
-  if (clientId !== config.clientId || clientSecret !== config.clientSecret) {
-    appendIdpCall(account, {
-      endpoint: 'token',
-      method: 'POST',
-      account,
-      success: false,
-      statusCode: 401,
-      details: `Invalid credentials. Received clientId="${clientId}". Expected "${config.clientId}". ${received}`,
-    });
-    return NextResponse.json({ error: 'invalid_client', error_description: 'Invalid client_id or client_secret' }, { status: 401 });
-  }
 
   const codeEntry = consumeCode(account, code);
   if (!codeEntry) {
