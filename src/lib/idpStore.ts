@@ -33,8 +33,7 @@ function defaultConfig(account: string): IdpConfig {
     clientId: `idp-${account}`,
     clientSecret: stableSecret(account),
     users: [
-      { email: `admin@${account}.com`, name: 'Admin User', password: 'demo123' },
-      { email: `buyer@${account}.com`, name: 'Test Buyer', password: 'demo123' },
+      { email: 'johndoe@testemail.com', name: 'Test Buyer', password: 'demo123' },
     ],
   };
 }
