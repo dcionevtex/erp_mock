@@ -47,25 +47,19 @@ export default function AuthorizePage() {
   const syntheticEmail = digits ? `${digits}@${account}.com` : null;
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center p-4"
-      style={{ background: '#0d1826' }}
-    >
-      <div className="w-full max-w-sm space-y-6">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+      <div className="w-full max-w-sm bg-card border border-border rounded-lg shadow-sm p-8 space-y-6">
 
         {/* Header */}
         <div className="text-center space-y-2">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <span className="text-2xl font-black tracking-tighter" style={{ color: '#F71963' }}>VTEX</span>
-            <span className="text-sm text-white/30">Demo IDP</span>
+            <span className="text-2xl font-black tracking-tighter text-primary">VTEX</span>
+            <span className="text-sm text-muted-foreground">Demo IDP</span>
           </div>
-          <p className="text-sm text-white/50">
-            Signing in to <span className="font-mono text-white/70">{account}</span>
+          <p className="text-sm text-muted-foreground">
+            Signing in to <span className="font-mono text-foreground">{account}</span>
           </p>
-          <div
-            className="inline-flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full"
-            style={{ background: 'rgba(247,25,99,0.1)', color: 'rgba(247,25,99,0.7)', border: '1px solid rgba(247,25,99,0.2)' }}
-          >
+          <div className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-secondary text-secondary-foreground">
             <svg className="w-3 h-3" viewBox="0 0 16 16" fill="currentColor">
               <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm.75 3.5v4a.75.75 0 0 1-1.5 0v-4a.75.75 0 0 1 1.5 0zm0 6.5a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0z" />
             </svg>
@@ -75,23 +69,19 @@ export default function AuthorizePage() {
 
         {/* Error */}
         {error && (
-          <div
-            className="rounded-lg px-4 py-3 text-sm text-center"
-            style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.2)', color: '#f87171' }}
-          >
+          <div className="rounded-md px-4 py-3 text-sm text-center bg-danger-faded text-danger-foreground border border-danger-foreground/20">
             {error}
           </div>
         )}
 
         {/* Mode toggle */}
-        <div className="flex rounded-lg p-0.5" style={{ background: 'rgba(255,255,255,0.06)' }}>
+        <div className="flex rounded-md p-0.5 bg-muted">
           <button
             type="button"
             onClick={() => setMode('email')}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium rounded-md transition-all"
-            style={mode === 'email'
-              ? { background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.9)' }
-              : { color: 'rgba(255,255,255,0.35)' }}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium rounded-md transition-all ${
+              mode === 'email' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'
+            }`}
           >
             <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <rect x="1" y="3" width="14" height="10" rx="2" /><path d="M1 5l7 5 7-5" />
@@ -101,10 +91,9 @@ export default function AuthorizePage() {
           <button
             type="button"
             onClick={() => setMode('phone')}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium rounded-md transition-all"
-            style={mode === 'phone'
-              ? { background: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.9)' }
-              : { color: 'rgba(255,255,255,0.35)' }}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium rounded-md transition-all ${
+              mode === 'phone' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'
+            }`}
           >
             <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="1" width="10" height="14" rx="2" /><circle cx="8" cy="12" r="0.75" fill="currentColor" stroke="none" />
@@ -116,7 +105,7 @@ export default function AuthorizePage() {
         {/* Quick-login shortcuts */}
         {mode === 'email' && config && config.users.length > 0 && (
           <div className="space-y-2">
-            <p className="text-[10px] uppercase tracking-widest text-center" style={{ color: 'rgba(255,255,255,0.25)' }}>
+            <p className="text-xs uppercase tracking-widest text-center text-muted-foreground">
               Test users
             </p>
             <div className="space-y-2">
@@ -125,19 +114,16 @@ export default function AuthorizePage() {
                   key={user.email}
                   type="button"
                   onClick={() => quickLoginEmail(user.email)}
-                  className="w-full flex items-center gap-3 rounded-xl px-4 py-3 text-left transition-all"
-                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(247,25,99,0.08)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(247,25,99,0.25)'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.08)'; }}
+                  className="w-full flex items-center gap-3 rounded-md px-4 py-3 text-left transition-all bg-muted border border-border hover:bg-secondary hover:border-primary/30"
                 >
-                  <div className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: 'rgba(247,25,99,0.15)', color: '#F71963' }}>
+                  <div className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold bg-secondary text-secondary-foreground">
                     {user.name.charAt(0).toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-white/80">{user.name}</p>
-                    <p className="text-xs text-white/35 truncate">{user.email}</p>
+                    <p className="text-sm font-medium text-foreground">{user.name}</p>
+                    <p className="text-xs text-muted-foreground truncate">{user.email}</p>
                   </div>
-                  <svg className="w-4 h-4 text-white/20 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <svg className="w-4 h-4 text-muted-foreground/60 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M5 10h10M10 5l5 5-5 5" />
                   </svg>
                 </button>
@@ -148,25 +134,22 @@ export default function AuthorizePage() {
 
         {mode === 'phone' && (
           <div className="space-y-2">
-            <p className="text-[10px] uppercase tracking-widest text-center" style={{ color: 'rgba(255,255,255,0.25)' }}>
+            <p className="text-xs uppercase tracking-widest text-center text-muted-foreground">
               Test phone
             </p>
             <button
               type="button"
               onClick={() => quickLoginPhone('+971529293054')}
-              className="w-full flex items-center gap-3 rounded-xl px-4 py-3 text-left transition-all"
-              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(247,25,99,0.08)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(247,25,99,0.25)'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)'; (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.08)'; }}
+              className="w-full flex items-center gap-3 rounded-md px-4 py-3 text-left transition-all bg-muted border border-border hover:bg-secondary hover:border-primary/30"
             >
-              <div className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: 'rgba(247,25,99,0.15)', color: '#F71963' }}>
+              <div className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold bg-secondary text-secondary-foreground">
                 T
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-white/80">Test Buyer</p>
-                <p className="text-xs text-white/35">+971529293054</p>
+                <p className="text-sm font-medium text-foreground">Test Buyer</p>
+                <p className="text-xs text-muted-foreground">+971529293054</p>
               </div>
-              <svg className="w-4 h-4 text-white/20 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <svg className="w-4 h-4 text-muted-foreground/60 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M5 10h10M10 5l5 5-5 5" />
               </svg>
             </button>
@@ -175,11 +158,11 @@ export default function AuthorizePage() {
 
         {/* Divider */}
         <div className="flex items-center gap-3">
-          <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.08)' }} />
-          <span className="text-[10px] text-white/25">
+          <div className="flex-1 h-px bg-border" />
+          <span className="text-xs text-muted-foreground">
             {mode === 'email' ? 'or type any email' : 'or type any phone number'}
           </span>
-          <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.08)' }} />
+          <div className="flex-1 h-px bg-border" />
         </div>
 
         {/* Login form */}
@@ -195,7 +178,7 @@ export default function AuthorizePage() {
 
           {mode === 'email' ? (
             <div className="space-y-1">
-              <label className="text-[10px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              <label className="text-xs uppercase tracking-wider text-muted-foreground">
                 Email
               </label>
               <input
@@ -205,13 +188,12 @@ export default function AuthorizePage() {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 placeholder="john.doe@testemail.com"
-                className="w-full text-sm rounded-xl px-4 py-3 outline-none focus:ring-2"
-                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.8)' }}
+                className="w-full text-sm rounded-md px-4 py-3 outline-none focus:ring-2 focus:ring-primary/40 bg-background border border-border text-foreground placeholder:text-muted-foreground"
               />
             </div>
           ) : (
             <div className="space-y-1">
-              <label className="text-[10px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              <label className="text-xs uppercase tracking-wider text-muted-foreground">
                 Phone number
               </label>
               <input
@@ -221,15 +203,14 @@ export default function AuthorizePage() {
                 value={phone}
                 onChange={e => setPhone(e.target.value)}
                 placeholder="+971529293054"
-                className="w-full text-sm rounded-xl px-4 py-3 outline-none focus:ring-2"
-                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.8)' }}
+                className="w-full text-sm rounded-md px-4 py-3 outline-none focus:ring-2 focus:ring-primary/40 bg-background border border-border text-foreground placeholder:text-muted-foreground"
               />
               {syntheticEmail && (
-                <p className="text-[10px] pt-0.5 flex items-center gap-1.5" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                <p className="text-xs pt-0.5 flex items-center gap-1.5 text-muted-foreground">
                   <svg className="w-3 h-3 shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M2 8h12M8 2l6 6-6 6" />
                   </svg>
-                  VTEX profile email: <span className="font-mono text-white/45">{syntheticEmail}</span>
+                  VTEX profile email: <span className="font-mono text-foreground">{syntheticEmail}</span>
                 </p>
               )}
             </div>
@@ -238,14 +219,13 @@ export default function AuthorizePage() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full py-3 rounded-xl text-sm font-semibold transition-all disabled:opacity-50"
-            style={{ background: '#F71963', color: '#fff' }}
+            className="w-full py-3 rounded-md text-sm font-semibold transition-all disabled:opacity-50 bg-primary text-primary-foreground hover:opacity-90"
           >
             {submitting ? 'Signing in…' : 'Sign in'}
           </button>
         </form>
 
-        <p className="text-center text-[10px]" style={{ color: 'rgba(255,255,255,0.2)' }}>
+        <p className="text-center text-xs text-muted-foreground">
           Simulated identity provider for VTEX demos.
           <br />
           {mode === 'phone'

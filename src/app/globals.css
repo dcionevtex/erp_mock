@@ -39,6 +39,23 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-success: var(--success);
+  --color-success-faded: var(--success-faded);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-faded: var(--warning-faded);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-danger: var(--danger);
+  --color-danger-faded: var(--danger-faded);
+  --color-danger-foreground: var(--danger-foreground);
+  --color-emphasis: var(--emphasis);
+  --color-emphasis-foreground: var(--emphasis-foreground);
+  --color-gray-1: var(--gray-1);
+  --color-gray-2: var(--gray-2);
+  --color-gray-3: var(--gray-3);
+  --color-gray-4: var(--gray-4);
+  --color-gray-5: var(--gray-5);
+  --color-near-white: var(--near-white);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -49,39 +66,66 @@
 }
 
 :root {
-  /* VTEX Brand — primary #F71963, navy #142032 */
-  --background: oklch(0.985 0 0);
-  --foreground: oklch(0.2 0.01 240);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.2 0.01 240);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.2 0.01 240);
-  --primary: oklch(0.551 0.286 348);   /* #F71963 VTEX pink */
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.2 0.01 240);
-  --muted: oklch(0.96 0 0);
-  --muted-foreground: oklch(0.52 0.01 240);
-  --accent: oklch(0.96 0.005 348);
-  --accent-foreground: oklch(0.551 0.286 348);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.91 0 0);
-  --input: oklch(0.91 0 0);
-  --ring: oklch(0.551 0.286 348);      /* ring matches primary */
+  /* VTEX Admin / Product UI tokens — styleguide.vtex.com, via vtex-brand-guidelines skill.
+     Action-primary is BLUE, not the marketing brand's Rebel Pink. Pink is reserved for
+     the --emphasis token only (small accents), never the dominant or primary CTA color. */
+  --background: #F7F9FA;       /* near-white app background */
+  --foreground: #3F3F40;       /* text on base */
+  --card: #FFFFFF;             /* background base */
+  --card-foreground: #3F3F40;
+  --popover: #FFFFFF;
+  --popover-foreground: #3F3F40;
+  --primary: #134CD8;          /* action-primary blue */
+  --primary-foreground: #FFFFFF;
+  --secondary: #EEF3F7;        /* action-secondary */
+  --secondary-foreground: #134CD8;
+  --muted: #F2F4F5;            /* muted-5 */
+  --muted-foreground: #727273; /* muted-1 */
+  --accent: #EEF3F7;
+  --accent-foreground: #134CD8;
+  --destructive: #FF4C4C;      /* danger solid */
+  --destructive-foreground: #FFFFFF;
+  --border: #E3E4E6;           /* muted-4 */
+  --input: #E3E4E6;
+  --ring: #134CD8;             /* ring matches action-primary */
+
+  /* Semantic state colors */
+  --success: #8BC34A;
+  --success-faded: #EAFCE3;
+  --success-foreground: #79B03A;
+  --warning: #FFB100;
+  --warning-faded: #FFF6E0;
+  --warning-foreground: #E19D00;
+  --danger: #FF4C4C;
+  --danger-faded: #FFE6E6;
+  --danger-foreground: #FF4C4C;
+
+  /* Emphasis — VTEX Rebel Pink, sparingly (e.g. a single highlight or "Beta" accent) */
+  --emphasis: #F71963;
+  --emphasis-foreground: #FFFFFF;
+
+  /* Gray scale (muted) */
+  --gray-1: #727273;
+  --gray-2: #979899;
+  --gray-3: #CACBCC;
+  --gray-4: #E3E4E6;
+  --gray-5: #F2F4F5;
+  --near-white: #F7F9FA;
+
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --radius: 0.5rem;
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #3F3F40;
+  --sidebar-primary: #134CD8;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #EEF3F7;
+  --sidebar-accent-foreground: #134CD8;
+  --sidebar-border: #E3E4E6;
+  --sidebar-ring: #134CD8;
 }
 
 .dark {

@@ -46,12 +46,12 @@ export function InlineSetup({ config, onSaved }: Props) {
         </div>
         <div className="flex items-center gap-2 shrink-0 ml-3">
           {configured ? (
-            <span className="flex items-center gap-1 text-[11px] font-medium text-green-600 bg-green-50 border border-green-200 px-2 py-0.5 rounded-full">
+            <span className="flex items-center gap-1 text-xs font-medium text-success-foreground bg-success-faded px-2 py-0.5 rounded-full">
               <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M2 5l2.5 2.5L8 3" /></svg>
               Configured
             </span>
           ) : (
-            <span className="flex items-center gap-1 text-[11px] font-medium text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
+            <span className="flex items-center gap-1 text-xs font-medium text-warning-foreground bg-warning-faded px-2 py-0.5 rounded-full">
               <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><path d="M5 1a4 4 0 1 0 0 8A4 4 0 0 0 5 1zm.5 2.25v2a.5.5 0 0 1-1 0v-2a.5.5 0 0 1 1 0zm0 4a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0z" /></svg>
               Not configured
             </span>
@@ -164,7 +164,7 @@ function AccountForm({ config, onSaved }: { config: AppConfigPublic | null; onSa
             <span className="flex items-center gap-1.5">
               App Key
               {config?.appKey && (
-                <span className="text-[10px] font-medium text-green-600 bg-green-50 px-1.5 py-0.5 rounded">
+                <span className="text-xs font-medium text-success-foreground bg-success-faded px-1.5 py-0.5 rounded">
                   configured · {config.appKey}
                 </span>
               )}
@@ -178,7 +178,7 @@ function AccountForm({ config, onSaved }: { config: AppConfigPublic | null; onSa
             <span className="flex items-center gap-1.5">
               App Token
               {config?.appTokenConfigured && (
-                <span className="text-[10px] font-medium text-green-600 bg-green-50 px-1.5 py-0.5 rounded">configured</span>
+                <span className="text-xs font-medium text-success-foreground bg-success-faded px-1.5 py-0.5 rounded">configured</span>
               )}
             </span>
           }
@@ -200,21 +200,20 @@ function AccountForm({ config, onSaved }: { config: AppConfigPublic | null; onSa
 
       <div className="flex items-center justify-between">
         <div>
-          {saveOk && <p className="text-xs text-green-600 font-medium">Configuration saved.</p>}
+          {saveOk && <p className="text-xs text-success-foreground font-medium">Configuration saved.</p>}
           {saveError && <p className="text-xs text-destructive">{saveError}</p>}
         </div>
         <button
           type="submit"
           disabled={saving}
-          className="px-4 py-1.5 text-sm font-semibold rounded-md disabled:opacity-50 transition-colors"
-          style={{ background: '#F71963', color: '#fff' }}
+          className="px-4 py-1.5 text-sm font-semibold rounded-md bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors"
         >
           {saving ? 'Saving…' : 'Save Configuration'}
         </button>
       </div>
 
       {appKeyChanged && (
-        <div className="flex items-start gap-2 rounded-lg border border-yellow-300 bg-yellow-50 px-3 py-2 text-xs text-yellow-800">
+        <div className="flex items-start gap-2 rounded-lg border border-warning/30 bg-warning-faded px-3 py-2 text-xs text-warning-foreground">
           <span className="mt-0.5 shrink-0">⚠</span>
           <span>
             App Key changed — remember to re-register the Hook URL in VTEX using the new App Key.
@@ -234,7 +233,7 @@ function TabBtn({ active, onClick, children }: { active: boolean; onClick: () =>
       onClick={onClick}
       className={[
         'px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors',
-        active ? 'border-[#F71963] text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground',
+        active ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground',
       ].join(' ')}
     >
       {children}

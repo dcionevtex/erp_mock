@@ -13,28 +13,31 @@ type Tab = 'inbox' | 'events';
 type SortKey = 'receivedAt_desc' | 'receivedAt_asc';
 const PAGE_SIZE = 50;
 
+// Order here drives both the table column order and the "toggle columns" list —
+// default-visible columns are listed first (scannable summary), secondary/detail
+// columns (already duplicated in the order detail modal) come after.
 const ALL_COLS = [
-  { key: 'account',       label: 'Account' },
+  { key: 'error',         label: 'Error' },
   { key: 'orderId',       label: 'Order ID' },
+  { key: 'customer',      label: 'Customer' },
+  { key: 'total',         label: 'Total' },
+  { key: 'items',         label: 'Items' },
+  { key: 'received',      label: 'Received' },
+  { key: 'account',       label: 'Account' },
   { key: 'seq',           label: 'Seq' },
   { key: 'vtexStatus',    label: 'VTEX Status' },
   { key: 'src',           label: 'Source' },
-  { key: 'customer',      label: 'Customer' },
   { key: 'email',         label: 'Email' },
-  { key: 'total',         label: 'Total' },
-  { key: 'items',         label: 'Items' },
   { key: 'shipping',      label: 'Shipping' },
   { key: 'payment',       label: 'Payment' },
   { key: 'startHandling', label: 'Start Handling' },
   { key: 'invoice',       label: 'Invoice' },
-  { key: 'received',      label: 'Received' },
   { key: 'attempts',      label: 'Attempts' },
-  { key: 'error',         label: 'Error' },
 ] as const;
 
 type ColKey = typeof ALL_COLS[number]['key'];
 
-const DEFAULT_COLS: ColKey[] = ['orderId', 'customer', 'total', 'startHandling', 'invoice', 'received', 'error'];
+const DEFAULT_COLS: ColKey[] = ['error', 'orderId', 'customer', 'total', 'items', 'received'];
 
 export default function DashboardPage() {
   const [orders, setOrders] = useState<ErpOrderRecord[]>([]);
@@ -224,22 +227,22 @@ export default function DashboardPage() {
   return (
     <AppShell>
     <div className="bg-background min-h-full">
-      {/* Header — VTEX brand: navy bg, pink accents */}
-      <header className="border-b border-border px-4 py-0 flex items-stretch justify-between gap-4 sticky top-0 z-10" style={{ background: '#142032' }}>
+      {/* Header — VTEX Admin: light surface, blue action accents */}
+      <header className="border-b border-border bg-card px-4 py-0 flex items-stretch justify-between gap-4 sticky top-0 z-10">
         <div className="flex items-center gap-4 py-3">
           {/* VTEX wordmark */}
-          <span className="text-xl font-black tracking-tighter leading-none" style={{ color: '#F71963' }}>VTEX</span>
-          <span className="text-white/20 text-lg font-thin">|</span>
-          <h1 className="text-sm font-semibold text-white/90">A Simple ERP Simulator</h1>
+          <span className="text-xl font-black tracking-tighter leading-none text-emphasis">VTEX</span>
+          <span className="text-border text-lg font-thin">|</span>
+          <h1 className="text-sm font-semibold text-foreground">A Simple ERP Simulator</h1>
           {config && (
-            <span className="text-xs text-white/40 hidden sm:inline">
+            <span className="text-xs text-muted-foreground hidden sm:inline">
               {config.account || 'no account set'} · {config.integrationMode}
             </span>
           )}
         </div>
         <div className="flex items-center gap-3">
           {lastFetch && (
-            <span className="text-xs text-white/40 hidden sm:inline">
+            <span className="text-xs text-muted-foreground hidden sm:inline">
               updated {lastFetch.toLocaleTimeString()}
             </span>
           )}
@@ -248,7 +251,7 @@ export default function DashboardPage() {
               await fetch('/api/auth/logout', { method: 'POST' });
               window.location.href = '/login';
             }}
-            className="px-3 py-1.5 text-xs font-medium text-white/60 hover:text-white transition-colors rounded border border-white/10 hover:border-white/20"
+            className="px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors rounded border border-border hover:bg-muted"
           >
             Sign out
           </button>
@@ -256,8 +259,7 @@ export default function DashboardPage() {
             <button
               onClick={handlePollFeed}
               disabled={polling}
-              className="px-3 py-1.5 text-xs font-semibold rounded-md disabled:opacity-50 transition-colors"
-              style={{ background: '#F71963', color: '#fff' }}
+              className="px-3 py-1.5 text-xs font-semibold rounded-md bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors"
             >
               {polling ? 'Polling…' : 'Poll Feed Now'}
             </button>
@@ -268,20 +270,17 @@ export default function DashboardPage() {
       <main className="px-4 py-4 space-y-4 w-full max-w-[1600px] mx-auto">
         {/* Credentials warning — shown at the very top when creds are missing */}
         {credsMissing && (
-          <div
-            className="flex items-start gap-3 rounded-xl px-5 py-4"
-            style={{ background: 'rgba(247,25,99,0.08)', border: '2px solid #F71963' }}
-          >
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="shrink-0 mt-0.5" aria-hidden="true">
-              <path d="M10 2L18 17H2L10 2z" fill="rgba(247,25,99,0.15)" stroke="#F71963" strokeWidth="1.6" strokeLinejoin="round" />
-              <path d="M10 8v4" stroke="#F71963" strokeWidth="2" strokeLinecap="round" />
-              <circle cx="10" cy="14.5" r="1" fill="#F71963" />
+          <div className="flex items-start gap-3 rounded-lg px-5 py-4 border-2 border-danger/40 bg-danger-faded">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="shrink-0 mt-0.5 text-danger-foreground" aria-hidden="true">
+              <path d="M10 2L18 17H2L10 2z" fill="currentColor" fillOpacity="0.15" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+              <path d="M10 8v4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              <circle cx="10" cy="14.5" r="1" fill="currentColor" />
             </svg>
             <div>
-              <p className="text-sm font-bold" style={{ color: '#F71963' }}>
+              <p className="text-sm font-bold text-danger-foreground">
                 VTEX credentials are not configured.
               </p>
-              <p className="text-sm mt-0.5" style={{ color: '#c0134f' }}>
+              <p className="text-sm mt-0.5 text-danger-foreground/85">
                 Open <strong>Configuration</strong> below and enter your App Key and App Token, or set them as environment variables.
               </p>
             </div>
@@ -409,8 +408,8 @@ export default function DashboardPage() {
 
             {/* Bulk action bar */}
             {selectedIds.size > 0 && (
-              <div className="flex items-center gap-3 rounded-lg border border-primary/30 px-4 py-2.5 text-sm" style={{ background: 'rgba(247,25,99,0.05)' }}>
-                <span className="font-medium" style={{ color: '#F71963' }}>
+              <div className="flex items-center gap-3 rounded-lg border border-primary/30 bg-primary/5 px-4 py-2.5 text-sm">
+                <span className="font-medium text-primary">
                   {selectedIds.size} order{selectedIds.size !== 1 ? 's' : ''} selected
                 </span>
                 <div className="flex items-center gap-2 ml-auto">
@@ -464,22 +463,22 @@ export default function DashboardPage() {
                         />
                       </th>
                       <th className="px-3 py-2 font-medium">Status</th>
-                      {visibleCols.has('account')       && <th className="px-3 py-2 font-medium">Account</th>}
+                      {visibleCols.has('error')          && <th className="px-3 py-2 font-medium">Error</th>}
                       {visibleCols.has('orderId')        && <th className="px-3 py-2 font-medium">Order ID</th>}
+                      {visibleCols.has('customer')       && <th className="px-3 py-2 font-medium">Customer</th>}
+                      {visibleCols.has('total')          && <th className="px-3 py-2 font-medium text-right">Total</th>}
+                      {visibleCols.has('items')          && <th className="px-3 py-2 font-medium text-center">Items</th>}
+                      {visibleCols.has('received')       && <th className="px-3 py-2 font-medium">Received</th>}
+                      {visibleCols.has('account')        && <th className="px-3 py-2 font-medium">Account</th>}
                       {visibleCols.has('seq')            && <th className="px-3 py-2 font-medium">Seq</th>}
                       {visibleCols.has('vtexStatus')     && <th className="px-3 py-2 font-medium">VTEX Status</th>}
                       {visibleCols.has('src')            && <th className="px-3 py-2 font-medium">Source</th>}
-                      {visibleCols.has('customer')       && <th className="px-3 py-2 font-medium">Customer</th>}
                       {visibleCols.has('email')          && <th className="px-3 py-2 font-medium">Email</th>}
-                      {visibleCols.has('total')          && <th className="px-3 py-2 font-medium text-right">Total</th>}
-                      {visibleCols.has('items')          && <th className="px-3 py-2 font-medium text-center">Items</th>}
                       {visibleCols.has('shipping')       && <th className="px-3 py-2 font-medium">Shipping</th>}
                       {visibleCols.has('payment')        && <th className="px-3 py-2 font-medium">Payment</th>}
                       {visibleCols.has('startHandling')  && <th className="px-3 py-2 font-medium" title="Start Handling Status">Start Handling</th>}
                       {visibleCols.has('invoice')        && <th className="px-3 py-2 font-medium">Invoice</th>}
-                      {visibleCols.has('received')       && <th className="px-3 py-2 font-medium">Received</th>}
                       {visibleCols.has('attempts')       && <th className="px-3 py-2 font-medium text-center">Attempts</th>}
-                      {visibleCols.has('error')          && <th className="px-3 py-2 font-medium">Error</th>}
                       <th className="px-3 py-2"></th>
                     </tr>
                   </thead>
@@ -584,22 +583,22 @@ function HookUrlCard({ hookUrl }: { hookUrl: string }) {
 
   return (
     <div className="rounded-xl border border-border bg-card overflow-hidden">
-      <div className="flex items-center gap-2.5 px-4 py-2.5 border-b border-border/60" style={{ background: 'linear-gradient(to right, #142032 0%, #1e2f44 100%)' }}>
+      <div className="flex items-center gap-2.5 px-4 py-2.5 border-b border-border bg-muted/50">
         {/* Webhook icon */}
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#F71963" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
           <circle cx="5" cy="12" r="2" />
           <circle cx="11" cy="4" r="2" />
           <path d="M7 12h3a3 3 0 0 0 0-6H8" />
           <path d="M9 4H6a3 3 0 0 0 0 6h1" />
         </svg>
-        <span className="text-xs font-semibold text-white/90">Webhook Endpoint</span>
-        <span className="ml-auto text-[10px] text-white/30 font-mono uppercase tracking-wide">POST</span>
+        <span className="text-xs font-semibold text-foreground">Webhook Endpoint</span>
+        <span className="ml-auto text-xs text-muted-foreground font-mono uppercase tracking-wide">POST</span>
       </div>
 
       <div className="px-4 py-3 space-y-3">
         {/* URL row */}
         <div className="flex items-center gap-2">
-          <code className="flex-1 min-w-0 font-mono text-[12px] text-foreground bg-muted/60 border border-border rounded-lg px-3 py-2 truncate select-all">
+          <code className="flex-1 min-w-0 font-mono text-xs text-foreground bg-muted/60 border border-border rounded-lg px-3 py-2 truncate select-all">
             {hookUrl}
           </code>
           <button
@@ -607,8 +606,8 @@ function HookUrlCard({ hookUrl }: { hookUrl: string }) {
             className={[
               'shrink-0 flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg border transition-all duration-150',
               copied
-                ? 'border-green-400/60 bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400'
-                : 'border-border hover:border-[#F71963]/40 hover:bg-[#F71963]/5 text-foreground',
+                ? 'border-success/40 bg-success-faded text-success-foreground'
+                : 'border-border hover:border-primary/40 hover:bg-primary/5 text-foreground',
             ].join(' ')}
           >
             {copied ? (
@@ -631,15 +630,15 @@ function HookUrlCard({ hookUrl }: { hookUrl: string }) {
         </div>
 
         {/* Info row */}
-        <div className="flex items-start gap-2 text-[11px] text-muted-foreground">
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" className="mt-0.5 shrink-0 text-[#F71963]/70">
+        <div className="flex items-start gap-2 text-xs text-muted-foreground">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" className="mt-0.5 shrink-0 text-primary/70">
             <circle cx="6" cy="6" r="5" />
             <path d="M6 5.5v3M6 4h.01" />
           </svg>
           <span>
             Register this URL in VTEX with your App Key via{' '}
-            <code className="font-mono text-[10px] bg-muted px-1 py-0.5 rounded">Setup → Hook &amp; Feed Configuration</code>
-            {' '}or directly with <code className="font-mono text-[10px] bg-muted px-1 py-0.5 rounded">POST /api/orders/hook/config</code>.
+            <code className="font-mono text-xs bg-muted px-1 py-0.5 rounded">Setup → Hook &amp; Feed Configuration</code>
+            {' '}or directly with <code className="font-mono text-xs bg-muted px-1 py-0.5 rounded">POST /api/orders/hook/config</code>.
             Each App Key supports one Hook — re-register if you change keys.
           </span>
         </div>
@@ -677,9 +676,9 @@ function EventLogRow({ evt }: { evt: EventLogEntry }) {
       {open && (
         <tr className="border-b border-border/50 bg-muted/10">
           <td colSpan={6} className="px-4 py-3">
-            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-2">Payload</p>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Payload</p>
             {evt.payload != null ? (
-              <pre className="text-[11px] leading-relaxed bg-muted/60 rounded-md p-3 overflow-auto max-h-72 font-mono">
+              <pre className="text-xs leading-relaxed bg-muted/60 rounded-md p-3 overflow-auto max-h-72 font-mono">
                 {JSON.stringify(evt.payload, null, 2)}
               </pre>
             ) : (
@@ -702,10 +701,10 @@ function tabCls(active: boolean) {
 }
 
 function levelCls(level: string) {
-  const base = 'px-1.5 py-0.5 rounded text-[10px] font-medium';
-  if (level === 'ERROR') return `${base} bg-red-100 text-red-700`;
-  if (level === 'WARN') return `${base} bg-yellow-100 text-yellow-700`;
-  return `${base} bg-blue-100 text-blue-700`;
+  const base = 'px-1.5 py-0.5 rounded text-xs font-medium';
+  if (level === 'ERROR') return `${base} bg-danger-faded text-danger-foreground`;
+  if (level === 'WARN') return `${base} bg-warning-faded text-warning-foreground`;
+  return `${base} bg-secondary text-primary`;
 }
 
 function AccountFilterDropdown({
@@ -764,7 +763,7 @@ function AccountFilterDropdown({
         <span className="max-w-[120px] truncate">{label}</span>
         {selected.length > 0 && (
           <span
-            className="ml-0.5 flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold bg-primary text-primary-foreground shrink-0"
+            className="ml-0.5 flex items-center justify-center w-4 h-4 rounded-full text-xs font-bold bg-primary text-primary-foreground shrink-0"
           >
             {selected.length}
           </span>
@@ -781,12 +780,12 @@ function AccountFilterDropdown({
         <div className="absolute left-0 top-full mt-1 z-30 min-w-[180px] rounded-lg border border-border bg-background shadow-lg overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between px-3 py-2 border-b border-border/60 bg-muted/30">
-            <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Filter by Account</span>
+            <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Filter by Account</span>
             {selected.length > 0 && (
               <button
                 type="button"
                 onClick={() => { onClear(); setOpen(false); }}
-                className="text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
               >
                 Clear
               </button>
@@ -878,10 +877,9 @@ function Pagination({
               className={[
                 'w-8 h-7 text-xs rounded border transition-colors',
                 p === page
-                  ? 'border-transparent font-semibold text-white'
+                  ? 'border-transparent font-semibold bg-primary text-primary-foreground'
                   : 'border-border hover:bg-muted text-foreground',
               ].join(' ')}
-              style={p === page ? { background: '#F71963' } : undefined}
             >
               {p}
             </button>

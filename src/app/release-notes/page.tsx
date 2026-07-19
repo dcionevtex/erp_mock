@@ -11,25 +11,40 @@ type ReleaseEntry = {
 };
 
 const SIMULATOR_STYLE: Record<Simulator, { label: string; cls: string }> = {
-  platform:    { label: 'Platform',          cls: 'bg-white/8 text-white/40' },
-  erp:         { label: 'ERP Simulator',     cls: 'bg-emerald-500/10 text-emerald-400' },
-  ppp:         { label: 'Payment Provider',  cls: 'bg-violet-500/10 text-violet-400' },
-  marketplace: { label: 'External Seller',   cls: 'bg-sky-500/10 text-sky-400' },
-  giftcard:    { label: 'Gift Card',          cls: 'bg-amber-500/10 text-amber-400' },
-  idp:         { label: 'External IDP',      cls: 'bg-violet-500/10 text-violet-300' },
+  platform:    { label: 'Platform',          cls: 'bg-muted text-muted-foreground' },
+  erp:         { label: 'ERP Simulator',     cls: 'bg-emerald-50 text-emerald-700' },
+  ppp:         { label: 'Payment Provider',  cls: 'bg-violet-50 text-violet-700' },
+  marketplace: { label: 'External Seller',   cls: 'bg-sky-50 text-sky-700' },
+  giftcard:    { label: 'Gift Card',          cls: 'bg-warning-faded text-warning-foreground' },
+  idp:         { label: 'External IDP',      cls: 'bg-indigo-50 text-indigo-700' },
 };
 
-const CHANGE_TYPE_STYLE: Record<'feat' | 'fix' | 'chore', { label: string; color: string; bg: string }> = {
-  feat:  { label: 'feat',  color: '#60a5fa', bg: 'rgba(96,165,250,0.1)' },
-  fix:   { label: 'fix',   color: '#fbbf24', bg: 'rgba(251,191,36,0.1)' },
-  chore: { label: 'chore', color: 'rgba(255,255,255,0.25)', bg: 'rgba(255,255,255,0.05)' },
+const CHANGE_TYPE_STYLE: Record<'feat' | 'fix' | 'chore', { label: string; cls: string }> = {
+  feat:  { label: 'feat',  cls: 'bg-secondary text-primary' },
+  fix:   { label: 'fix',   cls: 'bg-warning-faded text-warning-foreground' },
+  chore: { label: 'chore', cls: 'bg-muted text-muted-foreground' },
 };
 
 const RELEASES: ReleaseEntry[] = [
   {
+    version: '1.7.0',
+    date: 'July 19, 2026',
+    tag: 'latest',
+    simulators: ['platform', 'erp', 'ppp', 'marketplace', 'giftcard', 'idp'],
+    changes: [
+      { type: 'feat', text: 'Full VTEX Admin visual redesign across the entire platform — every simulator now follows the styleguide.vtex.com product design system (light surfaces, Action Blue #134CD8 as the primary color) instead of the dark, Rebel-Pink-branded look. Rebel Pink is now reserved for small emphasis accents only (the VTEX wordmark, "Beta"/"Live"/"Latest" tags), matching how the real VTEX Admin separates brand identity from product UI.' },
+      { type: 'feat', text: 'New semantic design tokens in globals.css: success/warning/danger states with faded-pill variants, plus a dedicated emphasis token — status badges, scenario toggles, and call-log indicators across all simulators now read state at a glance instead of using ad-hoc Tailwind colors.' },
+      { type: 'feat', text: 'PPP, External Seller, and Gift Card simulators gained a proper first-run empty state — a centered card with a clear "Connect your VTEX account" prompt and primary CTA, replacing the low-visibility inline account bar.' },
+      { type: 'fix', text: 'ERP order table: Error column moved next to Status (was the last of 19 columns); default view now shows a scannable 6-7 column set with the rest reachable via the existing column-visibility toggle.' },
+      { type: 'fix', text: 'StatusBadge severity is now visually distinct — errors use the danger-faded token, success/neutral use success/muted tokens, instead of similar-weight flat color pairs.' },
+      { type: 'fix', text: 'Replaced remaining sub-12px arbitrary text sizes (text-[9px]/[10px]/[11px]) across ERP setup panels, About page, and all Beta simulator documentation panels with text-xs minimum.' },
+      { type: 'fix', text: 'Fixed a hardcoded, untokenized color value on the Gift Card provider list button; Sidebar active-nav state now uses a blue tint + left border accent instead of pink.' },
+      { type: 'chore', text: 'Synced the local vtex-brand-guidelines skill copy in this repo to v0.2.0 (adds product-ui-tokens.md, the source for this redesign’s color tokens, and bundled logo assets).' },
+    ],
+  },
+  {
     version: '1.6.0',
     date: 'June 23, 2026',
-    tag: 'latest',
     simulators: ['idp'],
     changes: [
       { type: 'feat', text: 'External IDP Simulator — full OAuth 2.0 Authorization Code flow mock. VTEX storefronts can now point their Authentication settings at this simulator and complete a real login handshake.' },
@@ -205,26 +220,26 @@ const RELEASES: ReleaseEntry[] = [
 
 export default function ReleaseNotesPage() {
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: '#0d1826' }}>
+    <div className="min-h-screen flex flex-col bg-background">
 
       {/* Header */}
-      <header className="border-b border-white/10 px-8 h-14 flex items-center justify-between shrink-0">
+      <header className="border-b border-border bg-card px-8 h-14 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-4">
           <Link
             href="/"
             className="flex items-center gap-1.5 transition-opacity hover:opacity-70"
           >
-            <svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            <svg className="w-3.5 h-3.5 text-muted-foreground" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 5l-5 5 5 5" />
             </svg>
-            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>All tools</span>
+            <span className="text-xs text-muted-foreground">All tools</span>
           </Link>
-          <span style={{ color: 'rgba(255,255,255,0.15)' }}>/</span>
+          <span className="text-muted-foreground/40">/</span>
           <div className="flex items-baseline gap-2">
-            <span className="text-sm font-black tracking-tighter" style={{ color: '#F71963' }}>VTEX</span>
-            <span className="text-sm text-white/50 font-medium">Demo Platform</span>
-            <span style={{ color: 'rgba(255,255,255,0.15)' }}>—</span>
-            <span className="text-sm text-white/70">Release Notes</span>
+            <span className="text-sm font-black tracking-tighter text-emphasis">VTEX</span>
+            <span className="text-sm text-muted-foreground font-medium">Demo Platform</span>
+            <span className="text-muted-foreground/40">—</span>
+            <span className="text-sm text-foreground">Release Notes</span>
           </div>
         </div>
       </header>
@@ -236,7 +251,7 @@ export default function ReleaseNotesPage() {
           {/* Legend */}
           <div className="flex items-center gap-2 flex-wrap pb-2">
             {(Object.entries(SIMULATOR_STYLE) as [Simulator, { label: string; cls: string }][]).map(([, style]) => (
-              <span key={style.label} className={`text-[10px] font-medium px-2 py-0.5 rounded ${style.cls}`}>
+              <span key={style.label} className={`text-xs font-medium px-2 py-0.5 rounded ${style.cls}`}>
                 {style.label}
               </span>
             ))}
@@ -245,46 +260,36 @@ export default function ReleaseNotesPage() {
           {RELEASES.map((release) => (
             <div
               key={release.version}
-              className="rounded-xl overflow-hidden"
-              style={{ border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)' }}
+              className="rounded-lg overflow-hidden border border-border bg-card shadow-sm"
             >
               {/* Version header */}
-              <div
-                className="flex items-center gap-3 px-5 py-3 border-b border-white/[0.06]"
-                style={{ background: 'rgba(255,255,255,0.03)' }}
-              >
-                <span className="text-sm font-bold font-mono text-white/90">{release.version}</span>
+              <div className="flex items-center gap-3 px-5 py-3 border-b border-border bg-muted/60">
+                <span className="text-sm font-bold font-mono text-foreground">{release.version}</span>
                 {release.tag && (
-                  <span
-                    className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
-                    style={{ background: '#F71963', color: '#fff' }}
-                  >
+                  <span className="text-xs font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-emphasis text-emphasis-foreground">
                     {release.tag}
                   </span>
                 )}
                 <div className="flex items-center gap-1.5 flex-wrap">
                   {release.simulators.map(sim => (
-                    <span key={sim} className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${SIMULATOR_STYLE[sim].cls}`}>
+                    <span key={sim} className={`text-xs font-medium px-1.5 py-0.5 rounded ${SIMULATOR_STYLE[sim].cls}`}>
                       {SIMULATOR_STYLE[sim].label}
                     </span>
                   ))}
                 </div>
-                <span className="ml-auto text-xs text-white/30">{release.date}</span>
+                <span className="ml-auto text-xs text-muted-foreground">{release.date}</span>
               </div>
 
               {/* Changes */}
-              <ul className="divide-y divide-white/[0.04]">
+              <ul className="divide-y divide-border">
                 {release.changes.map((change, i) => {
                   const style = CHANGE_TYPE_STYLE[change.type];
                   return (
                     <li key={i} className="flex items-start gap-3 px-5 py-2.5">
-                      <span
-                        className="mt-0.5 shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded"
-                        style={{ color: style.color, background: style.bg }}
-                      >
+                      <span className={`mt-0.5 shrink-0 text-xs font-semibold px-1.5 py-0.5 rounded ${style.cls}`}>
                         {style.label}
                       </span>
-                      <span className="text-sm leading-snug" style={{ color: 'rgba(255,255,255,0.65)' }}>
+                      <span className="text-sm leading-snug text-foreground/80">
                         {change.text}
                       </span>
                     </li>

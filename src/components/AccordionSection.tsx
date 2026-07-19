@@ -14,7 +14,7 @@ export function AccordionSection({
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <section>
+    <section className="rounded-lg border border-border bg-card shadow-sm px-6 py-5">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
@@ -22,8 +22,8 @@ export function AccordionSection({
       >
         <h2 className="text-base font-semibold text-foreground flex items-center gap-3">
           <span
-            className="w-1 h-5 rounded-full shrink-0 transition-opacity"
-            style={{ background: '#F71963', opacity: open ? 1 : 0.4 }}
+            className="w-1 h-5 rounded-full shrink-0 transition-opacity bg-primary"
+            style={{ opacity: open ? 1 : 0.4 }}
           />
           {title}
         </h2>

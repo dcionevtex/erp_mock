@@ -57,17 +57,17 @@ function LoginForm() {
       : null;
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: '#0d1826' }}>
+    <div className="min-h-screen flex flex-col bg-background">
       <main className="flex-1 flex items-center justify-center px-6 py-16">
         <div className="w-full max-w-sm space-y-8">
 
           {/* Brand */}
           <div className="space-y-1">
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-black tracking-tighter" style={{ color: '#F71963' }}>VTEX</span>
-              <span className="text-lg font-semibold text-white/80">Demo Platform</span>
+              <span className="text-2xl font-black tracking-tighter text-emphasis">VTEX</span>
+              <span className="text-lg font-semibold text-foreground">Demo Platform</span>
             </div>
-            <p className="text-sm text-white/35">
+            <p className="text-sm text-muted-foreground">
               Integration simulators for pre-sales and technical demos
             </p>
           </div>
@@ -77,52 +77,42 @@ function LoginForm() {
             {TOOLS.map(tool => (
               <div
                 key={tool.label}
-                className="flex items-start gap-3 rounded-xl px-4 py-3"
-                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
+                className="flex items-start gap-3 rounded-lg bg-card border border-border px-4 py-3 shadow-sm"
               >
-                <span className="mt-0.5 text-white/30 shrink-0">{tool.icon}</span>
+                <span className="mt-0.5 text-primary shrink-0">{tool.icon}</span>
                 <div className="min-w-0">
-                  <p className="text-sm font-medium text-white/70">{tool.label}</p>
-                  <p className="text-xs text-white/30 leading-relaxed mt-0.5">{tool.desc}</p>
+                  <p className="text-sm font-medium text-foreground">{tool.label}</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed mt-0.5">{tool.desc}</p>
                 </div>
               </div>
             ))}
           </div>
 
           {/* Sign-in card */}
-          <div
-            className="rounded-2xl px-6 py-6 space-y-5"
-            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)' }}
-          >
-            <p className="text-sm font-semibold text-white/70">Sign in with your VTEX account</p>
+          <div className="rounded-lg bg-card border border-border px-6 py-6 space-y-5 shadow-sm">
+            <p className="text-sm font-semibold text-foreground">Sign in with your VTEX account</p>
 
             {errorMessage && (
-              <div
-                className="flex items-center gap-2 rounded-lg px-4 py-3"
-                style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)' }}
-              >
-                <svg className="w-4 h-4 shrink-0 text-red-400" viewBox="0 0 16 16" fill="currentColor">
+              <div className="flex items-center gap-2 rounded-md bg-danger-faded border border-danger/20 px-4 py-3">
+                <svg className="w-4 h-4 shrink-0 text-danger-foreground" viewBox="0 0 16 16" fill="currentColor">
                   <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm.75 3.5v4a.75.75 0 0 1-1.5 0v-4a.75.75 0 0 1 1.5 0zm0 6.5a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0z" />
                 </svg>
-                <p className="text-sm text-red-400">{errorMessage}</p>
+                <p className="text-sm text-danger-foreground">{errorMessage}</p>
               </div>
             )}
 
             <button
               onClick={handleGoogleSignIn}
               disabled={loading}
-              className="w-full flex items-center justify-center gap-3 rounded-lg px-4 py-2.5 text-sm font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-              style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.8)' }}
-              onMouseEnter={e => { if (!loading) e.currentTarget.style.background = 'rgba(255,255,255,0.11)'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.07)'; }}
+              className="w-full flex items-center justify-center gap-3 rounded-md px-4 py-2.5 text-sm font-semibold transition-colors bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {loading ? (
-                <svg className="w-4 h-4 animate-spin text-white/50" viewBox="0 0 24 24" fill="none">
+                <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
                 </svg>
               ) : (
-                <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 shrink-0 rounded-full bg-white p-0.5" viewBox="0 0 24 24">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
                   <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
                   <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05" />
@@ -132,7 +122,7 @@ function LoginForm() {
               {loading ? 'Redirecting to Google…' : 'Sign in with Google'}
             </button>
 
-            <p className="text-center text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.2)' }}>
+            <p className="text-center text-xs leading-relaxed text-muted-foreground">
               Restricted to @vtex.com accounts. Do not use live production credentials or real customer data.
             </p>
           </div>
@@ -141,27 +131,23 @@ function LoginForm() {
       </main>
 
       {/* Footer */}
-      <footer
-        className="px-8 py-4 flex items-center justify-between gap-4 flex-wrap shrink-0 border-t"
-        style={{ borderColor: 'rgba(255,255,255,0.07)', background: '#0e1a27' }}
-      >
+      <footer className="px-8 py-4 flex items-center justify-between gap-4 flex-wrap shrink-0 border-t border-border bg-card">
         <a
           href="https://github.com/dcionevtex"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs transition-opacity hover:opacity-80"
-          style={{ color: 'rgba(255,255,255,0.3)' }}
+          className="text-xs text-muted-foreground transition-opacity hover:opacity-80"
         >
-          Built by <span className="font-semibold" style={{ color: 'rgba(255,255,255,0.6)' }}>@dcionevtex</span> & his bot army{' '}
+          Built by <span className="font-semibold text-foreground">@dcionevtex</span> & his bot army{' '}
           <svg width="14" height="16" viewBox="0 0 14 16" style={{ imageRendering: 'pixelated', display: 'inline-block', verticalAlign: 'middle', marginBottom: '1px' }}>
-            <rect x="6" y="0" width="2" height="4" fill="#c4b5fd"/>
+            <rect x="6" y="0" width="2" height="4" fill="#a78bfa"/>
             <rect x="2" y="4" width="10" height="2" fill="#94a3b8"/>
             <rect x="0" y="6" width="2" height="8" fill="#94a3b8"/>
             <rect x="12" y="6" width="2" height="8" fill="#94a3b8"/>
             <rect x="2" y="14" width="10" height="2" fill="#94a3b8"/>
-            <rect x="4" y="8" width="2" height="2" fill="#5eead4"/>
-            <rect x="8" y="8" width="2" height="2" fill="#5eead4"/>
-            <rect x="4" y="12" width="6" height="2" fill="#f87171"/>
+            <rect x="4" y="8" width="2" height="2" fill="#0d9488"/>
+            <rect x="8" y="8" width="2" height="2" fill="#0d9488"/>
+            <rect x="4" y="12" width="6" height="2" fill="#dc2626"/>
           </svg>
         </a>
         <a
@@ -172,12 +158,12 @@ function LoginForm() {
           aria-label="Brazilian Engineering"
         >
           <div className="flex flex-col items-center">
-            <span className="font-black italic leading-none tracking-tight" style={{ fontSize: '0.95rem', color: '#ffffff', fontFamily: 'Inter, sans-serif' }}>
+            <span className="font-black italic leading-none tracking-tight" style={{ fontSize: '0.95rem', color: '#3F3F40', fontFamily: 'Inter, sans-serif' }}>
               #BrazilianEngineering
             </span>
             <svg viewBox="0 0 240 16" width="200" height="13" className="mt-0.5" aria-hidden="true">
               <path d="M 2 8 C 60 15 100 13 112 8" stroke="#FEDF00" strokeWidth="2.8" fill="none" strokeLinecap="round" />
-              <path d="M 128 8 C 145 13 185 15 238 8" stroke="rgba(255,255,255,0.45)" strokeWidth="2.2" fill="none" strokeLinecap="round" />
+              <path d="M 128 8 C 145 13 185 15 238 8" stroke="#CACBCC" strokeWidth="2.2" fill="none" strokeLinecap="round" />
               <polygon points="120,1 130,8 120,15 110,8" fill="#009B3A" />
               <polygon points="120,3.5 128,8 120,12.5 112,8" fill="#FEDF00" />
               <circle cx="120" cy="8" r="4" fill="#002776" />
@@ -185,7 +171,7 @@ function LoginForm() {
             </svg>
           </div>
         </a>
-        <span className="text-xs" style={{ color: 'rgba(255,255,255,0.15)' }}>Demo &amp; test use only</span>
+        <span className="text-xs text-muted-foreground">Demo &amp; test use only</span>
       </footer>
     </div>
   );

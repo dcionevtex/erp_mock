@@ -58,40 +58,40 @@ const SCENARIOS: { value: MktScenario; label: string; color: string; dot: string
   {
     value: 'available',
     label: 'Available',
-    color: 'text-emerald-400',
-    dot: 'bg-emerald-400',
+    color: 'text-success-foreground',
+    dot: 'bg-success',
     description: 'All items in stock. Returns prices, SLAs, and stock balance.',
   },
   {
     value: 'unavailable',
     label: 'Unavailable',
-    color: 'text-red-400',
-    dot: 'bg-red-400',
+    color: 'text-danger-foreground',
+    dot: 'bg-danger',
     description: 'No stock. Returns quantity 0 and empty SLA list.',
     comingSoon: true,
   },
   {
     value: 'partial',
     label: 'Partial',
-    color: 'text-amber-400',
-    dot: 'bg-amber-400',
+    color: 'text-warning-foreground',
+    dot: 'bg-warning',
     description: 'First item available, remaining items out of stock.',
     comingSoon: true,
   },
 ];
 
 const METHOD_COLORS: Record<string, string> = {
-  POST: 'bg-sky-500/15 text-sky-400 border-sky-500/20',
-  PUT: 'bg-violet-500/15 text-violet-400 border-violet-500/20',
-  GET: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20',
-  DELETE: 'bg-red-500/15 text-red-400 border-red-500/20',
+  POST: 'bg-sky-50 text-sky-700 border-sky-200',
+  PUT: 'bg-violet-50 text-violet-700 border-violet-200',
+  GET: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  DELETE: 'bg-red-50 text-red-700 border-red-200',
 };
 
 const ENDPOINT_COLORS: Record<string, string> = {
-  simulation: 'text-sky-400',
-  placement: 'text-violet-400',
-  fulfill: 'text-emerald-400',
-  cancel: 'text-red-400',
+  simulation: 'text-sky-700',
+  placement: 'text-violet-700',
+  fulfill: 'text-emerald-700',
+  cancel: 'text-red-700',
 };
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -99,12 +99,12 @@ const ENDPOINT_COLORS: Record<string, string> = {
 function BrazilianEngineeringLogo() {
   return (
     <div className="flex flex-col items-center select-none">
-      <span className="font-black italic leading-none tracking-tight" style={{ fontSize: '1.1rem', color: '#ffffff', fontFamily: 'Inter, sans-serif' }}>
+      <span className="font-black italic leading-none tracking-tight text-foreground" style={{ fontSize: '1.1rem', fontFamily: 'Inter, sans-serif' }}>
         #BrazilianEngineering
       </span>
       <svg viewBox="0 0 240 16" width="220" height="14" className="mt-1" aria-hidden="true">
         <path d="M 2 8 C 60 15 100 13 112 8" stroke="#FEDF00" strokeWidth="2.8" fill="none" strokeLinecap="round" />
-        <path d="M 128 8 C 145 13 185 15 238 8" stroke="rgba(255,255,255,0.45)" strokeWidth="2.2" fill="none" strokeLinecap="round" />
+        <path d="M 128 8 C 145 13 185 15 238 8" stroke="#CACBCC" strokeWidth="2.2" fill="none" strokeLinecap="round" />
         <polygon points="120,1 130,8 120,15 110,8" fill="#009B3A" />
         <polygon points="120,3.5 128,8 120,12.5 112,8" fill="#FEDF00" />
         <circle cx="120" cy="8" r="4" fill="#002776" />
@@ -116,7 +116,7 @@ function BrazilianEngineeringLogo() {
 
 function JsonBlock({ data }: { data: unknown }) {
   return (
-    <pre className="text-xs leading-relaxed overflow-x-auto whitespace-pre-wrap break-words" style={{ color: 'rgba(255,255,255,0.55)' }}>
+    <pre className="text-xs leading-relaxed overflow-x-auto whitespace-pre-wrap break-words text-foreground/80 font-mono">
       {JSON.stringify(data, null, 2)}
     </pre>
   );
@@ -332,32 +332,31 @@ export default function MarketplacePage() {
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden" style={{ background: '#0d1826' }}>
+    <div className="h-screen flex flex-col overflow-hidden bg-background text-foreground">
 
       {/* Header */}
-      <header className="grid grid-cols-3 items-center h-16 px-6 shrink-0 border-b border-white/10">
+      <header className="grid grid-cols-3 items-center h-16 px-6 shrink-0 border-b border-border bg-card">
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center gap-1.5 transition-opacity hover:opacity-70">
-            <svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            <svg className="w-3.5 h-3.5 text-muted-foreground" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 5l-5 5 5 5" />
             </svg>
-            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>All tools</span>
+            <span className="text-xs text-muted-foreground">All tools</span>
           </Link>
-          <span style={{ color: 'rgba(255,255,255,0.15)' }}>/</span>
-          <span className="text-sm font-semibold text-white/70">External Seller Simulator</span>
+          <span className="text-border">/</span>
+          <span className="text-sm font-semibold text-foreground">External Seller Simulator</span>
         </div>
 
         <div className="flex flex-col items-center justify-center min-w-0">
           {account ? (
             <>
-              <span className="text-xs text-white/25 uppercase tracking-widest">Fulfillment URL</span>
+              <span className="text-xs text-muted-foreground uppercase tracking-widest">Fulfillment URL</span>
               <div className="flex items-center gap-2 mt-0.5">
-                <span className="text-xs font-mono text-white/50 break-all text-center">{baseUrl}</span>
+                <span className="text-xs font-mono text-foreground/80 break-all text-center">{baseUrl}</span>
                 <button
                   onClick={copyUrl}
                   title="Copy URL"
-                  className="shrink-0 transition-opacity hover:opacity-80"
-                  style={{ color: copied ? '#34d399' : 'rgba(255,255,255,0.35)' }}
+                  className={`shrink-0 transition-colors ${copied ? 'text-success-foreground' : 'text-muted-foreground hover:text-foreground'}`}
                 >
                   {copied ? (
                     <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0z"/></svg>
@@ -368,7 +367,7 @@ export default function MarketplacePage() {
               </div>
             </>
           ) : (
-            <span className="text-xs text-white/25">Configure account to get started</span>
+            <span className="text-xs text-muted-foreground">Configure account to get started</span>
           )}
         </div>
 
@@ -377,10 +376,7 @@ export default function MarketplacePage() {
             <button
               onClick={clearCalls}
               disabled={clearing || calls.length === 0}
-              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg transition-all disabled:opacity-30"
-              style={{ color: 'rgba(255,255,255,0.4)', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}
-              onMouseEnter={e => { if (!clearing) e.currentTarget.style.color = 'rgba(255,255,255,0.7)'; }}
-              onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.4)'; }}
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md transition-colors disabled:opacity-30 text-muted-foreground bg-muted border border-border hover:text-foreground hover:bg-secondary"
             >
               <svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M4 7h12M6 7l1 9h6l1-9M8 7V4h4v3" />
@@ -395,16 +391,16 @@ export default function MarketplacePage() {
       <div className="flex flex-1 overflow-hidden">
 
         {/* Left panel */}
-        <aside className="w-80 shrink-0 flex flex-col border-r border-white/10 overflow-hidden">
+        <aside className="w-80 shrink-0 flex flex-col border-r border-border bg-card overflow-hidden">
           {/* Tabs */}
-          <div className="flex border-b border-white/10 shrink-0">
+          <div className="flex border-b border-border shrink-0">
             {([['scenario', 'Scenario'], ['setup', 'Setup'], ['suggest', 'Catalog']] as const).map(([val, label]) => (
               <button
                 key={val}
                 onClick={() => setActiveTab(val)}
                 className={[
-                  'flex-1 py-3 text-xs font-medium transition-colors',
-                  activeTab === val ? 'text-white/80 border-b-2 border-[#F71963]' : 'text-white/30 hover:text-white/50',
+                  'flex-1 py-3 text-xs font-medium transition-colors border-b-2',
+                  activeTab === val ? 'text-primary border-primary' : 'text-muted-foreground border-transparent hover:text-foreground',
                 ].join(' ')}
               >
                 {label}
@@ -418,13 +414,7 @@ export default function MarketplacePage() {
 
                 {/* Account config */}
                 <div className="space-y-2">
-                  {!account && (
-                    <div className="rounded-lg px-3 py-2 mb-1 flex items-center gap-2" style={{ background: 'rgba(247,25,99,0.06)', border: '1px solid rgba(247,25,99,0.25)' }}>
-                      <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 16 16" fill="#F71963"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm.75 3.5v4a.75.75 0 0 1-1.5 0v-4a.75.75 0 0 1 1.5 0zm0 6.5a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0z"/></svg>
-                      <span className="text-xs font-semibold" style={{ color: '#F71963' }}>Start here — enter your account name</span>
-                    </div>
-                  )}
-                  <p className="text-xs uppercase tracking-widest text-white/25">VTEX Account</p>
+                  <p className="text-xs uppercase tracking-widest text-muted-foreground">VTEX Account</p>
                   <div className="flex gap-2">
                     <input
                       type="text"
@@ -432,29 +422,23 @@ export default function MarketplacePage() {
                       onChange={e => setAccountInput(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && commitAccount()}
                       placeholder="mystore"
-                      className="flex-1 text-sm rounded-lg px-3 py-2 outline-none focus:ring-1 focus:ring-pink-500/50"
-                      style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.8)' }}
+                      className="flex-1 text-sm rounded-md px-3 py-2 outline-none border border-border bg-background text-foreground focus:ring-2 focus:ring-primary/40 focus:border-primary"
                     />
                     <button
                       onClick={commitAccount}
                       disabled={!accountInput.trim()}
-                      className="px-3 py-2 rounded-lg text-xs font-semibold transition-all disabled:opacity-30"
-                      style={{ background: 'rgba(247,25,99,0.15)', border: '1px solid rgba(247,25,99,0.3)', color: '#F71963' }}
+                      className="px-3 py-2 rounded-md text-xs font-semibold bg-primary text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       Connect
                     </button>
                   </div>
                   {account && (
-                    <div
-                      className="rounded-lg px-3 py-2 space-y-1"
-                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
-                    >
-                      <p className="text-xs text-white/25">Fulfillment URL to register in VTEX</p>
-                      <p className="text-xs font-mono break-all" style={{ color: 'rgba(255,255,255,0.6)' }}>{baseUrl}</p>
+                    <div className="rounded-md px-3 py-2 space-y-1 bg-muted border border-border">
+                      <p className="text-xs text-muted-foreground">Fulfillment URL to register in VTEX</p>
+                      <p className="text-xs font-mono break-all text-foreground/80">{baseUrl}</p>
                       <button
                         onClick={copyUrl}
-                        className="flex items-center gap-1.5 text-xs mt-1 transition-opacity hover:opacity-80"
-                        style={{ color: copied ? '#34d399' : 'rgba(255,255,255,0.35)' }}
+                        className={`flex items-center gap-1.5 text-xs mt-1 transition-colors ${copied ? 'text-success-foreground' : 'text-muted-foreground hover:text-foreground'}`}
                       >
                         {copied ? (
                           <>
@@ -475,30 +459,26 @@ export default function MarketplacePage() {
                 {/* Scenario selector */}
                 <div className="space-y-2">
                   {/* Test product notice */}
-                  <div
-                    className="rounded-lg px-3 py-3 space-y-2"
-                    style={{ background: 'rgba(247,25,99,0.06)', border: '1px solid rgba(247,25,99,0.2)' }}
-                  >
+                  <div className="rounded-md px-3 py-3 space-y-2 bg-secondary border border-border">
                     <div className="flex items-center gap-1.5">
-                      <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 16 16" fill="#F71963"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm.75 3.5v4a.75.75 0 0 1-1.5 0v-4a.75.75 0 0 1 1.5 0zm0 6.5a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0z" /></svg>
-                      <p className="text-xs font-semibold" style={{ color: '#F71963' }}>Test product available</p>
+                      <svg className="w-3.5 h-3.5 shrink-0 text-primary" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm.75 3.5v4a.75.75 0 0 1-1.5 0v-4a.75.75 0 0 1 1.5 0zm0 6.5a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0z" /></svg>
+                      <p className="text-xs font-semibold text-primary">Test product available</p>
                     </div>
-                    <p className="text-xs text-white/40 leading-relaxed">
-                      A mock SKU is pre-configured in the <span className="text-white/60 font-mono">dcione</span> account mapped to seller <span className="text-white/60 font-mono">externalsellertest</span>. Use the link below to trigger a checkout flow directly. When prompted for a shipping address, use a Brazilian zip code (e.g. <span className="text-white/60 font-mono">05012000</span>).
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      A mock SKU is pre-configured in the <span className="text-foreground font-mono">dcione</span> account mapped to seller <span className="text-foreground font-mono">externalsellertest</span>. Use the link below to trigger a checkout flow directly. When prompted for a shipping address, use a Brazilian zip code (e.g. <span className="text-foreground font-mono">05012000</span>).
                     </p>
                     <a
                       href="https://dcione.myvtex.com/checkout/cart/add/?sku=100000&qty=1&seller=externalsellertest&sc=1"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-80 break-all"
-                      style={{ color: '#F71963' }}
+                      className="flex items-center gap-1.5 text-xs font-medium text-primary transition-opacity hover:opacity-80 break-all"
                     >
                       <svg className="w-3 h-3 shrink-0" viewBox="0 0 16 16" fill="currentColor"><path d="M3.75 2h3.5a.75.75 0 0 1 0 1.5h-3.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-3.5a.75.75 0 0 1 1.5 0v3.5A1.75 1.75 0 0 1 12.25 14h-8.5A1.75 1.75 0 0 1 2 12.25v-8.5C2 2.784 2.784 2 3.75 2zm6.854-1h4.146a.25.25 0 0 1 .25.25v4.146a.25.25 0 0 1-.427.177L13.03 4.03 9.28 7.78a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042l3.75-3.75-1.543-1.543A.25.25 0 0 1 10.604 1z" /></svg>
                       Add to cart and trigger checkout
                     </a>
                   </div>
 
-                  <p className="text-xs uppercase tracking-widest text-white/25">Simulation Scenario</p>
+                  <p className="text-xs uppercase tracking-widest text-muted-foreground">Simulation Scenario</p>
                   <div className="space-y-1.5">
                     {SCENARIOS.map(s => (
                       <button
@@ -506,24 +486,21 @@ export default function MarketplacePage() {
                         onClick={() => !s.comingSoon && changeScenario(s.value)}
                         disabled={!account || !!s.comingSoon}
                         className={[
-                          'w-full flex items-start gap-3 rounded-lg px-3 py-2.5 text-left transition-all disabled:opacity-40 disabled:cursor-not-allowed',
+                          'w-full flex items-start gap-3 rounded-md px-3 py-2.5 text-left transition-all disabled:opacity-40 disabled:cursor-not-allowed border',
                           scenario === s.value
-                            ? 'border border-white/20'
-                            : 'border border-transparent hover:border-white/10',
+                            ? 'border-primary bg-secondary'
+                            : 'border-transparent bg-muted hover:border-border',
                         ].join(' ')}
-                        style={{
-                          background: scenario === s.value ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.02)',
-                        }}
                       >
                         <span className={`mt-1 w-1.5 h-1.5 rounded-full shrink-0 ${s.dot}`} />
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
                             <p className={`text-xs font-semibold ${s.color}`}>{s.label}</p>
                             {s.comingSoon && (
-                              <span className="text-xs uppercase tracking-widest px-1.5 py-0.5 rounded border border-white/10 text-white/30">Coming Soon</span>
+                              <span className="text-xs uppercase tracking-widest px-1.5 py-0.5 rounded border border-border text-muted-foreground">Coming Soon</span>
                             )}
                           </div>
-                          <p className="text-xs text-white/30 mt-0.5 leading-relaxed">{s.description}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{s.description}</p>
                         </div>
                       </button>
                     ))}
@@ -532,19 +509,18 @@ export default function MarketplacePage() {
 
                 {/* Endpoint reference */}
                 <div className="space-y-2">
-                  <p className="text-xs uppercase tracking-widest text-white/25">Endpoints</p>
+                  <p className="text-xs uppercase tracking-widest text-muted-foreground">Endpoints</p>
                   <div className="space-y-1">
                     {Object.entries(ENDPOINT_DOCS).map(([key, doc]) => (
                       <div
                         key={key}
-                        className="rounded-lg px-3 py-2"
-                        style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}
+                        className="rounded-md px-3 py-2 bg-muted border border-border"
                       >
                         <div className="flex items-center gap-2">
                           <span className={`text-xs font-bold font-mono ${ENDPOINT_COLORS[key]}`}>{doc.method}</span>
-                          <span className="text-xs font-mono text-white/40 truncate">{doc.pathTemplate}</span>
+                          <span className="text-xs font-mono text-muted-foreground truncate">{doc.pathTemplate}</span>
                         </div>
-                        <p className="text-xs text-white/25 mt-0.5">{doc.label}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{doc.label}</p>
                       </div>
                     ))}
                   </div>
@@ -555,8 +531,8 @@ export default function MarketplacePage() {
             {activeTab === 'setup' && (
               <div className="p-4 space-y-5">
                 <div>
-                  <p className="text-xs font-semibold text-white/70">Setup guide</p>
-                  <p className="text-xs text-white/30 mt-1 leading-relaxed">
+                  <p className="text-xs font-semibold text-foreground">Setup guide</p>
+                  <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
                     How to connect this simulator as an external seller in your VTEX account.
                   </p>
                 </div>
@@ -596,22 +572,18 @@ export default function MarketplacePage() {
                   },
                 ].map(step => (
                   <div key={step.n} className="flex gap-3">
-                    <span
-                      className="shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold mt-0.5"
-                      style={{ background: 'rgba(247,25,99,0.15)', color: '#F71963' }}
-                    >
+                    <span className="shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold mt-0.5 bg-secondary text-primary">
                       {step.n}
                     </span>
                     <div>
-                      <p className="text-xs font-medium text-white/70">{step.title}</p>
-                      <p className="text-xs text-white/35 mt-0.5 leading-relaxed">{step.body}</p>
+                      <p className="text-xs font-medium text-foreground">{step.title}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{step.body}</p>
                       {step.link && 'url' in step.link && (
                         <a
                           href={step.link.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-xs mt-1 transition-opacity hover:opacity-80"
-                          style={{ color: '#F71963' }}
+                          className="inline-flex items-center gap-1 text-xs mt-1 text-primary transition-opacity hover:opacity-80"
                         >
                           {step.link.label}
                           <svg className="w-3 h-3" viewBox="0 0 16 16" fill="currentColor"><path d="M3.75 2h3.5a.75.75 0 0 1 0 1.5h-3.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-3.5a.75.75 0 0 1 1.5 0v3.5A1.75 1.75 0 0 1 12.25 14h-8.5A1.75 1.75 0 0 1 2 12.25v-8.5C2 2.784 2.784 2 3.75 2zm6.854-1h4.146a.25.25 0 0 1 .25.25v4.146a.25.25 0 0 1-.427.177L13.03 4.03 9.28 7.78a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042l3.75-3.75-1.543-1.543A.25.25 0 0 1 10.604 1z" /></svg>
@@ -620,8 +592,7 @@ export default function MarketplacePage() {
                       {step.link && 'tab' in step.link && (
                         <button
                           onClick={() => setActiveTab(step.link!.tab as 'scenario' | 'setup' | 'suggest')}
-                          className="inline-flex items-center gap-1 text-xs mt-1 transition-opacity hover:opacity-80"
-                          style={{ color: '#F71963' }}
+                          className="inline-flex items-center gap-1 text-xs mt-1 text-primary transition-opacity hover:opacity-80"
                         >
                           {step.link.label}
                           <svg className="w-3 h-3" viewBox="0 0 16 16" fill="currentColor"><path d="M6.22 3.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 0 1 0-1.06z"/></svg>
@@ -631,8 +602,8 @@ export default function MarketplacePage() {
                   </div>
                 ))}
 
-                <div className="pt-2 border-t border-white/08 space-y-1.5">
-                  <p className="text-xs uppercase tracking-widest text-white/25">Reference</p>
+                <div className="pt-2 border-t border-border space-y-1.5">
+                  <p className="text-xs uppercase tracking-widest text-muted-foreground">Reference</p>
                   {[
                     { label: 'External Seller Fulfillment API', url: 'https://developers.vtex.com/docs/api-reference/marketplace-protocol-external-seller-fulfillment' },
                     { label: 'Marketplace Protocol overview', url: 'https://developers.vtex.com/docs/guides/external-seller-integration-guide' },
@@ -643,8 +614,7 @@ export default function MarketplacePage() {
                       href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 text-xs transition-opacity hover:opacity-80"
-                      style={{ color: 'rgba(255,255,255,0.35)' }}
+                      className="flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
                     >
                       <svg className="w-3 h-3 shrink-0" viewBox="0 0 16 16" fill="currentColor"><path d="M3.75 2h3.5a.75.75 0 0 1 0 1.5h-3.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-3.5a.75.75 0 0 1 1.5 0v3.5A1.75 1.75 0 0 1 12.25 14h-8.5A1.75 1.75 0 0 1 2 12.25v-8.5C2 2.784 2.784 2 3.75 2zm6.854-1h4.146a.25.25 0 0 1 .25.25v4.146a.25.25 0 0 1-.427.177L13.03 4.03 9.28 7.78a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042l3.75-3.75-1.543-1.543A.25.25 0 0 1 10.604 1z" /></svg>
                       {link.label}
@@ -659,8 +629,8 @@ export default function MarketplacePage() {
 
                 {/* Credentials */}
                 <div className="space-y-2">
-                  <p className="text-xs uppercase tracking-widest text-white/25">Credentials</p>
-                  <p className="text-xs text-white/30 leading-relaxed">
+                  <p className="text-xs uppercase tracking-widest text-muted-foreground">Credentials</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
                     Stored locally. Forwarded to VTEX — never persisted on our server.
                   </p>
                   {[
@@ -670,14 +640,13 @@ export default function MarketplacePage() {
                     { key: 'appToken', label: 'App Token', placeholder: '••••••••', type: 'password' },
                   ].map(field => (
                     <div key={field.key} className="space-y-1">
-                      <label className="text-xs text-white/35">{field.label}</label>
+                      <label className="text-xs text-muted-foreground">{field.label}</label>
                       <input
                         type={field.type}
                         value={suggestCreds[field.key as keyof typeof suggestCreds]}
                         onChange={e => saveSuggestCreds({ ...suggestCreds, [field.key]: e.target.value })}
                         placeholder={field.placeholder}
-                        className="w-full text-xs rounded-lg px-3 py-2 outline-none focus:ring-1 focus:ring-pink-500/50"
-                        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.75)' }}
+                        className="w-full text-xs rounded-md px-3 py-2 outline-none border border-border bg-background text-foreground focus:ring-2 focus:ring-primary/40 focus:border-primary"
                       />
                     </div>
                   ))}
@@ -685,7 +654,7 @@ export default function MarketplacePage() {
 
                 {/* SKU data */}
                 <div className="space-y-2">
-                  <p className="text-xs uppercase tracking-widest text-white/25">SKU data</p>
+                  <p className="text-xs uppercase tracking-widest text-muted-foreground">SKU data</p>
                   {[
                     { key: 'sellerSkuId', label: 'Seller SKU ID *', placeholder: 'SKU-001' },
                     { key: 'productName', label: 'Product Name *', placeholder: 'My Product' },
@@ -700,21 +669,20 @@ export default function MarketplacePage() {
                     { key: 'currency', label: 'Currency code', placeholder: 'USD' },
                   ].map(field => (
                     <div key={field.key} className="space-y-1">
-                      <label className="text-xs text-white/35">{field.label}</label>
+                      <label className="text-xs text-muted-foreground">{field.label}</label>
                       <input
                         type="text"
                         value={suggestForm[field.key as keyof typeof suggestForm]}
                         onChange={e => setSuggestForm(f => ({ ...f, [field.key]: e.target.value }))}
                         placeholder={field.placeholder}
-                        className="w-full text-xs rounded-lg px-3 py-2 outline-none focus:ring-1 focus:ring-pink-500/50"
-                        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.75)' }}
+                        className="w-full text-xs rounded-md px-3 py-2 outline-none border border-border bg-background text-foreground focus:ring-2 focus:ring-primary/40 focus:border-primary"
                       />
                     </div>
                   ))}
 
                   {/* Dimensions row */}
                   <div>
-                    <label className="text-xs text-white/35 block mb-1">Dimensions (cm / kg)</label>
+                    <label className="text-xs text-muted-foreground block mb-1">Dimensions (cm / kg)</label>
                     <div className="grid grid-cols-4 gap-1.5">
                       {[
                         { key: 'height', placeholder: 'H' },
@@ -728,8 +696,7 @@ export default function MarketplacePage() {
                           value={suggestForm[f.key as keyof typeof suggestForm]}
                           onChange={e => setSuggestForm(form => ({ ...form, [f.key]: e.target.value }))}
                           placeholder={f.placeholder}
-                          className="text-xs rounded-lg px-2 py-2 outline-none focus:ring-1 focus:ring-pink-500/50 text-center"
-                          style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.75)' }}
+                          className="text-xs rounded-md px-2 py-2 outline-none border border-border bg-background text-foreground focus:ring-2 focus:ring-primary/40 focus:border-primary text-center"
                         />
                       ))}
                     </div>
@@ -740,14 +707,13 @@ export default function MarketplacePage() {
                 <button
                   onClick={registerSku}
                   disabled={registering || !account || !suggestCreds.sellerId || !suggestCreds.sellerAccount || !suggestCreds.appKey || !suggestCreds.appToken || !suggestForm.sellerSkuId || !suggestForm.productName || !suggestForm.skuName}
-                  className="w-full py-2.5 rounded-lg text-xs font-semibold transition-all disabled:opacity-30"
-                  style={{ background: 'rgba(247,25,99,0.15)', border: '1px solid rgba(247,25,99,0.3)', color: '#F71963' }}
+                  className="w-full py-2.5 rounded-md text-xs font-semibold bg-primary text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {registering ? 'Registering…' : 'Register SKU'}
                 </button>
 
                 {!account && (
-                  <p className="text-xs text-white/30 text-center">Set the marketplace account in the Scenario tab first.</p>
+                  <p className="text-xs text-muted-foreground text-center">Set the marketplace account in the Scenario tab first.</p>
                 )}
 
                 {/* Step-by-step result */}
@@ -756,35 +722,45 @@ export default function MarketplacePage() {
                     {registerSteps.map((step, i) => (
                       <div
                         key={i}
-                        className="rounded-lg p-3 space-y-2"
-                        style={{
-                          background: step.ok ? 'rgba(52,211,153,0.06)' : step.vtexStatus === 404 ? 'rgba(251,191,36,0.06)' : 'rgba(248,113,113,0.06)',
-                          border: `1px solid ${step.ok ? 'rgba(52,211,153,0.2)' : step.vtexStatus === 404 ? 'rgba(251,191,36,0.2)' : 'rgba(248,113,113,0.2)'}`,
-                        }}
+                        className={[
+                          'rounded-md p-3 space-y-2 border',
+                          step.ok ? 'bg-success-faded border-success' : step.vtexStatus === 404 ? 'bg-warning-faded border-warning' : 'bg-danger-faded border-danger',
+                        ].join(' ')}
                       >
                         <div className="flex items-center gap-2">
-                          <span className="text-xs text-white/30 font-medium">Step {i + 1}</span>
-                          <span className="text-xs text-white/50">{step.label}</span>
+                          {step.ok ? (
+                            <svg className="w-3.5 h-3.5 shrink-0 text-success-foreground" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.75.75 0 0 1 1.06-1.06L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0z" /></svg>
+                          ) : step.vtexStatus === 404 ? (
+                            <svg className="w-3.5 h-3.5 shrink-0 text-warning-foreground" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm.75 3.5v4a.75.75 0 0 1-1.5 0v-4a.75.75 0 0 1 1.5 0zm0 6.5a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0z" /></svg>
+                          ) : (
+                            <svg className="w-3.5 h-3.5 shrink-0 text-danger-foreground" viewBox="0 0 16 16" fill="currentColor"><path d="M4.28 3.22a.75.75 0 0 0-1.06 1.06L6.94 8l-3.72 3.72a.75.75 0 1 0 1.06 1.06L8 9.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L9.06 8l3.72-3.72a.75.75 0 0 0-1.06-1.06L8 6.94z" /></svg>
+                          )}
+                          <span className="text-xs text-muted-foreground font-medium">Step {i + 1}</span>
+                          <span className="text-xs text-foreground">{step.label}</span>
                           <span
-                            className="ml-auto text-xs font-bold font-mono px-1.5 py-0.5 rounded"
-                            style={{
-                              color: step.ok ? '#34d399' : step.vtexStatus === 404 ? '#fbbf24' : '#f87171',
-                              background: 'rgba(255,255,255,0.05)',
-                            }}
+                            className={[
+                              'ml-auto text-xs font-bold font-mono px-1.5 py-0.5 rounded bg-card',
+                              step.ok ? 'text-success-foreground' : step.vtexStatus === 404 ? 'text-warning-foreground' : 'text-danger-foreground',
+                            ].join(' ')}
                           >
                             {step.vtexStatus || 'ERR'}
                           </span>
                         </div>
-                        <p className={`text-xs font-medium ${step.ok ? 'text-emerald-400' : step.vtexStatus === 404 ? 'text-amber-400' : 'text-red-400'}`}>
+                        <p
+                          className={[
+                            'text-xs font-medium',
+                            step.ok ? 'text-success-foreground' : step.vtexStatus === 404 ? 'text-warning-foreground' : 'text-danger-foreground',
+                          ].join(' ')}
+                        >
                           {step.message}
                         </p>
                         {step.data != null && (
-                          <pre className="text-xs font-mono text-white/40 overflow-auto max-h-28 whitespace-pre-wrap break-all">
+                          <pre className="text-xs font-mono text-foreground/70 overflow-auto max-h-28 whitespace-pre-wrap break-all bg-card rounded p-2 border border-border">
                             {typeof step.data === 'string' ? step.data : JSON.stringify(step.data, null, 2)}
                           </pre>
                         )}
                         {!step.ok && step.sentUrl && (
-                          <p className="text-xs font-mono text-white/30 break-all">{step.sentUrl}</p>
+                          <p className="text-xs font-mono text-muted-foreground break-all">{step.sentUrl}</p>
                         )}
                       </div>
                     ))}
@@ -802,8 +778,7 @@ export default function MarketplacePage() {
                       href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 text-xs transition-opacity hover:opacity-80"
-                      style={{ color: 'rgba(255,255,255,0.25)' }}
+                      className="flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
                     >
                       <svg className="w-3 h-3 shrink-0" viewBox="0 0 16 16" fill="currentColor"><path d="M3.75 2h3.5a.75.75 0 0 1 0 1.5h-3.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-3.5a.75.75 0 0 1 1.5 0v3.5A1.75 1.75 0 0 1 12.25 14h-8.5A1.75 1.75 0 0 1 2 12.25v-8.5C2 2.784 2.784 2 3.75 2zm6.854-1h4.146a.25.25 0 0 1 .25.25v4.146a.25.25 0 0 1-.427.177L13.03 4.03 9.28 7.78a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042l3.75-3.75-1.543-1.543A.25.25 0 0 1 10.604 1z" /></svg>
                       {link.label}
@@ -817,150 +792,179 @@ export default function MarketplacePage() {
 
         {/* Right panel — call log */}
         <main className="flex-1 flex flex-col overflow-hidden">
-
-          {/* Flow strip */}
-          <div className="relative shrink-0 border-b border-white/10 px-6 py-3">
-            <div className="flex items-center justify-center gap-2">
-              {Object.entries(ENDPOINT_DOCS).map(([key, doc], i, arr) => {
-                const count = sortedCalls.filter(c => c.endpoint === key).length;
-                return (
-                  <div key={key} className="flex items-center gap-2">
-                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
-                      <span className={`text-xs font-bold font-mono ${ENDPOINT_COLORS[key]}`}>{doc.method}</span>
-                      <span className="text-xs text-white/40">{doc.label}</span>
-                      {count > 0 && (
-                        <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${ENDPOINT_COLORS[key]}`} style={{ background: 'rgba(255,255,255,0.06)' }}>
-                          {count}
-                        </span>
-                      )}
-                    </div>
-                    {i < arr.length - 1 && (
-                      <svg className="w-3 h-3 text-white/15 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M5 10h10M10 5l5 5-5 5" />
-                      </svg>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Call list */}
-          <div className="flex-1 overflow-y-auto">
-            {sortedCalls.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full gap-3" style={{ color: 'rgba(255,255,255,0.15)' }}>
-                <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                  <path d="M9 22V12h6v10" />
-                </svg>
-                <p className="text-sm">
-                  {account ? 'Waiting for VTEX marketplace calls…' : 'Configure your account name to get started'}
-                </p>
+          {!account ? (
+            /* First-run empty state — prominent centered account setup card */
+            <div className="flex-1 flex flex-col items-center justify-center px-6">
+              <div className="w-full max-w-sm rounded-lg border border-border bg-card shadow-sm p-6 text-center space-y-4">
+                <div className="mx-auto w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
+                  <svg className="w-5 h-5 text-primary" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 9l7-6 7 6v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    <path d="M8 19v-7h4v7" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-foreground">Connect your VTEX account</p>
+                  <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                    Enter your VTEX account name to generate a Fulfillment URL and start receiving marketplace calls.
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={accountInput}
+                    onChange={e => setAccountInput(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && commitAccount()}
+                    placeholder="mystore"
+                    className="flex-1 text-sm rounded-md px-3 py-2 outline-none border border-border bg-background text-foreground focus:ring-2 focus:ring-primary/40 focus:border-primary"
+                  />
+                  <button
+                    onClick={commitAccount}
+                    disabled={!accountInput.trim()}
+                    className="px-4 py-2 rounded-md text-sm font-semibold bg-primary text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    Connect
+                  </button>
+                </div>
               </div>
-            ) : (
-              <div className="divide-y divide-white/[0.04]">
-                {[...sortedCalls].reverse().map(call => {
-                  const expanded = expandedIds.has(call.id);
-                  const doc = ENDPOINT_DOCS[call.endpoint];
-                  return (
-                    <div key={call.id}>
-                      <button
-                        onClick={() => toggleExpand(call.id)}
-                        className="w-full flex items-center gap-3 px-5 py-3 text-left transition-colors hover:bg-white/[0.02]"
-                      >
-                        {/* Method badge */}
-                        <span className={`shrink-0 text-xs font-bold font-mono px-1.5 py-0.5 rounded border ${METHOD_COLORS[call.method] ?? 'bg-white/10 text-white/40 border-white/10'}`}>
-                          {call.method}
-                        </span>
-
-                        {/* Endpoint label + path */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className={`text-xs font-semibold ${ENDPOINT_COLORS[call.endpoint] ?? 'text-white/60'}`}>
-                              {doc?.label ?? call.endpoint}
+            </div>
+          ) : (
+            <>
+              {/* Flow strip */}
+              <div className="relative shrink-0 border-b border-border bg-card px-6 py-3">
+                <div className="flex items-center justify-center gap-2">
+                  {Object.entries(ENDPOINT_DOCS).map(([key, doc], i, arr) => {
+                    const count = sortedCalls.filter(c => c.endpoint === key).length;
+                    return (
+                      <div key={key} className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-muted border border-border">
+                          <span className={`text-xs font-bold font-mono ${ENDPOINT_COLORS[key]}`}>{doc.method}</span>
+                          <span className="text-xs text-muted-foreground">{doc.label}</span>
+                          {count > 0 && (
+                            <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full bg-card border border-border ${ENDPOINT_COLORS[key]}`}>
+                              {count}
                             </span>
-                            <span className="text-xs text-white/25 font-mono truncate hidden sm:block">{call.path}</span>
-                          </div>
-                          <p className="text-xs text-white/25 mt-0.5">
-                            {new Date(call.timestamp).toLocaleTimeString()}
-                            {call.orderId && <> · <span className="font-mono">{call.orderId}</span></>}
-                          </p>
-                        </div>
-
-                        {/* Status + duration */}
-                        <div className="flex items-center gap-2 shrink-0">
-                          <span className={`text-xs font-bold px-1.5 py-0.5 rounded ${call.httpStatus < 300 ? 'bg-emerald-500/15 text-emerald-400' : 'bg-red-500/15 text-red-400'}`}>
-                            {call.httpStatus}
-                          </span>
-                          <span className="text-xs text-white/20">{call.durationMs}ms</span>
-                          <svg
-                            className={`w-3.5 h-3.5 text-white/20 transition-transform ${expanded ? 'rotate-180' : ''}`}
-                            viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
-                          >
-                            <path d="M5 8l5 5 5-5" />
-                          </svg>
-                        </div>
-                      </button>
-
-                      {expanded && (
-                        <div className="px-5 pb-4 space-y-4" style={{ background: 'rgba(0,0,0,0.15)' }}>
-
-                          {/* Endpoint doc */}
-                          {doc && (
-                            <div className="rounded-lg px-4 py-3 space-y-1" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                              <p className="text-xs text-white/50 leading-relaxed">{doc.description}</p>
-                              <a
-                                href={doc.docUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 text-xs transition-opacity hover:opacity-80"
-                                style={{ color: '#F71963' }}
-                              >
-                                VTEX API reference
-                                <svg className="w-3 h-3" viewBox="0 0 16 16" fill="currentColor"><path d="M3.75 2h3.5a.75.75 0 0 1 0 1.5h-3.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-3.5a.75.75 0 0 1 1.5 0v3.5A1.75 1.75 0 0 1 12.25 14h-8.5A1.75 1.75 0 0 1 2 12.25v-8.5C2 2.784 2.784 2 3.75 2zm6.854-1h4.146a.25.25 0 0 1 .25.25v4.146a.25.25 0 0 1-.427.177L13.03 4.03 9.28 7.78a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042l3.75-3.75-1.543-1.543A.25.25 0 0 1 10.604 1z" /></svg>
-                              </a>
-                            </div>
                           )}
+                        </div>
+                        {i < arr.length - 1 && (
+                          <svg className="w-3 h-3 text-muted-foreground/50 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M5 10h10M10 5l5 5-5 5" />
+                          </svg>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
 
-                          {/* Request */}
-                          {call.requestBody != null && (
-                            <div className="space-y-1.5">
-                              <p className="text-xs uppercase tracking-widest text-white/25">Request body</p>
-                              <div className="rounded-lg p-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                                <JsonBlock data={call.requestBody} />
+              {/* Call list */}
+              <div className="flex-1 overflow-y-auto">
+                {sortedCalls.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full gap-3 text-muted-foreground">
+                    <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                      <path d="M9 22V12h6v10" />
+                    </svg>
+                    <p className="text-sm">Waiting for VTEX marketplace calls…</p>
+                  </div>
+                ) : (
+                  <div className="divide-y divide-border">
+                    {[...sortedCalls].reverse().map(call => {
+                      const expanded = expandedIds.has(call.id);
+                      const doc = ENDPOINT_DOCS[call.endpoint];
+                      return (
+                        <div key={call.id}>
+                          <button
+                            onClick={() => toggleExpand(call.id)}
+                            className="w-full flex items-center gap-3 px-5 py-3 text-left transition-colors hover:bg-muted"
+                          >
+                            {/* Method badge */}
+                            <span className={`shrink-0 text-xs font-bold font-mono px-1.5 py-0.5 rounded border ${METHOD_COLORS[call.method] ?? 'bg-muted text-muted-foreground border-border'}`}>
+                              {call.method}
+                            </span>
+
+                            {/* Endpoint label + path */}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className={`text-xs font-semibold ${ENDPOINT_COLORS[call.endpoint] ?? 'text-foreground'}`}>
+                                  {doc?.label ?? call.endpoint}
+                                </span>
+                                <span className="text-xs text-muted-foreground font-mono truncate hidden sm:block">{call.path}</span>
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-0.5">
+                                {new Date(call.timestamp).toLocaleTimeString()}
+                                {call.orderId && <> · <span className="font-mono">{call.orderId}</span></>}
+                              </p>
+                            </div>
+
+                            {/* Status + duration */}
+                            <div className="flex items-center gap-2 shrink-0">
+                              <span className={`text-xs font-bold px-1.5 py-0.5 rounded ${call.httpStatus < 300 ? 'bg-success-faded text-success-foreground' : 'bg-danger-faded text-danger-foreground'}`}>
+                                {call.httpStatus}
+                              </span>
+                              <span className="text-xs text-muted-foreground">{call.durationMs}ms</span>
+                              <svg
+                                className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${expanded ? 'rotate-180' : ''}`}
+                                viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+                              >
+                                <path d="M5 8l5 5 5-5" />
+                              </svg>
+                            </div>
+                          </button>
+
+                          {expanded && (
+                            <div className="px-5 pb-4 space-y-4 bg-muted/50">
+
+                              {/* Endpoint doc */}
+                              {doc && (
+                                <div className="rounded-md px-4 py-3 space-y-1 bg-card border border-border">
+                                  <p className="text-xs text-muted-foreground leading-relaxed">{doc.description}</p>
+                                  <a
+                                    href={doc.docUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1 text-xs text-primary transition-opacity hover:opacity-80"
+                                  >
+                                    VTEX API reference
+                                    <svg className="w-3 h-3" viewBox="0 0 16 16" fill="currentColor"><path d="M3.75 2h3.5a.75.75 0 0 1 0 1.5h-3.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-3.5a.75.75 0 0 1 1.5 0v3.5A1.75 1.75 0 0 1 12.25 14h-8.5A1.75 1.75 0 0 1 2 12.25v-8.5C2 2.784 2.784 2 3.75 2zm6.854-1h4.146a.25.25 0 0 1 .25.25v4.146a.25.25 0 0 1-.427.177L13.03 4.03 9.28 7.78a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042l3.75-3.75-1.543-1.543A.25.25 0 0 1 10.604 1z" /></svg>
+                                  </a>
+                                </div>
+                              )}
+
+                              {/* Request */}
+                              {call.requestBody != null && (
+                                <div className="space-y-1.5">
+                                  <p className="text-xs uppercase tracking-widest text-muted-foreground">Request body</p>
+                                  <div className="rounded-md p-3 bg-card border border-border">
+                                    <JsonBlock data={call.requestBody} />
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Response */}
+                              <div className="space-y-1.5">
+                                <p className="text-xs uppercase tracking-widest text-muted-foreground">Response body</p>
+                                <div className="rounded-md p-3 bg-card border border-border">
+                                  <JsonBlock data={call.responseBody} />
+                                </div>
                               </div>
                             </div>
                           )}
-
-                          {/* Response */}
-                          <div className="space-y-1.5">
-                            <p className="text-xs uppercase tracking-widest text-white/25">Response body</p>
-                            <div className="rounded-lg p-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                              <JsonBlock data={call.responseBody} />
-                            </div>
-                          </div>
                         </div>
-                      )}
-                    </div>
-                  );
-                })}
+                      );
+                    })}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
+            </>
+          )}
         </main>
       </div>
 
       {/* Footer */}
-      <footer
-        className="border-t px-8 py-4 flex items-center justify-between gap-4 flex-wrap shrink-0"
-        style={{ borderColor: 'rgba(255,255,255,0.08)', background: '#0e1a27' }}
-      >
+      <footer className="border-t border-border bg-card px-8 py-4 flex items-center justify-between gap-4 flex-wrap shrink-0">
         <button
           onClick={() => signOut({ callbackUrl: '/login' })}
-          className="flex items-center gap-2 text-xs font-medium transition-colors"
-          style={{ color: 'rgba(255,255,255,0.35)' }}
-          onMouseEnter={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.7)')}
-          onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.35)')}
+          className="flex items-center gap-2 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
           <svg className="w-4 h-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
             <path d="M7 3H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h3" />
@@ -978,10 +982,9 @@ export default function MarketplacePage() {
           href="https://github.com/dcionevtex"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs transition-opacity hover:opacity-80"
-          style={{ color: 'rgba(255,255,255,0.4)' }}
+          className="text-xs text-muted-foreground transition-opacity hover:opacity-80"
         >
-          Built by <span className="font-semibold" style={{ color: 'rgba(255,255,255,0.75)' }}>@dcionevtex</span> & his bot army{' '}
+          Built by <span className="font-semibold text-foreground">@dcionevtex</span> & his bot army{' '}
           <svg width="14" height="16" viewBox="0 0 14 16" style={{ imageRendering: 'pixelated', display: 'inline-block', verticalAlign: 'middle', marginBottom: '1px' }}>
             <rect x="6" y="0" width="2" height="4" fill="#c4b5fd"/>
             <rect x="2" y="4" width="10" height="2" fill="#94a3b8"/>

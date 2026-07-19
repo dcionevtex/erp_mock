@@ -129,52 +129,43 @@ const RELEASES: ReleaseEntry[] = [
 ];
 
 const CHANGE_TYPE_STYLE: Record<ReleaseEntry['changes'][number]['type'], { label: string; cls: string }> = {
-  feat:  { label: 'feat',  cls: 'bg-blue-50 text-blue-700' },
-  fix:   { label: 'fix',   cls: 'bg-amber-50 text-amber-700' },
-  chore: { label: 'chore', cls: 'bg-gray-100 text-gray-500' },
+  feat:  { label: 'feat',  cls: 'bg-secondary text-secondary-foreground' },
+  fix:   { label: 'fix',   cls: 'bg-warning-faded text-warning-foreground' },
+  chore: { label: 'chore', cls: 'bg-muted text-muted-foreground' },
 };
 
 export default function ReleaseNotesPage() {
   return (
     <AppShell>
       <div className="bg-background min-h-full flex flex-col">
-        <header
-          className="border-b border-white/10 px-6 py-4 sticky top-0 z-10"
-          style={{ background: '#142032' }}
-        >
+        <header className="border-b border-border px-6 py-4 sticky top-0 z-10 bg-card">
           <div className="flex items-baseline gap-3">
-            <span className="text-xl font-black tracking-tighter" style={{ color: '#F71963' }}>VTEX</span>
-            <span className="text-white/20 text-lg font-thin">|</span>
-            <h1 className="text-sm font-semibold text-white/90">Release Notes</h1>
+            <span className="text-xl font-black tracking-tighter text-primary">VTEX</span>
+            <span className="text-border text-lg font-thin">|</span>
+            <h1 className="text-sm font-semibold text-foreground">Release Notes</h1>
           </div>
         </header>
 
         <main className="flex-1 px-6 py-6 max-w-2xl">
           <div className="space-y-6">
             {RELEASES.map((release) => (
-              <div key={release.version} className="rounded-xl border border-border bg-card overflow-hidden">
-                <div
-                  className="flex items-center gap-3 px-5 py-3 border-b border-border/60"
-                  style={{ background: 'linear-gradient(to right, #142032 0%, #1e2f44 100%)' }}
-                >
-                  <span className="text-sm font-bold text-white font-mono">{release.version}</span>
+              <div key={release.version} className="rounded-xl border border-border bg-card overflow-hidden shadow-sm">
+                <div className="flex items-center gap-3 px-5 py-3 border-b border-border bg-secondary">
+                  <span className="text-sm font-bold text-foreground font-mono">{release.version}</span>
                   {release.tag && (
-                    <span
-                      className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
-                      style={{ background: '#F71963', color: '#fff' }}
-                    >
+                    <span className="text-xs font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-emphasis text-emphasis-foreground">
                       {release.tag}
                     </span>
                   )}
-                  <span className="ml-auto text-xs text-white/40">{release.date}</span>
+                  <span className="ml-auto text-xs text-muted-foreground">{release.date}</span>
                 </div>
 
-                <ul className="divide-y divide-border/40">
+                <ul className="divide-y divide-border">
                   {release.changes.map((change, i) => {
                     const style = CHANGE_TYPE_STYLE[change.type];
                     return (
                       <li key={i} className="flex items-start gap-3 px-5 py-2.5">
-                        <span className={`mt-0.5 shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded ${style.cls}`}>
+                        <span className={`mt-0.5 shrink-0 text-xs font-semibold px-1.5 py-0.5 rounded ${style.cls}`}>
                           {style.label}
                         </span>
                         <span className="text-sm text-foreground leading-snug">{change.text}</span>

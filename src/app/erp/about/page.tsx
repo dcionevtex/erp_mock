@@ -12,28 +12,28 @@ export default function AboutPage() {
     <div className="bg-background min-h-full flex flex-col">
 
       {/* Header */}
-      <header className="border-b border-border px-4 py-0 flex items-stretch gap-4 sticky top-0 z-10" style={{ background: '#142032' }}>
+      <header className="border-b border-border px-4 py-0 flex items-stretch gap-4 sticky top-0 z-10 bg-card">
         <div className="flex items-center gap-4 py-3">
-          <span className="text-xl font-black tracking-tighter leading-none" style={{ color: '#F71963' }}>VTEX</span>
-          <span className="text-white/20 text-lg font-thin">|</span>
-          <span className="text-sm font-semibold text-white/90">A Simple ERP Simulator</span>
-          <span className="text-white/20 text-lg font-thin hidden sm:block">|</span>
-          <span className="text-sm text-white/50 hidden sm:block">Documentation</span>
+          <span className="text-xl font-black tracking-tighter leading-none text-primary">VTEX</span>
+          <span className="text-border text-lg font-thin">|</span>
+          <span className="text-sm font-semibold text-foreground">A Simple ERP Simulator</span>
+          <span className="text-border text-lg font-thin hidden sm:block">|</span>
+          <span className="text-sm text-muted-foreground hidden sm:block">Documentation</span>
         </div>
       </header>
 
       <main className="flex-1 px-4 py-8 max-w-4xl mx-auto w-full space-y-8">
 
         {/* Hero */}
-        <div className="rounded-xl border border-border overflow-hidden">
-          <div className="px-6 py-5" style={{ background: '#142032' }}>
+        <div className="rounded-xl border border-border overflow-hidden bg-card shadow-sm">
+          <div className="px-6 py-5 bg-secondary">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-2xl font-black tracking-tighter" style={{ color: '#F71963' }}>VTEX</span>
-                  <span className="text-xl font-semibold text-white">A Simple ERP Simulator</span>
+                  <span className="text-2xl font-black tracking-tighter text-primary">VTEX</span>
+                  <span className="text-xl font-semibold text-foreground">A Simple ERP Simulator</span>
                 </div>
-                <p className="text-white/60 text-sm max-w-xl leading-relaxed">
+                <p className="text-muted-foreground text-sm max-w-xl leading-relaxed">
                   A demo-grade middleware that simulates the operational handoff between VTEX OMS and an external ERP system — using the official VTEX Feed and Hook integration patterns.
                 </p>
               </div>
@@ -44,7 +44,7 @@ export default function AboutPage() {
               </div>
             </div>
           </div>
-          <div className="px-6 py-4 bg-muted/30 border-t border-border grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="px-6 py-4 bg-muted border-t border-border grid grid-cols-2 sm:grid-cols-4 gap-4">
             <Stat label="Integration modes" value="Feed + Hook" />
             <Stat label="VTEX APIs used" value="5" />
             <Stat label="API endpoints" value="25" />
@@ -53,40 +53,40 @@ export default function AboutPage() {
         </div>
 
         {/* Seller account notice */}
-        <div className="rounded-xl overflow-hidden border" style={{ borderColor: '#f59e0b' }}>
-          <div className="flex items-center gap-2.5 px-4 py-2.5" style={{ background: '#f59e0b' }}>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M8 1.5L14.5 13H1.5L8 1.5z" fill="rgba(0,0,0,0.15)" stroke="white" strokeWidth="1.4" strokeLinejoin="round" />
-              <path d="M8 6v3.5" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
-              <circle cx="8" cy="11.5" r="0.85" fill="white" />
+        <div className="rounded-xl overflow-hidden border border-warning bg-card shadow-sm">
+          <div className="flex items-center gap-2.5 px-4 py-2.5 bg-warning-faded">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" className="text-warning-foreground shrink-0">
+              <path d="M8 1.5L14.5 13H1.5L8 1.5z" fill="currentColor" fillOpacity="0.15" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
+              <path d="M8 6v3.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+              <circle cx="8" cy="11.5" r="0.85" fill="currentColor" />
             </svg>
-            <span className="text-white font-bold text-xs tracking-wide uppercase">Seller Account Required</span>
+            <span className="text-warning-foreground font-bold text-xs tracking-wide uppercase">Seller Account Required</span>
           </div>
-          <div className="px-5 py-4 space-y-3 bg-amber-50 dark:bg-amber-950/20">
-            <p className="text-sm font-semibold text-amber-900 dark:text-amber-200">
+          <div className="px-5 py-4 space-y-3">
+            <p className="text-sm font-semibold text-foreground">
               This app is designed for <strong>seller accounts only</strong>. It will not work correctly with a marketplace account.
             </p>
-            <div className="grid sm:grid-cols-2 gap-3 text-xs text-amber-800 dark:text-amber-300">
-              <div className="rounded-lg bg-white/70 dark:bg-white/5 border border-amber-200 dark:border-amber-800 px-4 py-3 space-y-1">
-                <div className="font-bold text-amber-900 dark:text-amber-100 flex items-center gap-1.5">
-                  <span className="inline-block w-2 h-2 rounded-full bg-green-500" />
+            <div className="grid sm:grid-cols-2 gap-3 text-xs text-muted-foreground">
+              <div className="rounded-lg bg-muted border border-border px-4 py-3 space-y-1">
+                <div className="font-bold text-foreground flex items-center gap-1.5">
+                  <span className="inline-block w-2 h-2 rounded-full bg-success" />
                   Seller Account ✓
                 </div>
                 <p className="leading-relaxed">
-                  The account that <strong>owns and fulfills the orders</strong>. When an order is placed, VTEX routes it to the seller. The seller must call <strong>Start Handling</strong> to confirm it has taken responsibility for fulfillment — that's exactly what this app demonstrates.
+                  The account that <strong>owns and fulfills the orders</strong>. When an order is placed, VTEX routes it to the seller. The seller must call <strong>Start Handling</strong> to confirm it has taken responsibility for fulfillment — that&apos;s exactly what this app demonstrates.
                 </p>
               </div>
-              <div className="rounded-lg bg-white/70 dark:bg-white/5 border border-amber-200 dark:border-amber-800 px-4 py-3 space-y-1">
-                <div className="font-bold text-amber-900 dark:text-amber-100 flex items-center gap-1.5">
-                  <span className="inline-block w-2 h-2 rounded-full bg-red-400" />
+              <div className="rounded-lg bg-muted border border-border px-4 py-3 space-y-1">
+                <div className="font-bold text-foreground flex items-center gap-1.5">
+                  <span className="inline-block w-2 h-2 rounded-full bg-danger" />
                   Marketplace Account ✗
                 </div>
                 <p className="leading-relaxed">
-                  The account that <strong>lists products and collects the sale</strong>, but delegates fulfillment to sellers. Marketplace accounts use a different API flow to sync orders with their sellers — <strong>Start Handling is not called by the marketplace</strong>, so this app's pipeline won't behave as expected.
+                  The account that <strong>lists products and collects the sale</strong>, but delegates fulfillment to sellers. Marketplace accounts use a different API flow to sync orders with their sellers — <strong>Start Handling is not called by the marketplace</strong>, so this app&apos;s pipeline won&apos;t behave as expected.
                 </p>
               </div>
             </div>
-            <p className="text-xs text-amber-700 dark:text-amber-400">
+            <p className="text-xs text-muted-foreground">
               Not sure which type you have? If your VTEX account has its own warehouse and ships orders directly to customers, it&apos;s a seller account. If it sells products from third-party stores, it&apos;s a marketplace.
             </p>
           </div>
@@ -165,9 +165,9 @@ export default function AboutPage() {
             <div className="rounded-lg border border-border bg-card px-4 py-3 space-y-1.5">
               <div className="text-xs font-semibold text-foreground">How login works</div>
               <ul className="text-xs text-muted-foreground space-y-1 pl-4 list-disc leading-relaxed">
-                <li>On first visit, the app redirects unauthenticated users to <code className="font-mono text-[10px] bg-muted px-1 rounded">/login</code>.</li>
+                <li>On first visit, the app redirects unauthenticated users to <code className="font-mono text-xs bg-muted px-1 rounded">/login</code>.</li>
                 <li>Clicking <strong>Sign in with Google</strong> opens the standard Google OAuth consent screen.</li>
-                <li>Only <code className="font-mono text-[10px] bg-muted px-1 rounded">@vtex.com</code> email addresses pass the <code className="font-mono text-[10px] bg-muted px-1 rounded">signIn</code> callback — all others are rejected.</li>
+                <li>Only <code className="font-mono text-xs bg-muted px-1 rounded">@vtex.com</code> email addresses pass the <code className="font-mono text-xs bg-muted px-1 rounded">signIn</code> callback — all others are rejected.</li>
                 <li>After approval, NextAuth creates an encrypted session cookie and redirects to the dashboard.</li>
                 <li>Clicking <strong>Sign out</strong> in the sidebar destroys the session immediately.</li>
               </ul>
@@ -175,17 +175,17 @@ export default function AboutPage() {
             <div className="rounded-lg border border-border bg-card px-4 py-3 space-y-1.5">
               <div className="text-xs font-semibold text-foreground">Required environment variables</div>
               <ul className="text-xs text-muted-foreground space-y-1 pl-4 list-disc leading-relaxed">
-                <li><code className="font-mono text-[10px] bg-muted px-1 rounded">AUTH_GOOGLE_ID</code> — Google OAuth client ID</li>
-                <li><code className="font-mono text-[10px] bg-muted px-1 rounded">AUTH_GOOGLE_SECRET</code> — Google OAuth client secret</li>
-                <li><code className="font-mono text-[10px] bg-muted px-1 rounded">AUTH_SECRET</code> — min 32-char secret for NextAuth session encryption</li>
+                <li><code className="font-mono text-xs bg-muted px-1 rounded">AUTH_GOOGLE_ID</code> — Google OAuth client ID</li>
+                <li><code className="font-mono text-xs bg-muted px-1 rounded">AUTH_GOOGLE_SECRET</code> — Google OAuth client secret</li>
+                <li><code className="font-mono text-xs bg-muted px-1 rounded">AUTH_SECRET</code> — min 32-char secret for NextAuth session encryption</li>
               </ul>
-              <p className="text-[11px] text-muted-foreground mt-2">
-                Configure these in Google Cloud Console under <strong>APIs &amp; Services → Credentials</strong>. Add <code className="font-mono text-[10px] bg-muted px-1 rounded">/api/auth/callback/google</code> as an authorized redirect URI.
+              <p className="text-xs text-muted-foreground mt-2">
+                Configure these in Google Cloud Console under <strong>APIs &amp; Services → Credentials</strong>. Add <code className="font-mono text-xs bg-muted px-1 rounded">/api/auth/callback/google</code> as an authorized redirect URI.
               </p>
             </div>
           </div>
           <p className="text-xs text-muted-foreground mt-3">
-            VTEX App Key / App Token are stored separately in an encrypted HttpOnly session cookie (via <code className="font-mono text-[10px] bg-muted px-1 rounded">iron-session</code>), isolated per browser session. Sign-out destroys both cookies immediately.
+            VTEX App Key / App Token are stored separately in an encrypted HttpOnly session cookie (via <code className="font-mono text-xs bg-muted px-1 rounded">iron-session</code>), isolated per browser session. Sign-out destroys both cookies immediately.
           </p>
         </AccordionSection>
 
@@ -196,14 +196,14 @@ export default function AboutPage() {
           </p>
           <div className="rounded-lg border border-border overflow-hidden">
             <table className="w-full text-xs">
-              <thead className="bg-muted/40">
-                <tr className="text-left text-muted-foreground uppercase tracking-wide text-[10px]">
+              <thead className="bg-muted">
+                <tr className="text-left text-muted-foreground uppercase tracking-wide text-xs">
                   <th className="px-4 py-2.5 font-semibold">Field</th>
                   <th className="px-4 py-2.5 font-semibold">Env Variable</th>
                   <th className="px-4 py-2.5 font-semibold">Description</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border/50">
+              <tbody className="divide-y divide-border">
                 {[
                   ['VTEX Account', 'VTEX_ACCOUNT', 'Your VTEX store account name (e.g. mystore)'],
                   ['Environment', 'VTEX_ENVIRONMENT', 'Default: vtexcommercestable.com.br'],
@@ -219,7 +219,7 @@ export default function AboutPage() {
                   ['Cron Secret', 'CRON_SECRET', 'Bearer token Vercel injects when invoking the weekly cleanup cron. Leave blank to allow open access (demo only)'],
                   ['App URL', 'NEXT_PUBLIC_APP_URL', 'Public URL of the deployment — used to render the full Hook URL in the UI (e.g. https://your-app.vercel.app)'],
                 ].map(([field, env, desc]) => (
-                  <tr key={field} className="hover:bg-muted/20 transition-colors">
+                  <tr key={field} className="hover:bg-muted/60 transition-colors">
                     <td className="px-4 py-2.5 font-medium text-foreground">{field}</td>
                     <td className="px-4 py-2.5 font-mono text-muted-foreground">{env}</td>
                     <td className="px-4 py-2.5 text-muted-foreground">{desc}</td>
@@ -233,16 +233,16 @@ export default function AboutPage() {
           </p>
 
           {/* Account mismatch guard */}
-          <div className="mt-4 rounded-lg border border-amber-300 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/20 overflow-hidden">
-            <div className="flex items-center gap-2 px-4 py-2.5 border-b border-amber-200 dark:border-amber-800 bg-amber-100/60 dark:bg-amber-900/20">
-              <svg className="w-3.5 h-3.5 text-amber-600 shrink-0" viewBox="0 0 16 16" fill="currentColor">
+          <div className="mt-4 rounded-lg border border-warning bg-card overflow-hidden">
+            <div className="flex items-center gap-2 px-4 py-2.5 border-b border-warning bg-warning-faded">
+              <svg className="w-3.5 h-3.5 text-warning-foreground shrink-0" viewBox="0 0 16 16" fill="currentColor">
                 <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 10 5zm0 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" clipRule="evenodd" />
               </svg>
-              <span className="text-xs font-bold text-amber-800 dark:text-amber-200 uppercase tracking-wide">Account Mismatch — VTEX API Actions Blocked</span>
+              <span className="text-xs font-bold text-warning-foreground uppercase tracking-wide">Account Mismatch — VTEX API Actions Blocked</span>
             </div>
-            <div className="px-4 py-3 space-y-2 text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
+            <div className="px-4 py-3 space-y-2 text-xs text-muted-foreground leading-relaxed">
               <p>
-                Your session holds credentials for <strong>one VTEX account at a time</strong>. When the console receives orders from multiple accounts (via Hook URL routing with <code className="font-mono text-[10px] bg-amber-100 dark:bg-amber-900/40 px-1 rounded">?account=</code>), each order is tagged with the account it came from.
+                Your session holds credentials for <strong>one VTEX account at a time</strong>. When the console receives orders from multiple accounts (via Hook URL routing with <code className="font-mono text-xs bg-muted px-1 rounded">?account=</code>), each order is tagged with the account it came from.
               </p>
               <p>
                 If an order&apos;s account does not match the account in your current Configuration, the app will <strong>block all VTEX API actions</strong> for that order — Reprocess, Retry Start Handling, Send Invoice, and Cancel — and display a warning in the order detail modal.
@@ -253,7 +253,7 @@ export default function AboutPage() {
               <p>
                 <strong>To act on an order from a different account:</strong> open Configuration, switch to the matching account credentials, then retry the action.
               </p>
-              <p className="text-amber-600 dark:text-amber-400">
+              <p className="text-warning-foreground">
                 Actions that are ERP-only — <strong>Delete</strong>, <strong>Mark Resolved</strong>, <strong>Copy ERP payload</strong>, <strong>Copy VTEX payload</strong> — are never blocked, as they do not call the VTEX API.
               </p>
             </div>
@@ -269,14 +269,14 @@ export default function AboutPage() {
           <div className="grid sm:grid-cols-2 gap-4">
             {/* Hook payload */}
             <div className="rounded-lg border border-border overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-2.5 bg-muted/40 border-b border-border">
+              <div className="flex items-center justify-between px-4 py-2.5 bg-muted border-b border-border">
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold font-mono px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-600">POST</span>
+                  <span className="text-xs font-bold font-mono px-1.5 py-0.5 rounded bg-success-faded text-success-foreground">POST</span>
                   <span className="text-xs font-semibold text-foreground">Hook Configuration</span>
                 </div>
-                <code className="text-[10px] font-mono text-muted-foreground">/api/orders/hook/config</code>
+                <code className="text-xs font-mono text-muted-foreground">/api/orders/hook/config</code>
               </div>
-              <pre className="text-[11px] font-mono leading-relaxed p-4 overflow-x-auto bg-muted/20">{`{
+              <pre className="text-xs font-mono leading-relaxed p-4 overflow-x-auto bg-muted">{`{
   "filter": {
     "type": "FromWorkflow",
     "status": [
@@ -298,14 +298,14 @@ export default function AboutPage() {
 
             {/* Feed payload */}
             <div className="rounded-lg border border-border overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-2.5 bg-muted/40 border-b border-border">
+              <div className="flex items-center justify-between px-4 py-2.5 bg-muted border-b border-border">
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold font-mono px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-600">POST</span>
+                  <span className="text-xs font-bold font-mono px-1.5 py-0.5 rounded bg-success-faded text-success-foreground">POST</span>
                   <span className="text-xs font-semibold text-foreground">Feed Configuration</span>
                 </div>
-                <code className="text-[10px] font-mono text-muted-foreground">/api/orders/feed/config</code>
+                <code className="text-xs font-mono text-muted-foreground">/api/orders/feed/config</code>
               </div>
-              <pre className="text-[11px] font-mono leading-relaxed p-4 overflow-x-auto bg-muted/20">{`{
+              <pre className="text-xs font-mono leading-relaxed p-4 overflow-x-auto bg-muted">{`{
   "filter": {
     "type": "FromWorkflow",
     "status": [
@@ -327,17 +327,17 @@ export default function AboutPage() {
 
           {/* Status explanation table */}
           <div className="rounded-lg border border-border overflow-hidden mt-2">
-            <div className="px-4 py-2.5 bg-muted/40 border-b border-border">
-              <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Why these statuses?</span>
+            <div className="px-4 py-2.5 bg-muted border-b border-border">
+              <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Why these statuses?</span>
             </div>
             <table className="w-full text-xs">
-              <thead className="bg-muted/20">
-                <tr className="text-left text-muted-foreground uppercase tracking-wide text-[10px]">
+              <thead className="bg-muted">
+                <tr className="text-left text-muted-foreground uppercase tracking-wide text-xs">
                   <th className="px-4 py-2 font-semibold">VTEX Status</th>
                   <th className="px-4 py-2 font-semibold">What it means for the ERP</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border/50">
+              <tbody className="divide-y divide-border">
                 {[
                   ['ready-for-handling', 'Order approved and waiting for ERP to accept — the main trigger for Start Handling'],
                   ['handling', 'ERP has called Start Handling — confirms the order is in processing'],
@@ -346,7 +346,7 @@ export default function AboutPage() {
                   ['cancel', 'Cancellation requested — ERP should stop processing if possible'],
                   ['canceled', 'Order fully cancelled — ERP should clean up any reservation'],
                 ].map(([status, meaning]) => (
-                  <tr key={status} className="hover:bg-muted/20 transition-colors">
+                  <tr key={status} className="hover:bg-muted/60 transition-colors">
                     <td className="px-4 py-2.5 font-mono font-medium text-foreground">{status}</td>
                     <td className="px-4 py-2.5 text-muted-foreground">{meaning}</td>
                   </tr>
@@ -356,7 +356,7 @@ export default function AboutPage() {
           </div>
 
           <p className="text-xs text-muted-foreground mt-1">
-            These statuses are pre-loaded as defaults in the <strong>Setup → Hook &amp; Feed Configuration</strong> editor. The <code className="font-mono text-[10px] bg-muted px-1 rounded">visibilityTimeoutInSeconds</code> (240 s) gives the ERP 4 minutes to process each Feed message before it becomes visible again for retry.
+            These statuses are pre-loaded as defaults in the <strong>Setup → Hook &amp; Feed Configuration</strong> editor. The <code className="font-mono text-xs bg-muted px-1 rounded">visibilityTimeoutInSeconds</code> (240 s) gives the ERP 4 minutes to process each Feed message before it becomes visible again for retry.
           </p>
         </AccordionSection>
 
@@ -364,14 +364,14 @@ export default function AboutPage() {
         <AccordionSection title="Order Status Reference">
           <div className="rounded-lg border border-border overflow-hidden">
             <table className="w-full text-xs">
-              <thead className="bg-muted/40">
-                <tr className="text-left text-muted-foreground uppercase tracking-wide text-[10px]">
+              <thead className="bg-muted">
+                <tr className="text-left text-muted-foreground uppercase tracking-wide text-xs">
                   <th className="px-4 py-2.5 font-semibold">ERP Status</th>
                   <th className="px-4 py-2.5 font-semibold">Meaning</th>
                   <th className="px-4 py-2.5 font-semibold">Next step</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border/50">
+              <tbody className="divide-y divide-border">
                 {[
                   ['RECEIVED', 'Event received, pipeline not yet started', 'Automatic — processing begins immediately'],
                   ['PROCESSING', 'Pipeline is actively running', 'Wait'],
@@ -385,7 +385,7 @@ export default function AboutPage() {
                   ['INVOICE_ERROR', 'Invoice POST failed', 'Retry via Send Invoice button'],
                   ['CANCELLED', 'Order was cancelled in VTEX', 'No action needed — Delete to remove from inbox'],
                 ].map(([status, meaning, next]) => (
-                  <tr key={status} className="hover:bg-muted/20 transition-colors">
+                  <tr key={status} className="hover:bg-muted/60 transition-colors">
                     <td className="px-4 py-2.5 font-mono font-medium text-foreground">{status}</td>
                     <td className="px-4 py-2.5 text-muted-foreground">{meaning}</td>
                     <td className="px-4 py-2.5 text-muted-foreground">{next}</td>
@@ -426,8 +426,8 @@ export default function AboutPage() {
               { method: 'GET',  path: '/api/auth/[...nextauth]', desc: 'NextAuth.js catch-all — handles Google OAuth callback, session, and sign-out' },
               { method: 'POST', path: '/api/auth/[...nextauth]', desc: 'NextAuth.js catch-all — handles sign-in POST and CSRF token exchange' },
             ].map(({ method, path, desc }) => (
-              <div key={path} className="flex items-start gap-3 px-4 py-3 rounded-lg border border-border bg-card hover:bg-muted/20 transition-colors">
-                <span className={`shrink-0 text-[10px] font-bold font-mono px-1.5 py-0.5 rounded ${methodColor(method)}`}>
+              <div key={path} className="flex items-start gap-3 px-4 py-3 rounded-lg border border-border bg-card hover:bg-muted/60 transition-colors">
+                <span className={`shrink-0 text-xs font-bold font-mono px-1.5 py-0.5 rounded ${methodColor(method)}`}>
                   {method}
                 </span>
                 <code className="text-xs font-mono text-foreground shrink-0 pt-0.5">{path}</code>
@@ -481,16 +481,16 @@ export default function AboutPage() {
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-start gap-3 px-4 py-3 rounded-lg border border-border bg-card hover:bg-muted/20 hover:border-[#F71963]/30 transition-colors group"
+                  className="flex items-start gap-3 px-4 py-3 rounded-lg border border-border bg-card hover:bg-muted hover:border-primary/30 transition-colors group"
                 >
-                  <svg className="w-3.5 h-3.5 mt-0.5 shrink-0 text-[#F71963] opacity-70 group-hover:opacity-100 transition-opacity" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <svg className="w-3.5 h-3.5 mt-0.5 shrink-0 text-primary opacity-70 group-hover:opacity-100 transition-opacity" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M2.5 7h9M8 3.5l3.5 3.5L8 10.5" />
                   </svg>
                   <div className="min-w-0">
-                    <div className="text-xs font-semibold text-foreground group-hover:text-[#F71963] transition-colors">{title}</div>
-                    <div className="text-[11px] text-muted-foreground mt-0.5 leading-relaxed">{desc}</div>
+                    <div className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors">{title}</div>
+                    <div className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{desc}</div>
                   </div>
-                  <svg className="w-3 h-3 mt-0.5 shrink-0 text-muted-foreground/40 group-hover:text-[#F71963]/60 transition-colors ml-auto" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <svg className="w-3 h-3 mt-0.5 shrink-0 text-muted-foreground/40 group-hover:text-primary/60 transition-colors ml-auto" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M2.5 9.5l7-7M4 2.5h5.5v5.5" />
                   </svg>
                 </a>
@@ -504,7 +504,7 @@ export default function AboutPage() {
           <div className="grid sm:grid-cols-2 gap-4">
             <div className="rounded-lg border border-border bg-card px-5 py-4 space-y-2">
               <div className="flex items-center gap-2">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#F71963" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
                   <circle cx="7" cy="7" r="5.5" />
                   <path d="M7 4v3.5l2 1.5" />
                 </svg>
@@ -514,8 +514,8 @@ export default function AboutPage() {
                 A Vercel Cron job runs every <strong>Sunday at 00:00 UTC</strong> and deletes all ERP orders and event log entries. This keeps the demo environment clean for the next week of testing.
               </p>
               <p className="text-xs text-muted-foreground">
-                Endpoint: <code className="font-mono text-[10px] bg-muted px-1 rounded">GET /api/cron/cleanup</code>.
-                Protected by <code className="font-mono text-[10px] bg-muted px-1 rounded">CRON_SECRET</code> env var when set.
+                Endpoint: <code className="font-mono text-xs bg-muted px-1 rounded">GET /api/cron/cleanup</code>.
+                Protected by <code className="font-mono text-xs bg-muted px-1 rounded">CRON_SECRET</code> env var when set.
               </p>
               <p className="text-xs text-muted-foreground">
                 A live countdown to the next purge is displayed in the app footer.
@@ -523,18 +523,18 @@ export default function AboutPage() {
             </div>
             <div className="rounded-lg border border-border bg-card px-5 py-4 space-y-2">
               <div className="flex items-center gap-2">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#F71963" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
                   <path d="M2 4h10M5 4V2.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5V4M12 4l-.8 7.2A1 1 0 0 1 10.2 12H3.8a1 1 0 0 1-1-.8L2 4" />
                 </svg>
                 <span className="text-sm font-semibold text-foreground">What Gets Cleared</span>
               </div>
               <ul className="text-xs text-muted-foreground space-y-1 pl-4 list-disc leading-relaxed">
-                <li>All records in the <code className="font-mono text-[10px] bg-muted px-1 rounded">erp_orders</code> table</li>
-                <li>All entries in the <code className="font-mono text-[10px] bg-muted px-1 rounded">event_log</code> table</li>
+                <li>All records in the <code className="font-mono text-xs bg-muted px-1 rounded">erp_orders</code> table</li>
+                <li>All entries in the <code className="font-mono text-xs bg-muted px-1 rounded">event_log</code> table</li>
                 <li>In-memory fallback stores (on the same instance)</li>
               </ul>
               <p className="text-xs text-muted-foreground mt-1">
-                Account credentials in <code className="font-mono text-[10px] bg-muted px-1 rounded">account_configs</code> are <strong>not</strong> cleared — hook routing continues to work after the purge.
+                Account credentials in <code className="font-mono text-xs bg-muted px-1 rounded">account_configs</code> are <strong>not</strong> cleared — hook routing continues to work after the purge.
               </p>
             </div>
           </div>
@@ -573,22 +573,22 @@ export default function AboutPage() {
                 fixed: false,
               },
             ].map(({ tag, title, body, fix, fixed }) => (
-              <div key={title} className={`rounded-lg border px-5 py-4 space-y-2 ${fixed ? 'border-green-200 bg-green-50/50 dark:border-green-900 dark:bg-green-950/20' : 'border-border bg-card'}`}>
+              <div key={title} className={`rounded-lg border px-5 py-4 space-y-2 ${fixed ? 'border-success bg-success-faded' : 'border-border bg-card'}`}>
                 <div className="flex items-start gap-3">
-                  <span className={`shrink-0 text-[10px] font-bold font-mono px-1.5 py-0.5 rounded mt-0.5 ${fixed ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400' : 'bg-muted text-muted-foreground'}`}>
+                  <span className={`shrink-0 text-xs font-bold font-mono px-1.5 py-0.5 rounded mt-0.5 ${fixed ? 'bg-success-faded text-success-foreground' : 'bg-muted text-muted-foreground'}`}>
                     {tag}
                   </span>
                   <div className="space-y-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-sm font-semibold text-foreground">{title}</span>
                       {fixed && (
-                        <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400">
+                        <span className="text-xs font-semibold px-1.5 py-0.5 rounded-full bg-success-faded text-success-foreground">
                           ✓ Fixed
                         </span>
                       )}
                     </div>
                     <p className="text-xs text-muted-foreground leading-relaxed">{body}</p>
-                    <p className="text-xs leading-relaxed" style={{ color: fixed ? '#15803d' : undefined }}>
+                    <p className={`text-xs leading-relaxed ${fixed ? 'text-success-foreground' : ''}`}>
                       <strong>{fixed ? 'Status:' : 'Workaround:'}</strong> {fix}
                     </p>
                   </div>
@@ -612,7 +612,7 @@ export default function AboutPage() {
               { name: 'Vercel', role: 'Deployment — serverless functions + edge network' },
             ].map(({ name, role }) => (
               <div key={name} className="flex items-start gap-3 px-4 py-3 rounded-lg border border-border bg-card">
-                <div className="w-2 h-2 rounded-full mt-1.5 shrink-0" style={{ background: '#F71963' }} />
+                <div className="w-2 h-2 rounded-full mt-1.5 shrink-0 bg-primary" />
                 <div>
                   <div className="text-sm font-semibold text-foreground">{name}</div>
                   <div className="text-xs text-muted-foreground mt-0.5">{role}</div>
@@ -662,7 +662,7 @@ export default function AboutPage() {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <div className="text-[10px] text-muted-foreground uppercase tracking-wide font-medium">{label}</div>
+      <div className="text-xs text-muted-foreground uppercase tracking-wide font-medium">{label}</div>
       <div className="text-sm font-semibold text-foreground mt-0.5">{value}</div>
     </div>
   );
@@ -671,12 +671,11 @@ function Stat({ label, value }: { label: string; value: string }) {
 function Badge({ children, color }: { children: React.ReactNode; color: 'pink' | 'navy' }) {
   return (
     <span
-      className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
-      style={
+      className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
         color === 'pink'
-          ? { background: '#F71963', color: '#fff' }
-          : { background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.6)' }
-      }
+          ? 'bg-emphasis text-emphasis-foreground'
+          : 'bg-secondary text-secondary-foreground'
+      }`}
     >
       {children}
     </span>
@@ -686,7 +685,7 @@ function Badge({ children, color }: { children: React.ReactNode; color: 'pink' |
 function FeatureCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
   return (
     <div className="rounded-lg border border-border bg-card p-4 space-y-2">
-      <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'rgba(247,25,99,0.08)' }}>
+      <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-secondary">
         {icon}
       </div>
       <div className="text-sm font-semibold text-foreground">{title}</div>
@@ -702,7 +701,7 @@ function Flow({ steps }: { steps: { label: string; sub: string }[] }) {
         <div key={i} className="flex items-center">
           <div className="flex flex-col items-center px-3 py-2 rounded-lg border border-border bg-card text-center min-w-[90px]">
             <span className="text-xs font-medium text-foreground leading-tight">{step.label}</span>
-            <span className="text-[10px] text-muted-foreground mt-0.5">{step.sub}</span>
+            <span className="text-xs text-muted-foreground mt-0.5">{step.sub}</span>
           </div>
           {i < steps.length - 1 && (
             <svg className="w-5 h-5 text-muted-foreground/40 shrink-0" viewBox="0 0 20 20" fill="currentColor">
@@ -716,15 +715,15 @@ function Flow({ steps }: { steps: { label: string; sub: string }[] }) {
 }
 
 function methodColor(method: string) {
-  if (method === 'GET') return 'bg-blue-50 text-blue-600';
-  if (method === 'POST') return 'bg-emerald-50 text-emerald-600';
-  if (method === 'DELETE') return 'bg-red-50 text-red-600';
+  if (method === 'GET') return 'bg-secondary text-secondary-foreground';
+  if (method === 'POST') return 'bg-success-faded text-success-foreground';
+  if (method === 'DELETE') return 'bg-danger-faded text-danger-foreground';
   return 'bg-muted text-muted-foreground';
 }
 
 function HookIcon() {
   return (
-    <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="#F71963" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg className="w-4 h-4 text-primary" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M6 2l4 4-4 4M2 8h8a4 4 0 0 1 0 8H8" />
     </svg>
   );
@@ -732,7 +731,7 @@ function HookIcon() {
 
 function FeedIcon() {
   return (
-    <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="#F71963" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg className="w-4 h-4 text-primary" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M2 4h12M2 8h8M2 12h5" />
     </svg>
   );
@@ -740,7 +739,7 @@ function FeedIcon() {
 
 function InboxIcon() {
   return (
-    <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="#F71963" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg className="w-4 h-4 text-primary" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M2 10l2-7h8l2 7H2zM2 10v3a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-3" />
       <path d="M6 13a2 2 0 0 0 4 0" />
     </svg>

@@ -186,13 +186,13 @@ export function IntegrationSetup({ config }: Props) {
   return (
     <div className="space-y-6">
       {!credentialsAvailable && (
-        <div className="flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
+        <div className="flex items-center gap-2 rounded-lg border border-danger/30 bg-danger-faded px-3 py-2 text-sm text-danger-foreground">
           <span>⚠</span>
           <span>VTEX credentials must be configured before loading or saving integration config.</span>
         </div>
       )}
 
-      <div className="rounded-lg border border-amber-300/40 bg-amber-50/30 px-4 py-3 text-xs text-amber-800 dark:text-amber-300 dark:bg-amber-900/10">
+      <div className="rounded-lg border border-warning/30 bg-warning-faded px-4 py-3 text-xs text-warning-foreground">
         <strong>Warning:</strong> Saving will overwrite the current VTEX configuration for this account.
         Changes take effect immediately in VTEX.
       </div>
@@ -285,8 +285,7 @@ function ConfigPanel({
         <button
           onClick={onSave}
           disabled={panelState.saving}
-          className="px-3 py-1.5 text-xs font-semibold rounded transition-colors disabled:opacity-50"
-          style={{ background: '#F71963', color: '#fff' }}
+          className="px-3 py-1.5 text-xs font-semibold rounded bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50"
         >
           {panelState.saving ? 'Saving…' : 'Save Config'}
         </button>
@@ -303,7 +302,7 @@ function ConfigPanel({
         onChange={(e) => onJsonChange(e.target.value)}
         rows={14}
         spellCheck={false}
-        className="w-full font-mono text-[11px] rounded-md border border-input bg-background px-3 py-2 focus:outline-none focus:ring-1 focus:ring-ring resize-y leading-relaxed"
+        className="w-full font-mono text-xs rounded-md border border-input bg-background px-3 py-2 focus:outline-none focus:ring-1 focus:ring-ring resize-y leading-relaxed"
         placeholder={panelState.loading ? 'Loading from VTEX…' : undefined}
       />
 
@@ -312,8 +311,8 @@ function ConfigPanel({
           className={[
             'px-3 py-2 rounded-md text-xs font-medium',
             panelState.responseOk
-              ? 'bg-green-50 text-green-700 border border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800'
-              : 'bg-red-50 text-red-700 border border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800',
+              ? 'bg-success-faded text-success-foreground border border-success/20'
+              : 'bg-danger-faded text-danger-foreground border border-danger/20',
           ].join(' ')}
         >
           {panelState.response}
@@ -322,34 +321,34 @@ function ConfigPanel({
 
       {showCurl && (
         <div className="space-y-2 pt-1">
-          <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">cURL Examples</p>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">cURL Examples</p>
 
           <div className="space-y-1">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] text-muted-foreground font-mono">GET (read current config)</span>
+              <span className="text-xs text-muted-foreground font-mono">GET (read current config)</span>
               <button
                 onClick={() => copyText(curlGet, setCopiedGet)}
-                className="text-[10px] px-1.5 py-0.5 border border-border rounded hover:bg-muted transition-colors"
+                className="text-xs px-1.5 py-0.5 border border-border rounded hover:bg-muted transition-colors"
               >
                 {copiedGet ? 'Copied!' : 'Copy'}
               </button>
             </div>
-            <pre className="text-[10px] bg-muted/60 rounded-md p-2 overflow-x-auto font-mono leading-relaxed whitespace-pre-wrap break-all">
+            <pre className="text-xs bg-muted/60 rounded-md p-2 overflow-x-auto font-mono leading-relaxed whitespace-pre-wrap break-all">
               {curlGet}
             </pre>
           </div>
 
           <div className="space-y-1">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] text-muted-foreground font-mono">POST (save config)</span>
+              <span className="text-xs text-muted-foreground font-mono">POST (save config)</span>
               <button
                 onClick={() => copyText(curlPost, setCopiedPost)}
-                className="text-[10px] px-1.5 py-0.5 border border-border rounded hover:bg-muted transition-colors"
+                className="text-xs px-1.5 py-0.5 border border-border rounded hover:bg-muted transition-colors"
               >
                 {copiedPost ? 'Copied!' : 'Copy'}
               </button>
             </div>
-            <pre className="text-[10px] bg-muted/60 rounded-md p-2 overflow-x-auto font-mono leading-relaxed whitespace-pre-wrap break-all">
+            <pre className="text-xs bg-muted/60 rounded-md p-2 overflow-x-auto font-mono leading-relaxed whitespace-pre-wrap break-all">
               {curlPost}
             </pre>
           </div>

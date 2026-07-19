@@ -59,8 +59,13 @@ export function OrderRow({ order, onAction, configAccount, credsConfigured, sele
           />
         </td>
         <td className="px-3 py-2 whitespace-nowrap"><StatusBadge status={order.erpStatus} /></td>
-        {col('account')       && <td className="px-3 py-2 text-xs font-medium text-muted-foreground whitespace-nowrap">{order.account ?? '—'}</td>}
+        {col('error')          && <td className="px-3 py-2 text-xs text-danger-foreground max-w-[180px] truncate" title={order.errorMessage}>{order.errorMessage ?? '—'}</td>}
         {col('orderId')        && <td className="px-3 py-2 font-mono text-xs max-w-[140px] truncate" title={order.orderId}>{order.orderId}</td>}
+        {col('customer')       && <td className="px-3 py-2 text-xs max-w-[120px] truncate">{order.customerName ?? '—'}</td>}
+        {col('total')          && <td className="px-3 py-2 text-xs text-right">{fmtCurrency(order.totalValue)}</td>}
+        {col('items')          && <td className="px-3 py-2 text-xs text-center">{order.itemCount ?? '—'}</td>}
+        {col('received')       && <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">{fmt(order.receivedAt)}</td>}
+        {col('account')       && <td className="px-3 py-2 text-xs font-medium text-muted-foreground whitespace-nowrap">{order.account ?? '—'}</td>}
         {col('seq')            && <td className="px-3 py-2 text-xs text-muted-foreground">{order.sequence ?? '—'}</td>}
         {col('vtexStatus')     && <td className="px-3 py-2 text-xs text-muted-foreground">{order.vtexStatus ?? '—'}</td>}
         {col('src')            && <td className="px-3 py-2">
@@ -71,17 +76,12 @@ export function OrderRow({ order, onAction, configAccount, credsConfigured, sele
             {order.source}
           </span>
         </td>}
-        {col('customer')       && <td className="px-3 py-2 text-xs max-w-[120px] truncate">{order.customerName ?? '—'}</td>}
         {col('email')          && <td className="px-3 py-2 text-xs text-muted-foreground max-w-[130px] truncate">{order.customerEmailMasked ?? '—'}</td>}
-        {col('total')          && <td className="px-3 py-2 text-xs text-right">{fmtCurrency(order.totalValue)}</td>}
-        {col('items')          && <td className="px-3 py-2 text-xs text-center">{order.itemCount ?? '—'}</td>}
         {col('shipping')       && <td className="px-3 py-2 text-xs text-muted-foreground max-w-[100px] truncate">{order.shippingSummary ?? '—'}</td>}
         {col('payment')        && <td className="px-3 py-2 text-xs text-muted-foreground max-w-[100px] truncate">{order.paymentSummary ?? '—'}</td>}
         {col('startHandling')  && <td className="px-3 py-2 whitespace-nowrap"><StatusBadge status={order.startHandlingStatus} /></td>}
         {col('invoice')        && <td className="px-3 py-2 whitespace-nowrap"><StatusBadge status={order.invoiceStatus} /></td>}
-        {col('received')       && <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">{fmt(order.receivedAt)}</td>}
         {col('attempts')       && <td className="px-3 py-2 text-xs text-center">{order.attempts}</td>}
-        {col('error')          && <td className="px-3 py-2 text-xs text-destructive max-w-[140px] truncate" title={order.errorMessage}>{order.errorMessage ?? '—'}</td>}
         <td className="px-3 py-2 text-center">
           {/* open icon */}
           <svg className="w-3.5 h-3.5 text-muted-foreground inline-block" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -185,21 +185,17 @@ function OrderDetailModal({
     >
       {/* Panel */}
       <div
-        className="relative w-full max-w-5xl max-h-[92vh] flex flex-col rounded-2xl overflow-hidden shadow-2xl border border-border"
-        style={{ background: 'var(--background)' }}
+        className="relative w-full max-w-5xl max-h-[92vh] flex flex-col rounded-lg overflow-hidden shadow-lg border border-border bg-card"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal header */}
-        <div
-          className="flex items-center justify-between gap-4 px-6 py-4 shrink-0 border-b border-border"
-          style={{ background: '#142032' }}
-        >
+        <div className="flex items-center justify-between gap-4 px-6 py-4 shrink-0 border-b border-border bg-muted/50">
           <div className="flex items-center gap-3 min-w-0">
-            <span className="text-xs font-black tracking-tighter" style={{ color: '#F71963' }}>VTEX</span>
-            <span className="text-white/20 font-thin">|</span>
-            <span className="font-mono text-sm font-semibold text-white truncate">{order.orderId}</span>
+            <span className="text-xs font-black tracking-tighter text-emphasis">VTEX</span>
+            <span className="text-border font-thin">|</span>
+            <span className="font-mono text-sm font-semibold text-foreground truncate">{order.orderId}</span>
             {order.sequence && (
-              <span className="text-xs text-white/40 hidden sm:inline">#{order.sequence}</span>
+              <span className="text-xs text-muted-foreground hidden sm:inline">#{order.sequence}</span>
             )}
           </div>
           <div className="flex items-center gap-2 shrink-0">
@@ -208,7 +204,7 @@ function OrderDetailModal({
             <button
               type="button"
               onClick={onClose}
-              className="ml-2 flex items-center justify-center w-7 h-7 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-colors"
+              className="ml-2 flex items-center justify-center w-7 h-7 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
               aria-label="Close"
             >
               <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -223,27 +219,25 @@ function OrderDetailModal({
 
           {/* Credential / account warning — shown at the very top so users see it before trying to act */}
           {vtexBlocked && (
-            <div className="flex items-start gap-3 rounded-xl px-4 py-3 border-2" style={
-              missingCreds
-                ? { background: 'rgba(220,38,38,0.06)', borderColor: '#dc2626' }
-                : { background: 'rgba(245,158,11,0.08)', borderColor: '#f59e0b' }
-            }>
-              <svg className="w-4 h-4 shrink-0 mt-0.5" viewBox="0 0 16 16" fill="currentColor"
-                style={{ color: missingCreds ? '#dc2626' : '#d97706' }}>
+            <div className={cn(
+              'flex items-start gap-3 rounded-lg px-4 py-3 border-2',
+              missingCreds ? 'bg-danger-faded border-danger/40' : 'bg-warning-faded border-warning/40',
+            )}>
+              <svg className={cn('w-4 h-4 shrink-0 mt-0.5', missingCreds ? 'text-danger-foreground' : 'text-warning-foreground')} viewBox="0 0 16 16" fill="currentColor">
                 <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 10 5zm0 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" clipRule="evenodd" />
               </svg>
               <div>
                 {missingCreds ? (
                   <>
-                    <p className="text-sm font-bold text-red-700">VTEX credentials not configured</p>
-                    <p className="text-xs text-red-600 mt-0.5">
+                    <p className="text-sm font-bold text-danger-foreground">VTEX credentials not configured</p>
+                    <p className="text-xs text-danger-foreground/85 mt-0.5">
                       Open <strong>Configuration</strong> and enter your App Key and App Token before using Reprocess, Start Handling, Invoice, or Cancel.
                     </p>
                   </>
                 ) : (
                   <>
-                    <p className="text-sm font-bold text-amber-800">Account mismatch — VTEX API actions are disabled</p>
-                    <p className="text-xs text-amber-700 mt-0.5">
+                    <p className="text-sm font-bold text-warning-foreground">Account mismatch — VTEX API actions are disabled</p>
+                    <p className="text-xs text-warning-foreground/85 mt-0.5">
                       This order belongs to account <strong>{order.account}</strong>, but your credentials are configured for <strong>{configAccount}</strong>.
                       Switch to <strong>{order.account}</strong> in Configuration to perform these actions.
                     </p>
@@ -561,7 +555,7 @@ function CollapsibleCard({ title, tag, children }: { title: string; tag?: string
         <div className="flex items-center gap-2">
           <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{title}</h4>
           {tag && (
-            <span className="text-[9px] font-mono font-semibold px-1.5 py-0.5 rounded bg-muted border border-border text-muted-foreground">
+            <span className="text-xs font-mono font-semibold px-1.5 py-0.5 rounded bg-muted border border-border text-muted-foreground">
               {tag}
             </span>
           )}
@@ -598,10 +592,10 @@ function JsonViewer({ data, maxHeight = 'max-h-48' }: { data: unknown; maxHeight
 }
 
 const TIMELINE_STYLES: Record<string, { dot: string; icon: string }> = {
-  SUCCESS: { dot: 'bg-emerald-500 ring-emerald-200', icon: 'text-emerald-600' },
-  ERROR:   { dot: 'bg-red-500 ring-red-200',         icon: 'text-red-600' },
-  INFO:    { dot: 'bg-blue-400 ring-blue-200',        icon: 'text-blue-600' },
-  SKIPPED: { dot: 'bg-gray-300 ring-gray-100',        icon: 'text-gray-400' },
+  SUCCESS: { dot: 'bg-success ring-success/25', icon: 'text-success-foreground' },
+  ERROR:   { dot: 'bg-danger ring-danger/25',   icon: 'text-danger-foreground' },
+  INFO:    { dot: 'bg-primary ring-primary/20', icon: 'text-primary' },
+  SKIPPED: { dot: 'bg-gray-3 ring-gray-5',      icon: 'text-muted-foreground' },
 };
 
 function TimelineEntry({ entry, last }: { entry: ErpTimelineEntry; last: boolean }) {
@@ -645,7 +639,7 @@ function ActionBtn({ children, onClick, disabled = false, variant = 'default' }:
       className={cn(
         'inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border transition-colors disabled:opacity-40 disabled:pointer-events-none',
         variant === 'ghost'  ? 'border-border bg-background hover:bg-muted text-foreground'
-        : variant === 'danger' ? 'border-transparent bg-red-600 text-white hover:bg-red-700'
+        : variant === 'danger' ? 'border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/90'
         : 'border-transparent bg-primary text-primary-foreground hover:bg-primary/90',
       )}
     >
