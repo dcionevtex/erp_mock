@@ -8,6 +8,11 @@ export default auth((req) => {
   const ALWAYS_PUBLIC = ['/api/vtex/hook', '/api/health', '/api/auth'];
   if (ALWAYS_PUBLIC.some((p) => pathname.startsWith(p))) return NextResponse.next();
 
+  // Always public: the IDP login page itself — end customers going through the
+  // simulated OAuth flow from a VTEX storefront must never be asked to sign in
+  // to this app with a @vtex.com Google account first.
+  if (/^\/idp\/[^/]+\/authorize\/?$/.test(pathname)) return NextResponse.next();
+
   // Other API routes are invoked from the authenticated UI — no redirect needed
   if (pathname.startsWith('/api/')) return NextResponse.next();
 
