@@ -37,6 +37,13 @@ export async function POST(
     effectiveEmail = `${digits}@${account}.com`;
     name = phone.startsWith('+') ? phone : `+${digits}`;
   } else if (email) {
+    if (email.toLowerCase().endsWith('@vtex.com')) {
+      const loginUrl = new URL(`/idp/${account}/authorize`, req.url);
+      loginUrl.searchParams.set('state', state);
+      loginUrl.searchParams.set('redirect_uri', redirectUri);
+      loginUrl.searchParams.set('error', '@vtex.com emails are reserved and not accepted — use a different test email.');
+      return NextResponse.redirect(loginUrl, { status: 302 });
+    }
     effectiveEmail = email;
     name = email.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
   } else {
