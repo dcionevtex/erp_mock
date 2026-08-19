@@ -27,9 +27,17 @@ const CHANGE_TYPE_STYLE: Record<'feat' | 'fix' | 'chore', { label: string; cls: 
 
 const RELEASES: ReleaseEntry[] = [
   {
-    version: '1.7.2',
+    version: '1.7.3',
     date: 'August 19, 2026',
     tag: 'latest',
+    simulators: ['idp'],
+    changes: [
+      { type: 'fix', text: 'IDP login page now rejects @vtex.com emails with a clear error, and shows a standing disclaimer explaining why: that domain already has a real VTEX ID tied to it, which breaks the demo login instead of completing it cleanly.' },
+    ],
+  },
+  {
+    version: '1.7.2',
+    date: 'August 19, 2026',
     simulators: ['platform', 'idp'],
     changes: [
       { type: 'fix', text: 'External IDP login page (/idp/[account]/authorize) is now publicly accessible — it no longer forces end customers going through a VTEX storefront login into signing in to this app with a @vtex.com Google account first. The IDP dashboard and every other page remain gated.' },
