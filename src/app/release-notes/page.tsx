@@ -27,9 +27,17 @@ const CHANGE_TYPE_STYLE: Record<'feat' | 'fix' | 'chore', { label: string; cls: 
 
 const RELEASES: ReleaseEntry[] = [
   {
-    version: '1.7.1',
+    version: '1.7.2',
     date: 'August 19, 2026',
     tag: 'latest',
+    simulators: ['platform', 'idp'],
+    changes: [
+      { type: 'fix', text: 'External IDP login page (/idp/[account]/authorize) is now publicly accessible — it no longer forces end customers going through a VTEX storefront login into signing in to this app with a @vtex.com Google account first. The IDP dashboard and every other page remain gated.' },
+    ],
+  },
+  {
+    version: '1.7.1',
+    date: 'August 19, 2026',
     simulators: ['platform'],
     changes: [
       { type: 'feat', text: 'Added Stakeholder Scout to the Claude Skills & MCP section on the launcher — profiles deal stakeholders (career history, VTEX vs. competitor platform affinity, champion/blocker signals, warm-intro paths) into a stakeholder map, influence × support matrix, and Slack-ready update.' },
