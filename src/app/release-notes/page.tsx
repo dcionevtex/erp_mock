@@ -27,9 +27,17 @@ const CHANGE_TYPE_STYLE: Record<'feat' | 'fix' | 'chore', { label: string; cls: 
 
 const RELEASES: ReleaseEntry[] = [
   {
+    version: '1.7.1',
+    date: 'August 19, 2026',
+    tag: 'latest',
+    simulators: ['platform'],
+    changes: [
+      { type: 'feat', text: 'Added Stakeholder Scout to the Claude Skills & MCP section on the launcher — profiles deal stakeholders (career history, VTEX vs. competitor platform affinity, champion/blocker signals, warm-intro paths) into a stakeholder map, influence × support matrix, and Slack-ready update.' },
+    ],
+  },
+  {
     version: '1.7.0',
     date: 'July 19, 2026',
-    tag: 'latest',
     simulators: ['platform', 'erp', 'ppp', 'marketplace', 'giftcard', 'idp'],
     changes: [
       { type: 'feat', text: 'Full VTEX Admin visual redesign across the entire platform — every simulator now follows the styleguide.vtex.com product design system (light surfaces, Action Blue #134CD8 as the primary color) instead of the dark, Rebel-Pink-branded look. Rebel Pink is now reserved for small emphasis accents only (the VTEX wordmark, "Beta"/"Live"/"Latest" tags), matching how the real VTEX Admin separates brand identity from product UI.' },
