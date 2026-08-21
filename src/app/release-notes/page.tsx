@@ -27,9 +27,18 @@ const CHANGE_TYPE_STYLE: Record<'feat' | 'fix' | 'chore', { label: string; cls: 
 
 const RELEASES: ReleaseEntry[] = [
   {
+    version: '1.8.0',
+    date: 'August 21, 2026',
+    tag: 'latest',
+    simulators: ['idp'],
+    changes: [
+      { type: 'feat', text: 'Phone login can now be turned off per account — a new "Login Options" toggle in the IDP Config tab hides the phone tab on the login page when off. Saved as part of the account config, so it persists across sessions.' },
+      { type: 'feat', text: 'Added a one-off ?phone=true/false override on the Authorization URL for testing a different behavior without changing the saved account default.' },
+    ],
+  },
+  {
     version: '1.7.3',
     date: 'August 19, 2026',
-    tag: 'latest',
     simulators: ['idp'],
     changes: [
       { type: 'fix', text: 'IDP login page now rejects @vtex.com emails with a clear error, and shows a standing disclaimer explaining why: that domain already has a real VTEX ID tied to it, which breaks the demo login instead of completing it cleanly.' },
