@@ -131,6 +131,16 @@ export default function IdpPage() {
     setResetting(false);
   }
 
+  async function setPhoneEnabled(enabled: boolean) {
+    if (!account) return;
+    const res = await fetch(`/api/idp/${account}/config`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phoneEnabled: enabled }),
+    });
+    if (res.ok) setConfig(await res.json() as IdpConfig);
+  }
+
   async function addUser() {
     if (!account || !newUserEmail || !newUserName || !config) return;
     const users: IdpUser[] = [...config.users, { email: newUserEmail, name: newUserName, password: newUserPassword || 'demo123' }];
@@ -303,6 +313,40 @@ export default function IdpPage() {
                     >
                       {resetting ? 'Regenerating…' : 'Regenerate secret'}
                     </button>
+                  </div>
+                )}
+
+                {/* Login options */}
+                {config && (
+                  <div className="space-y-2">
+                    <p className="text-xs uppercase tracking-widest text-muted-foreground">Login Options</p>
+                    <div className="flex items-center justify-between gap-3 rounded-md px-3 py-2 bg-muted border border-border">
+                      <div>
+                        <p className="text-xs font-medium text-foreground">Phone login</p>
+                        <p className="text-xs text-muted-foreground">Show the phone tab on the login page, in addition to email.</p>
+                      </div>
+                      <div className="flex shrink-0 rounded-md p-0.5 bg-background border border-border">
+                        <button
+                          onClick={() => setPhoneEnabled(true)}
+                          className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all ${
+                            (config.phoneEnabled ?? true) ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'
+                          }`}
+                        >
+                          On
+                        </button>
+                        <button
+                          onClick={() => setPhoneEnabled(false)}
+                          className={`px-2.5 py-1 text-xs font-medium rounded-md transition-all ${
+                            !(config.phoneEnabled ?? true) ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'
+                          }`}
+                        >
+                          Off
+                        </button>
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      One-off override without changing this default: append <span className="font-mono text-foreground">?phone=true</span> or <span className="font-mono text-foreground">?phone=false</span> to the Authorization URL below.
+                    </p>
                   </div>
                 )}
 

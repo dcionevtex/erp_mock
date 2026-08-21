@@ -8,6 +8,7 @@ export type IdpConfig = {
   clientId: string;
   clientSecret: string;
   users: IdpUser[];
+  phoneEnabled: boolean;
 };
 
 export type IdpCode = {

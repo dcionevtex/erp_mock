@@ -35,6 +35,7 @@ function defaultConfig(account: string): IdpConfig {
     users: [
       { email: 'johndoe@testemail.com', name: 'Test Buyer', password: 'demo123' },
     ],
+    phoneEnabled: true,
   };
 }
 
@@ -48,6 +49,13 @@ export function getIdpConfig(account: string): IdpConfig {
 export function setIdpUsers(account: string, users: IdpConfig['users']): IdpConfig {
   const cfg = getIdpConfig(account);
   const updated = { ...cfg, users };
+  cfgMap().set(account, updated);
+  return updated;
+}
+
+export function setIdpPhoneEnabled(account: string, phoneEnabled: boolean): IdpConfig {
+  const cfg = getIdpConfig(account);
+  const updated = { ...cfg, phoneEnabled };
   cfgMap().set(account, updated);
   return updated;
 }

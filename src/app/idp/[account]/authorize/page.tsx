@@ -13,12 +13,18 @@ export default function AuthorizePage() {
   const state = searchParams.get('state') ?? '';
   const redirectUri = searchParams.get('redirect_uri') ?? '';
   const error = searchParams.get('error') ?? '';
+  const phoneOverride = searchParams.get('phone');
 
   const [config, setConfig] = useState<IdpConfig | null>(null);
   const [mode, setMode] = useState<LoginMode>('email');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [submitting, setSubmitting] = useState(false);
+
+  // Saved per-account default, unless overridden by a ?phone= query param on this link.
+  const phoneEnabled = phoneOverride !== null ? phoneOverride === 'true' : (config?.phoneEnabled ?? true);
+  // Falls back to email if phone becomes disabled after the user already selected it.
+  const activeMode: LoginMode = phoneEnabled ? mode : 'email';
 
   useEffect(() => {
     fetch(`/api/idp/${account}/config`)
@@ -83,6 +89,7 @@ export default function AuthorizePage() {
         </div>
 
         {/* Mode toggle */}
+        {phoneEnabled && (
         <div className="flex rounded-md p-0.5 bg-muted">
           <button
             type="button"
@@ -109,9 +116,10 @@ export default function AuthorizePage() {
             Phone
           </button>
         </div>
+        )}
 
         {/* Quick-login shortcuts */}
-        {mode === 'email' && config && config.users.length > 0 && (
+        {activeMode === 'email' && config && config.users.length > 0 && (
           <div className="space-y-2">
             <p className="text-xs uppercase tracking-widest text-center text-muted-foreground">
               Test users
@@ -140,7 +148,7 @@ export default function AuthorizePage() {
           </div>
         )}
 
-        {mode === 'phone' && (
+        {activeMode === 'phone' && (
           <div className="space-y-2">
             <p className="text-xs uppercase tracking-widest text-center text-muted-foreground">
               Test phone
@@ -168,7 +176,7 @@ export default function AuthorizePage() {
         <div className="flex items-center gap-3">
           <div className="flex-1 h-px bg-border" />
           <span className="text-xs text-muted-foreground">
-            {mode === 'email' ? 'or type any email' : 'or type any phone number'}
+            {activeMode === 'email' ? 'or type any email' : 'or type any phone number'}
           </span>
           <div className="flex-1 h-px bg-border" />
         </div>
@@ -184,7 +192,7 @@ export default function AuthorizePage() {
           <input type="hidden" name="state" value={state} />
           <input type="hidden" name="redirect_uri" value={redirectUri} />
 
-          {mode === 'email' ? (
+          {activeMode === 'email' ? (
             <div className="space-y-1">
               <label className="text-xs uppercase tracking-wider text-muted-foreground">
                 Email
@@ -236,7 +244,7 @@ export default function AuthorizePage() {
         <p className="text-center text-xs text-muted-foreground">
           Simulated identity provider for VTEX demos.
           <br />
-          {mode === 'phone'
+          {activeMode === 'phone'
             ? 'Phone is converted to a synthetic email for the VTEX profile system.'
             : 'Any email is accepted — no password required.'}
         </p>

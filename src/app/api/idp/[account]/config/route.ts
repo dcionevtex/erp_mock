@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getIdpConfig, setIdpUsers, resetIdpSecret } from '@/lib/idpStore';
+import { getIdpConfig, setIdpUsers, setIdpPhoneEnabled, resetIdpSecret } from '@/lib/idpStore';
 import type { IdpUser } from '@/types/idp';
 
 export const dynamic = 'force-dynamic';
@@ -17,7 +17,7 @@ export async function POST(
   { params }: { params: Promise<{ account: string }> },
 ) {
   const { account } = await params;
-  let body: { action?: string; users?: IdpUser[] };
+  let body: { action?: string; users?: IdpUser[]; phoneEnabled?: boolean };
   try {
     body = await req.json() as typeof body;
   } catch {
@@ -30,6 +30,10 @@ export async function POST(
 
   if (Array.isArray(body.users)) {
     return NextResponse.json(setIdpUsers(account, body.users));
+  }
+
+  if (typeof body.phoneEnabled === 'boolean') {
+    return NextResponse.json(setIdpPhoneEnabled(account, body.phoneEnabled));
   }
 
   return NextResponse.json({ error: 'Unknown action' }, { status: 400 });
