@@ -7,7 +7,7 @@ import { Suspense } from 'react';
 
 const TOOLS = [
   {
-    label: 'ERP Simulator',
+    label: 'ERP/OMS Simulator',
     desc: 'Feed & Hook consumption, order normalization, Start Handling',
     icon: (
       <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">

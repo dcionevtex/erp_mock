@@ -3,7 +3,7 @@ import { AccordionSection } from '@/components/AccordionSection';
 import { AppShell } from '@/components/AppShell';
 
 export const metadata = {
-  title: 'About — VTEX A Simple ERP Simulator',
+  title: 'About — VTEX A Simple ERP/OMS Simulator',
 };
 
 export default function AboutPage() {
@@ -16,7 +16,7 @@ export default function AboutPage() {
         <div className="flex items-center gap-4 py-3">
           <span className="text-xl font-black tracking-tighter leading-none text-primary">VTEX</span>
           <span className="text-border text-lg font-thin">|</span>
-          <span className="text-sm font-semibold text-foreground">A Simple ERP Simulator</span>
+          <span className="text-sm font-semibold text-foreground">A Simple ERP/OMS Simulator</span>
           <span className="text-border text-lg font-thin hidden sm:block">|</span>
           <span className="text-sm text-muted-foreground hidden sm:block">Documentation</span>
         </div>
@@ -31,7 +31,7 @@ export default function AboutPage() {
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-2xl font-black tracking-tighter text-primary">VTEX</span>
-                  <span className="text-xl font-semibold text-foreground">A Simple ERP Simulator</span>
+                  <span className="text-xl font-semibold text-foreground">A Simple ERP/OMS Simulator</span>
                 </div>
                 <p className="text-muted-foreground text-sm max-w-xl leading-relaxed">
                   A demo-grade middleware that simulates the operational handoff between VTEX OMS and an external ERP system — using the official VTEX Feed and Hook integration patterns.
@@ -95,7 +95,7 @@ export default function AboutPage() {
         {/* What it does */}
         <AccordionSection title="What It Does">
           <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-            A Simple ERP Simulator simulates the external ERP side of a VTEX order integration. When an order is placed in VTEX, this app receives the event (via Hook or Feed), fetches the full order from VTEX OMS, normalizes it into an ERP payload, simulates ERP acceptance, and calls VTEX Start Handling to confirm the handoff.
+            A Simple ERP/OMS Simulator simulates both sides of a VTEX order integration: it reads directly from VTEX OMS and simulates the external ERP receiving it. When an order is placed in VTEX, this app receives the event (via Hook or Feed), fetches the full order from VTEX OMS, normalizes it into an ERP payload, simulates ERP acceptance, and calls VTEX Start Handling to confirm the handoff.
           </p>
           <div className="grid sm:grid-cols-3 gap-3">
             <FeatureCard

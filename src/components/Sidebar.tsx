@@ -76,7 +76,7 @@ export function Sidebar() {
         </button>
         {expanded && (
           <span className="ml-3 text-sm font-semibold text-foreground truncate whitespace-nowrap">
-            ERP Simulator
+            ERP/OMS Simulator
           </span>
         )}
       </div>

@@ -10,7 +10,7 @@ A multi-simulator integration demo tool for VTEX Solution Engineers and SAs. Eac
 
 | Simulator | Path | Status | What it demonstrates |
 |---|---|---|---|
-| ERP Simulator | `/erp` | Live | OMS → ERP order handoff via Feed or Hook, Get Order, Start Handling, electronic invoice, shipping label |
+| ERP/OMS Simulator | `/erp` | Live | OMS → ERP order handoff via Feed or Hook, Get Order, Start Handling, electronic invoice, shipping label |
 | Payment Provider Protocol | `/payment-provider` | Live | Full PPP endpoint suite — create, cancel, refund, settlement — with per-scenario approval control |
 | External Seller Simulator | `/marketplace` | Beta | Fulfillment simulation, order placement, cancellation, SKU registration via Change Notification + Suggestions |
 | Gift Card Provider | `/gift-card` | Beta | Gift Card Provider Protocol — fictional card auto-return, transaction lifecycle (debit, settle, cancel) |
@@ -41,7 +41,7 @@ Open [http://localhost:3000](http://localhost:3000). Sign in with your @vtex.com
 
 - Node.js 24 or later
 - A Google Cloud project with OAuth credentials configured for @vtex.com login
-- A VTEX account + App Key/Token with OMS permissions (for ERP Simulator)
+- A VTEX account + App Key/Token with OMS permissions (for ERP/OMS Simulator)
 
 ---
 
@@ -53,7 +53,7 @@ AUTH_SECRET=                          # any random string, e.g. output of: opens
 AUTH_GOOGLE_ID=                       # Google OAuth client ID
 AUTH_GOOGLE_SECRET=                   # Google OAuth client secret
 
-# ERP Simulator — can also be set at runtime via the config panel
+# ERP/OMS Simulator — can also be set at runtime via the config panel
 VTEX_ACCOUNT=
 VTEX_ENVIRONMENT=vtexcommercestable.com.br
 VTEX_APP_KEY=
@@ -84,7 +84,7 @@ The app uses NextAuth v5 with Google OAuth. Only `@vtex.com` email addresses can
 
 ---
 
-## ERP Simulator
+## ERP/OMS Simulator
 
 Demonstrates the full VTEX OMS → ERP order integration lifecycle.
 
@@ -93,7 +93,7 @@ Demonstrates the full VTEX OMS → ERP order integration lifecycle.
 ```
 VTEX OMS
   → POST /api/vtex/hook  (push)  or  POST /api/vtex/feed/poll  (pull)
-  → Get Order API → ERP Payload Normalizer → ERP Simulator
+  → Get Order API → ERP Payload Normalizer → ERP/OMS Simulator
   → Start Handling (only on ERP success)
   → ERP Orders Inbox
 ```

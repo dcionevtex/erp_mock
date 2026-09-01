@@ -16,7 +16,7 @@ The launcher at `/` is the entry point. It links to four live simulators plus co
 
 | Simulator | Path | Status | What it demonstrates |
 |---|---|---|---|
-| ERP Simulator | `/erp` | Live | OMS → ERP order handoff via Feed or Hook, Get Order, Start Handling, invoice, shipping label |
+| ERP/OMS Simulator | `/erp` | Live | OMS → ERP order handoff via Feed or Hook, Get Order, Start Handling, invoice, shipping label |
 | Payment Provider Protocol | `/payment-provider` | Live | PPP endpoints (create, cancel, refund, settlement), account-scoped, scenario toggles |
 | External Seller Simulator | `/marketplace` | Beta | Fulfillment simulation, order placement, cancellation, SKU registration via Change Notification + Suggestions flow |
 | Gift Card Provider | `/gift-card` | Beta | Gift Card Provider Protocol endpoints, fictional card auto-return, transaction lifecycle |
@@ -157,7 +157,7 @@ Without `DATABASE_URL`, the app runs fully in-memory. This is fine for demos but
 
 ---
 
-## 6. ERP Simulator: Key Flows
+## 6. ERP/OMS Simulator: Key Flows
 
 ### Hook flow
 ```

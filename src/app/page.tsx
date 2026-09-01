@@ -128,7 +128,7 @@ function StatusCarousel() {
 const TOOLS = [
   {
     href: '/erp',
-    label: 'ERP Simulator',
+    label: 'ERP/OMS Simulator',
     description: 'Simulate the VTEX OMS to ERP order handoff. Receive orders via Feed or Hook, run the full processing pipeline, and inspect every step in a live inbox.',
     tag: 'Live',
     tagColor: 'bg-success-faded text-success-foreground',

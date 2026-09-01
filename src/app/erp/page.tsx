@@ -233,7 +233,7 @@ export default function DashboardPage() {
           {/* VTEX wordmark */}
           <span className="text-xl font-black tracking-tighter leading-none text-emphasis">VTEX</span>
           <span className="text-border text-lg font-thin">|</span>
-          <h1 className="text-sm font-semibold text-foreground">A Simple ERP Simulator</h1>
+          <h1 className="text-sm font-semibold text-foreground">A Simple ERP/OMS Simulator</h1>
           {config && (
             <span className="text-xs text-muted-foreground hidden sm:inline">
               {config.account || 'no account set'} · {config.integrationMode}

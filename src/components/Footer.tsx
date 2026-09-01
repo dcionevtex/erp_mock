@@ -93,7 +93,7 @@ export function Footer() {
           <div className="md:col-span-2 space-y-2">
             <div className="flex items-center gap-2 mb-3">
               <span className="text-base font-black tracking-tighter text-emphasis">VTEX</span>
-              <span className="text-sm font-semibold text-foreground">A Simple ERP Simulator</span>
+              <span className="text-sm font-semibold text-foreground">A Simple ERP/OMS Simulator</span>
               <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-emphasis/10 text-emphasis">
                 Demo
               </span>

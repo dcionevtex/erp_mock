@@ -12,7 +12,7 @@ type ReleaseEntry = {
 
 const SIMULATOR_STYLE: Record<Simulator, { label: string; cls: string }> = {
   platform:    { label: 'Platform',          cls: 'bg-muted text-muted-foreground' },
-  erp:         { label: 'ERP Simulator',     cls: 'bg-emerald-50 text-emerald-700' },
+  erp:         { label: 'ERP/OMS Simulator', cls: 'bg-emerald-50 text-emerald-700' },
   ppp:         { label: 'Payment Provider',  cls: 'bg-violet-50 text-violet-700' },
   marketplace: { label: 'External Seller',   cls: 'bg-sky-50 text-sky-700' },
   giftcard:    { label: 'Gift Card',          cls: 'bg-warning-faded text-warning-foreground' },
@@ -27,9 +27,17 @@ const CHANGE_TYPE_STYLE: Record<'feat' | 'fix' | 'chore', { label: string; cls: 
 
 const RELEASES: ReleaseEntry[] = [
   {
-    version: '1.8.0',
+    version: '1.8.1',
     date: 'August 21, 2026',
     tag: 'latest',
+    simulators: ['erp', 'platform'],
+    changes: [
+      { type: 'chore', text: 'Renamed "ERP Simulator" to "ERP/OMS Simulator" across the launcher, login page, sidebar, footer, about page, and docs — it always read directly from VTEX OMS, this just makes that visible in the name.' },
+    ],
+  },
+  {
+    version: '1.8.0',
+    date: 'August 21, 2026',
     simulators: ['idp'],
     changes: [
       { type: 'feat', text: 'Phone login can now be turned off per account — a new "Login Options" toggle in the IDP Config tab hides the phone tab on the login page when off. Saved as part of the account config, so it persists across sessions.' },
