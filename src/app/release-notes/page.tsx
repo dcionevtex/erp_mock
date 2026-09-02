@@ -27,9 +27,17 @@ const CHANGE_TYPE_STYLE: Record<'feat' | 'fix' | 'chore', { label: string; cls: 
 
 const RELEASES: ReleaseEntry[] = [
   {
-    version: '1.8.5',
+    version: '1.9.0',
     date: 'September 2, 2026',
     tag: 'latest',
+    simulators: ['erp'],
+    changes: [
+      { type: 'feat', text: 'New PIPE-08 guard: Start Handling is only called when Get Order confirms the order is actually ready-for-handling. Previously any status that wasn\'t already past handling would trigger the call, so a hook firing (or being re-delivered) one step early could call Start Handling before VTEX allows it. Guarded orders stay at ERP_ACCEPTED with a SKIPPED timeline entry and pick back up on the next hook/feed delivery or a Reprocess.' },
+    ],
+  },
+  {
+    version: '1.8.5',
+    date: 'September 2, 2026',
     simulators: ['platform'],
     changes: [
       { type: 'chore', text: 'Moved the Release Notes teaser to the top of the launcher, above the Platform Status carousel.' },
