@@ -27,9 +27,17 @@ const CHANGE_TYPE_STYLE: Record<'feat' | 'fix' | 'chore', { label: string; cls: 
 
 const RELEASES: ReleaseEntry[] = [
   {
-    version: '1.8.3',
+    version: '1.8.4',
     date: 'September 2, 2026',
     tag: 'latest',
+    simulators: ['platform'],
+    changes: [
+      { type: 'feat', text: 'Added Stakeholder Scout to Field Tools, linking to the private se-scout-service repo. Private entries now show a "Private" badge and an inline note to ping Diego Cione on Slack for access.' },
+    ],
+  },
+  {
+    version: '1.8.3',
+    date: 'September 2, 2026',
     simulators: ['erp'],
     changes: [
       { type: 'fix', text: 'Fixed the per-currency display shipped in 1.8.2 — it read currencyCode off the wrong field and always fell back to BRL. VTEX nests it under storePreferencesData.currencyCode, not on the order root; corrected the extraction so non-BRL accounts (e.g. AED) now show correctly.' },
