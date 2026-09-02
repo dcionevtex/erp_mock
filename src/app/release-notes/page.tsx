@@ -27,9 +27,17 @@ const CHANGE_TYPE_STYLE: Record<'feat' | 'fix' | 'chore', { label: string; cls: 
 
 const RELEASES: ReleaseEntry[] = [
   {
+    version: '1.8.2',
+    date: 'September 2, 2026',
+    tag: 'latest',
+    simulators: ['erp'],
+    changes: [
+      { type: 'fix', text: 'Order totals and item prices now display in the order’s actual currency (read from VTEX’s currencyCode) instead of always showing R$, so non-BRL demo accounts show the right symbol.' },
+    ],
+  },
+  {
     version: '1.8.1',
     date: 'August 21, 2026',
-    tag: 'latest',
     simulators: ['erp', 'platform'],
     changes: [
       { type: 'chore', text: 'Renamed "ERP Simulator" to "ERP/OMS Simulator" across the launcher, login page, sidebar, footer, about page, and docs — it always read directly from VTEX OMS, this just makes that visible in the name.' },
