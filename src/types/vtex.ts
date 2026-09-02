@@ -46,6 +46,13 @@ export type VtexShippingData = {
   logisticsInfo?: VtexLogisticsInfo[];
 };
 
+export type VtexStorePreferencesData = {
+  countryCode?: string;
+  currencyCode?: string;
+  currencySymbol?: string;
+  timeZone?: string;
+};
+
 export type VtexOrderItem = {
   uniqueId?: string;
   id?: string;       // skuId
@@ -97,9 +104,8 @@ export type VtexOrder = {
   origin?: string;
   affiliateId?: string;
   salesChannel?: string;
-  storePreferencesData?: unknown;
+  storePreferencesData?: VtexStorePreferencesData | null;
   value?: number;
-  currencyCode?: string;
   totals?: VtexTotal[];
   items?: VtexOrderItem[];
   clientProfileData?: VtexClientProfileData | null;

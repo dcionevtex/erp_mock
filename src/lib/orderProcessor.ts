@@ -93,7 +93,7 @@ export async function processOrder(
       customerName: erpPayload.customer?.name,
       customerEmailMasked: erpPayload.customer?.emailMasked,
       totalValue: vtexOrder.value,
-      currencyCode: vtexOrder.currencyCode,
+      currencyCode: vtexOrder.storePreferencesData?.currencyCode,
       itemCount: vtexOrder.items?.length,
       paymentSummary: erpPayload.paymentSummary,
       shippingSummary: erpPayload.shippingSummary,
