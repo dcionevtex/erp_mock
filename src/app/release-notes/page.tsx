@@ -27,9 +27,17 @@ const CHANGE_TYPE_STYLE: Record<'feat' | 'fix' | 'chore', { label: string; cls: 
 
 const RELEASES: ReleaseEntry[] = [
   {
-    version: '1.8.4',
+    version: '1.8.5',
     date: 'September 2, 2026',
     tag: 'latest',
+    simulators: ['platform'],
+    changes: [
+      { type: 'chore', text: 'Moved the Release Notes teaser to the top of the launcher, above the Platform Status carousel.' },
+    ],
+  },
+  {
+    version: '1.8.4',
+    date: 'September 2, 2026',
     simulators: ['platform'],
     changes: [
       { type: 'feat', text: 'Added Stakeholder Scout to Field Tools, linking to the private se-scout-service repo. Private entries now show a "Private" badge and an inline note to ping Diego Cione on Slack for access.' },
