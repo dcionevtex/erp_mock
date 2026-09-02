@@ -245,6 +245,21 @@ const FIELD_TOOLS = [
       </svg>
     ),
   },
+  {
+    href: 'https://github.com/dcionevtex/se-scout-service',
+    label: 'Stakeholder Scout',
+    description: 'Scouts and profiles the stakeholders and decision-making unit of any deal — career history, VTEX vs. competitor platform affinity, champion/blocker signals, and warm-intro paths — output as a stakeholder map, an influence × support matrix, and a Slack-ready update.',
+    author: 'Diego Cione',
+    private: true,
+    icon: (
+      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="10" cy="10" r="6" />
+        <path d="M20 20l-4.35-4.35" />
+        <circle cx="10" cy="9" r="1.6" />
+        <path d="M7.3 13c0-1.6 1.3-2.6 2.7-2.6s2.7 1 2.7 2.6" />
+      </svg>
+    ),
+  },
 ];
 
 const LAB_APPS = [
@@ -459,6 +474,11 @@ export default function LauncherPage() {
                         <span className="text-xs px-1.5 py-0.5 rounded font-medium bg-teal-50 text-teal-700">
                           {tool.author}
                         </span>
+                        {tool.private && (
+                          <span className="text-xs px-1.5 py-0.5 rounded font-medium bg-warning-faded text-warning-foreground">
+                            Private
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -466,6 +486,12 @@ export default function LauncherPage() {
                   <p className="text-xs leading-relaxed text-muted-foreground">
                     {tool.description}
                   </p>
+
+                  {tool.private && (
+                    <p className="text-xs leading-relaxed text-warning-foreground">
+                      Closed repo — ping Diego Cione on Slack to request access.
+                    </p>
+                  )}
                 </a>
               ))}
             </div>
