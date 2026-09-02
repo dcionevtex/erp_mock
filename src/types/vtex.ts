@@ -99,6 +99,7 @@ export type VtexOrder = {
   salesChannel?: string;
   storePreferencesData?: unknown;
   value?: number;
+  currencyCode?: string;
   totals?: VtexTotal[];
   items?: VtexOrderItem[];
   clientProfileData?: VtexClientProfileData | null;

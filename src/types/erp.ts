@@ -118,6 +118,7 @@ export type ErpOrderRecord = {
   customerName?: string;
   customerEmailMasked?: string;
   totalValue?: number;
+  currencyCode?: string;
   itemCount?: number;
   paymentSummary?: string;
   shippingSummary?: string;

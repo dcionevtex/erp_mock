@@ -31,9 +31,14 @@ export function OrderRow({ order, onAction, configAccount, credsConfigured, sele
     return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
   }
 
-  function fmtCurrency(val?: number) {
+  function fmtCurrency(val?: number, currencyCode?: string) {
     if (val == null) return '—';
-    return `R$ ${(val / 100).toFixed(2)}`;
+    const amount = val / 100;
+    try {
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: currencyCode || 'BRL' }).format(amount);
+    } catch {
+      return `${currencyCode ?? 'R$'} ${amount.toFixed(2)}`;
+    }
   }
 
   return (
@@ -62,7 +67,7 @@ export function OrderRow({ order, onAction, configAccount, credsConfigured, sele
         {col('error')          && <td className="px-3 py-2 text-xs text-danger-foreground max-w-[180px] truncate" title={order.errorMessage}>{order.errorMessage ?? '—'}</td>}
         {col('orderId')        && <td className="px-3 py-2 font-mono text-xs max-w-[140px] truncate" title={order.orderId}>{order.orderId}</td>}
         {col('customer')       && <td className="px-3 py-2 text-xs max-w-[120px] truncate">{order.customerName ?? '—'}</td>}
-        {col('total')          && <td className="px-3 py-2 text-xs text-right">{fmtCurrency(order.totalValue)}</td>}
+        {col('total')          && <td className="px-3 py-2 text-xs text-right">{fmtCurrency(order.totalValue, order.currencyCode)}</td>}
         {col('items')          && <td className="px-3 py-2 text-xs text-center">{order.itemCount ?? '—'}</td>}
         {col('received')       && <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">{fmt(order.receivedAt)}</td>}
         {col('account')       && <td className="px-3 py-2 text-xs font-medium text-muted-foreground whitespace-nowrap">{order.account ?? '—'}</td>}
@@ -171,9 +176,14 @@ function OrderDetailModal({
     return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
   }
 
-  function fmtCurrency(val?: number) {
+  function fmtCurrency(val?: number, currencyCode?: string) {
     if (val == null) return '—';
-    return `R$ ${(val / 100).toFixed(2)}`;
+    const amount = val / 100;
+    try {
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: currencyCode || 'BRL' }).format(amount);
+    } catch {
+      return `${currencyCode ?? 'R$'} ${amount.toFixed(2)}`;
+    }
   }
 
   const modal = (
@@ -256,7 +266,7 @@ function OrderDetailModal({
                 <Field label="Sequence" value={order.sequence} />
                 <Field label="Customer" value={order.customerName} />
                 <Field label="Email" value={order.customerEmailMasked} />
-                <Field label="Total" value={fmtCurrency(order.totalValue)} />
+                <Field label="Total" value={fmtCurrency(order.totalValue, order.currencyCode)} />
                 <Field label="Payment" value={order.paymentSummary} />
                 <Field label="Shipping" value={order.shippingSummary} />
                 <div className="flex flex-col gap-1">
@@ -333,9 +343,9 @@ function OrderDetailModal({
                       <td className="py-2 pr-4 font-mono text-muted-foreground">{item.productId ?? '—'}</td>
                       <td className="py-2 pr-4 text-foreground font-medium">{item.name ?? '—'}</td>
                       <td className="py-2 pr-4 text-right tabular-nums">{item.quantity ?? '—'}</td>
-                      <td className="py-2 pr-4 text-right tabular-nums text-muted-foreground">{fmtCurrency(item.price)}</td>
-                      <td className="py-2 pr-4 text-right tabular-nums text-muted-foreground">{fmtCurrency(item.sellingPrice)}</td>
-                      <td className="py-2 text-right tabular-nums font-semibold">{fmtCurrency(item.total)}</td>
+                      <td className="py-2 pr-4 text-right tabular-nums text-muted-foreground">{fmtCurrency(item.price, order.currencyCode)}</td>
+                      <td className="py-2 pr-4 text-right tabular-nums text-muted-foreground">{fmtCurrency(item.sellingPrice, order.currencyCode)}</td>
+                      <td className="py-2 text-right tabular-nums font-semibold">{fmtCurrency(item.total, order.currencyCode)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -416,7 +426,7 @@ function OrderDetailModal({
               <CollapsibleCard title="Payment Details">
                 <div className="space-y-3 py-1">
                   <Field label="Method" value={order.erpPayload.paymentSummary} />
-                  <Field label="Total charged" value={fmtCurrency(order.totalValue)} />
+                  <Field label="Total charged" value={fmtCurrency(order.totalValue, order.currencyCode)} />
                 </div>
               </CollapsibleCard>
             )}
