@@ -251,15 +251,16 @@ Pipeline step names: `EVENT_RECEIVED`, `GET_ORDER_REQUESTED`, `GET_ORDER_SUCCESS
 
 ## 9. Start Handling Guards
 
-Three guards in `src/lib/orderProcessor.ts` prevent invalid Start Handling calls:
+Four guards in `src/lib/orderProcessor.ts` prevent invalid Start Handling calls:
 
 | Guard | Code | Trigger | Action |
 |---|---|---|---|
 | **PIPE-07** | Already handled | `startHandlingStatus === 'SUCCESS'` at pipeline entry | Writes a SKIPPED timeline entry and exits pipeline immediately |
 | **PIPE-06** | Get Order failed | `vtexClient.getOrder()` throws | Writes `GET_ORDER_ERROR` timeline entry, sets status to `ERROR`, exits without calling Start Handling |
 | **PIPE-05** | ERP simulation failed | `simulateErpAcceptance()` returns `FAILURE` | Writes `ERP_SIMULATION_ERROR` timeline entry, sets status to `ERROR`, exits without calling Start Handling |
+| **PIPE-08** | Not yet ready-for-handling | `vtexOrder.status !== 'ready-for-handling'` (and not already in `SH_DONE`) | Writes a SKIPPED `START_HANDLING_REQUESTED` timeline entry and exits without calling Start Handling. `erpStatus` stays `ERP_ACCEPTED` — not an error, just not time yet. Picked back up by the next hook/feed delivery or a manual retry. |
 
-Start Handling is only called when all three guards pass: the order has not been successfully handled before, Get Order succeeded, and ERP simulation returned SUCCESS.
+Start Handling is only called when all four guards pass: the order has not been successfully handled before, Get Order succeeded, ERP simulation returned SUCCESS, and VTEX confirms the order is actually `ready-for-handling` — VTEX only accepts the Start Handling call in that exact state, and a hook can fire (or be re-delivered) while the order is still one step earlier in the workflow.
 
 ---
 

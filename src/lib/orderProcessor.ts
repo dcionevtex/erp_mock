@@ -1,11 +1,13 @@
 // src/lib/orderProcessor.ts
 // Full pipeline orchestration: Get Order → PII mask → normalize → ERP simulate → Start Handling.
-// All three Start Handling guards live here (PIPE-05, PIPE-06, PIPE-07).
+// All four Start Handling guards live here (PIPE-05, PIPE-06, PIPE-07, PIPE-08).
 // Accepts injected dependencies for testability — never calls getServerConfig() directly.
 
 import type { IntegrationSource, AppConfig } from '@/types/erp';
 import type { VtexClient } from '@/lib/vtexClient';
 
+// The only VTEX status Start Handling is actually callable against (PIPE-08).
+const READY_FOR_HANDLING = 'ready-for-handling';
 // VTEX statuses that mean Start Handling already happened upstream
 const SH_DONE = new Set(['handling', 'verifying-invoice', 'invoiced', 'canceled']);
 // VTEX statuses that mean the invoice was already accepted by VTEX
@@ -165,6 +167,22 @@ export async function processOrder(
         message: `VTEX status is '${vtexStatus}' — Invoice already accepted`,
       });
     }
+    return;
+  }
+
+  // PIPE-08: VTEX only accepts Start Handling when the order is actually
+  // 'ready-for-handling'. A hook can fire (or be re-delivered) while the order
+  // is still one step earlier in the workflow — guard against calling Start
+  // Handling too early instead of letting VTEX reject it. erpStatus stays
+  // ERP_ACCEPTED; the next hook/feed delivery or a manual retry will pick it
+  // back up once VTEX actually reaches ready-for-handling.
+  if (vtexStatus !== READY_FOR_HANDLING) {
+    await appendTimelineEntry(record.id, {
+      timestamp: new Date().toISOString(),
+      step: 'START_HANDLING_REQUESTED',
+      status: 'SKIPPED',
+      message: `VTEX status is '${vtexStatus || 'unknown'}', not '${READY_FOR_HANDLING}' yet — Start Handling guarded (PIPE-08), will retry on next delivery`,
+    });
     return;
   }
 

@@ -261,6 +261,7 @@ Replace `<your-vtex-order-id>` with a real VTEX orderId from your account. The a
 - The order may not be in `ready-for-handling` state. VTEX only allows Start Handling for orders in this state.
 - Check the order status in the VTEX Admin or via Get Order API.
 - Some order types (marketplace orders, already-invoiced orders) may have restrictions.
+- This app guards against it (PIPE-08 in `src/lib/orderProcessor.ts`): if Get Order returns any status other than `ready-for-handling`, Start Handling is skipped rather than called and rejected. Check the order's timeline for a SKIPPED `START_HANDLING_REQUESTED` entry — it will retry on the next hook/feed delivery or a manual retry from the order accordion.
 
 **Feed returns empty array**
 

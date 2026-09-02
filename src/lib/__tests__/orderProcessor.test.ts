@@ -224,6 +224,64 @@ describe('processOrder — PIPE-05: guard when ERP simulation fails', () => {
 });
 
 // ---------------------------------------------------------------------------
+// 3b. PIPE-08: Guard when order is not yet ready-for-handling
+// ---------------------------------------------------------------------------
+describe('processOrder — PIPE-08: guard when order is not yet ready-for-handling', () => {
+  it('does NOT call startHandling when VTEX status is earlier than ready-for-handling', async () => {
+    await upsertOrder(makeRecord());
+    const mockClient = makeMockVtexClient({
+      getOrder: vi.fn().mockResolvedValue({ ...MOCK_VTEX_ORDER, status: 'payment-approved' }),
+    });
+    await processOrder('vtex-001', 'HOOK', {
+      vtexClient: mockClient,
+      config: { simulateErpFailure: false },
+    });
+    expect(mockClient.startHandling).not.toHaveBeenCalled();
+  });
+
+  it('leaves erpStatus at ERP_ACCEPTED (not ERROR) when guarded', async () => {
+    await upsertOrder(makeRecord());
+    const mockClient = makeMockVtexClient({
+      getOrder: vi.fn().mockResolvedValue({ ...MOCK_VTEX_ORDER, status: 'payment-approved' }),
+    });
+    await processOrder('vtex-001', 'HOOK', {
+      vtexClient: mockClient,
+      config: { simulateErpFailure: false },
+    });
+    expect((await getOrderByOrderId('vtex-001'))?.erpStatus).toBe('ERP_ACCEPTED');
+  });
+
+  it('writes a SKIPPED START_HANDLING_REQUESTED timeline entry when guarded', async () => {
+    await upsertOrder(makeRecord());
+    const mockClient = makeMockVtexClient({
+      getOrder: vi.fn().mockResolvedValue({ ...MOCK_VTEX_ORDER, status: 'payment-approved' }),
+    });
+    await processOrder('vtex-001', 'HOOK', {
+      vtexClient: mockClient,
+      config: { simulateErpFailure: false },
+    });
+    const stored = await getOrderByOrderId('vtex-001');
+    expect(
+      stored?.timeline.some(
+        (e) => e.step === 'START_HANDLING_REQUESTED' && e.status === 'SKIPPED',
+      ),
+    ).toBe(true);
+  });
+
+  it('does NOT call startHandling when VTEX status is missing entirely', async () => {
+    await upsertOrder(makeRecord());
+    const mockClient = makeMockVtexClient({
+      getOrder: vi.fn().mockResolvedValue({ ...MOCK_VTEX_ORDER, status: undefined }),
+    });
+    await processOrder('vtex-001', 'HOOK', {
+      vtexClient: mockClient,
+      config: { simulateErpFailure: false },
+    });
+    expect(mockClient.startHandling).not.toHaveBeenCalled();
+  });
+});
+
+// ---------------------------------------------------------------------------
 // 4. PIPE-04 + PIPE-08: Happy path
 // ---------------------------------------------------------------------------
 describe('processOrder — PIPE-04 + PIPE-08: happy path', () => {
