@@ -27,9 +27,17 @@ const CHANGE_TYPE_STYLE: Record<'feat' | 'fix' | 'chore', { label: string; cls: 
 
 const RELEASES: ReleaseEntry[] = [
   {
-    version: '1.8.2',
+    version: '1.8.3',
     date: 'September 2, 2026',
     tag: 'latest',
+    simulators: ['erp'],
+    changes: [
+      { type: 'fix', text: 'Fixed the per-currency display shipped in 1.8.2 — it read currencyCode off the wrong field and always fell back to BRL. VTEX nests it under storePreferencesData.currencyCode, not on the order root; corrected the extraction so non-BRL accounts (e.g. AED) now show correctly.' },
+    ],
+  },
+  {
+    version: '1.8.2',
+    date: 'September 2, 2026',
     simulators: ['erp'],
     changes: [
       { type: 'fix', text: 'Order totals and item prices now display in the order’s actual currency (read from VTEX’s currencyCode) instead of always showing R$, so non-BRL demo accounts show the right symbol.' },
