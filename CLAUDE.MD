@@ -10,7 +10,7 @@ A multi-simulator demo tool for VTEX Solution Engineers and SAs. Each simulator 
 
 ## 1. What This Platform Is Today
 
-The launcher at `/` is the entry point. It links to four live simulators plus community field tools and The Lab (upcoming experimental utilities).
+The launcher at `/` is the entry point. It links to five live simulators plus community field tools and The Lab (upcoming experimental utilities).
 
 ### Simulators
 
@@ -20,13 +20,14 @@ The launcher at `/` is the entry point. It links to four live simulators plus co
 | Payment Provider Protocol | `/payment-provider` | Live | PPP endpoints (create, cancel, refund, settlement), account-scoped, scenario toggles |
 | External Seller Simulator | `/marketplace` | Beta | Fulfillment simulation, order placement, cancellation, SKU registration via Change Notification + Suggestions flow |
 | Gift Card Provider | `/gift-card` | Beta | Gift Card Provider Protocol endpoints, fictional card auto-return, transaction lifecycle |
-| External IDP Simulator | `/idp` | New | OAuth 2.0 Authorization Code flow mock; VTEX storefronts authenticate against it via the Authentication admin |
+| External IDP Simulator | `/idp` | Live | OAuth 2.0 Authorization Code flow mock; VTEX storefronts authenticate against it via the Authentication admin |
+| Tax Provider Simulator | `/tax` | New | VTEX Tax Service protocol — single calculate-tax endpoint registered via orderForm.taxConfiguration, percentage-based tax rule catalog, scenario toggles |
 
 ### Shared platform features
 
 - **Google OAuth SSO** — NextAuth v5, @vtex.com emails only, configured in `src/auth.ts`
 - **Neon PostgreSQL** — Optional persistence via `DATABASE_URL`. Falls back to globalThis in-memory store without it. `src/lib/db.ts` is the abstraction layer.
-- **Account-scoped isolation** — PPP, Marketplace, and Gift Card simulators namespace all state by VTEX account name. Each account gets its own URL and call log.
+- **Account-scoped isolation** — PPP, Marketplace, Gift Card, and Tax Provider simulators namespace all state by VTEX account name. Each account gets its own URL and call log.
 - **VTEX Platform Status carousel** — Homepage fetches status.vtex.com and surfaces active incidents.
 
 ---
@@ -37,7 +38,7 @@ Follow these patterns when adding features or new simulators.
 
 ### 2.1 Account-scoped simulator pattern
 
-PPP, Marketplace, and Gift Card all follow the same pattern:
+PPP, Marketplace, Gift Card, and Tax Provider all follow the same pattern:
 
 ```
 src/types/[simulator].ts          — types for the protocol
@@ -234,7 +235,26 @@ Key behavior:
 
 ---
 
-## 10. Release Management
+## 10. Tax Provider Simulator
+
+Implements the VTEX Tax Service protocol. Routes under `/api/tax/[account]/`.
+
+Different from PPP/Marketplace/Gift Card — this protocol has no manifest and no hub API. VTEX registers a single absolute URL via the Checkout API's `orderForm.taxConfiguration` (`url`, `authorizationHeader`, `appId`, `isMarketplaceResponsibleForTaxes`), and Checkout calls that one endpoint synchronously on every cart change (5s timeout, no retry).
+
+Endpoints:
+- `POST calculate-tax` — the protocol endpoint itself; validates the `Authorization` header (echoed back verbatim by VTEX) before computing taxes. Its response attaches a best-effort `hooks.commit.url` per item (see below) since VTEX's docs never publish that field's exact shape.
+- `POST commit-tax` — the "commit" hook the Recipe doc describes ("the same route that is on the hooks object on the provider's response"), called back when order status changes. Simulator just acknowledges with 200 — `handleCommitTax` in `taxHandlers.ts` has a comment marking where a real integration would commit against its tax engine.
+- `GET/POST config` — scenario, tax rule catalog, Authorization secret (dashboard use)
+- `POST register` — server-side proxy that reads the account's current orderForm config and merges in `taxConfiguration` (the spec requires sending the entire orderForm back, not just the changed field)
+
+Key behavior:
+- Each active tax rule is a flat percentage applied independently to every line item's `itemPrice` (not compounded); computed values `<= 0` are omitted from the response rather than returned as `0`
+- Scenario toggle: apply taxes / no tax (empty array) / simulate error (HTTP 500)
+- Auth secret is deterministically derived per account (survives cold starts) with a manual regenerate option
+
+---
+
+## 11. Release Management
 
 Every meaningful set of changes must add an entry to the `RELEASES` array in `src/app/release-notes/page.tsx`.
 
@@ -243,7 +263,7 @@ Version rules:
 - `MINOR` (x.+1.0) — new self-contained features or significant UX changes
 - `MAJOR` (+1.0.0) — new simulator or full architectural redesign
 
-Simulator tags available: `'platform' | 'erp' | 'ppp' | 'marketplace' | 'giftcard' | 'idp'`
+Simulator tags available: `'platform' | 'erp' | 'ppp' | 'marketplace' | 'giftcard' | 'idp' | 'tax'`
 
 How to update:
 1. Remove `tag: 'latest'` from the previous top entry
@@ -254,7 +274,7 @@ How to update:
 
 ---
 
-## 11. What Is Out of Scope
+## 12. What Is Out of Scope
 
 Do not build these unless explicitly requested:
 
@@ -269,7 +289,7 @@ Do not build these unless explicitly requested:
 
 ---
 
-## 12. Development Notes
+## 13. Development Notes
 
 - `npm run dev` starts at localhost:3000
 - `npm run build` must exit 0 before any PR

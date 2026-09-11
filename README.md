@@ -14,6 +14,8 @@ A multi-simulator integration demo tool for VTEX Solution Engineers and SAs. Eac
 | Payment Provider Protocol | `/payment-provider` | Live | Full PPP endpoint suite — create, cancel, refund, settlement — with per-scenario approval control |
 | External Seller Simulator | `/marketplace` | Beta | Fulfillment simulation, order placement, cancellation, SKU registration via Change Notification + Suggestions |
 | Gift Card Provider | `/gift-card` | Beta | Gift Card Provider Protocol — fictional card auto-return, transaction lifecycle (debit, settle, cancel) |
+| External IDP Simulator | `/idp` | Live | OAuth 2.0 Authorization Code flow mock for VTEX storefront login |
+| Tax Provider Simulator | `/tax` | New | VTEX Tax Service protocol — single calculate-tax endpoint, percentage-based tax rules, scenario toggles |
 
 ---
 
@@ -221,6 +223,29 @@ Toggle **Return card** (approved) or **Return empty** (no cards found at checkou
 
 ---
 
+## Tax Provider Simulator
+
+Implements the [VTEX Tax Service](https://developers.vtex.com/docs/guides/tax-service-integration-guide) provider protocol. Unlike the other simulators, there's no manifest or hub API — a single URL is registered on the account's `orderForm.taxConfiguration`, and Checkout calls it synchronously on every cart change (5s timeout, no retry).
+
+### Setup in VTEX
+
+1. Open `/tax`, enter a VTEX account name.
+2. Use the **Register** tab with VTEX admin credentials to fetch the current orderForm config and write `taxConfiguration` (`url`, `authorizationHeader`, `appId`, `isMarketplaceResponsibleForTaxes`) back in one step.
+3. Add a product to cart and reach checkout — every cart change triggers a call, shown live in the call log.
+
+### Protocol endpoints exposed
+
+```
+POST /api/tax/[account]/calculate-tax   — the registered taxConfiguration.url
+POST /api/tax/[account]/commit-tax      — "commit" hook called back on order status change
+```
+
+### Scenario control
+
+Toggle **Apply taxes** (calculates each active rule against every item's price), **No tax** (empty array), or **Simulate error** (HTTP 500). Tax rules are a flat percentage applied independently per item — add, edit, or deactivate them from the Scenario tab. The `Authorization` header VTEX echoes back is validated against a per-account secret shown in the dashboard.
+
+---
+
 ## Demo Script
 
 ### Before the demo
@@ -258,6 +283,13 @@ Toggle **Return card** (approved) or **Return empty** (no cards found at checkou
 1. Copy the Hub URL, register in VTEX Payments.
 2. Go through checkout with any email — show the fictional card applied.
 3. Show the call log: search → get card → debit → settle.
+
+### Tax Provider demo (~3 min)
+
+1. Register the provider from the Register tab using VTEX admin credentials.
+2. Add a product to cart, reach checkout — show the calculate-tax call and applied taxes in the log.
+3. Toggle **No tax**, repeat checkout — show taxes disappear.
+4. Toggle **Simulate error**, repeat checkout — show how Checkout behaves when the provider fails.
 
 ---
 
