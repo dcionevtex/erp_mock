@@ -377,4 +377,9 @@ This app is built for demos. Before using in production:
 
 ---
 
-Built by [@dcionevtex](https://github.com/dcionevtex) & his bot army, with contributions from [@afonso-praca](https://github.com/afonso-praca) (Tax Provider Simulator).
+Built by [@dcionevtex](https://github.com/dcionevtex) & his bot army.
+
+## Colaboradores
+
+- [@dcionevtex](https://github.com/dcionevtex) — ERP/OMS, Payment Provider, External Seller, Gift Card, External IDP
+- [@afonso-praca](https://github.com/afonso-praca) — Tax Provider Simulator
