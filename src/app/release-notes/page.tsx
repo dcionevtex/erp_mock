@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-type Simulator = 'platform' | 'erp' | 'ppp' | 'marketplace' | 'giftcard' | 'idp';
+type Simulator = 'platform' | 'erp' | 'ppp' | 'marketplace' | 'giftcard' | 'idp' | 'tax';
 
 type ReleaseEntry = {
   version: string;
@@ -17,6 +17,7 @@ const SIMULATOR_STYLE: Record<Simulator, { label: string; cls: string }> = {
   marketplace: { label: 'External Seller',   cls: 'bg-sky-50 text-sky-700' },
   giftcard:    { label: 'Gift Card',          cls: 'bg-warning-faded text-warning-foreground' },
   idp:         { label: 'External IDP',      cls: 'bg-indigo-50 text-indigo-700' },
+  tax:         { label: 'Tax Provider',      cls: 'bg-rose-50 text-rose-700' },
 };
 
 const CHANGE_TYPE_STYLE: Record<'feat' | 'fix' | 'chore', { label: string; cls: string }> = {
@@ -27,9 +28,17 @@ const CHANGE_TYPE_STYLE: Record<'feat' | 'fix' | 'chore', { label: string; cls: 
 
 const RELEASES: ReleaseEntry[] = [
   {
+    version: '2.0.0',
+    date: 'September 11, 2026',
+    tag: 'latest',
+    simulators: ['tax', 'platform'],
+    changes: [
+      { type: 'feat', text: 'New Tax Provider Simulator (/tax) — implements the VTEX Tax Service protocol. Unlike PPP/Marketplace/Gift Card, this protocol has no manifest or hub API: VTEX registers a single calculate-tax URL via the Checkout API\'s orderForm.taxConfiguration, and Checkout calls it synchronously on every cart change. Tax rules are configurable flat percentages applied independently per line item, with Apply/No tax/Simulate error scenario toggles and a Register tab that reads and updates the account\'s orderForm config directly from the dashboard.' },
+    ],
+  },
+  {
     version: '1.9.0',
     date: 'September 2, 2026',
-    tag: 'latest',
     simulators: ['erp'],
     changes: [
       { type: 'feat', text: 'New PIPE-08 guard: Start Handling is only called when Get Order confirms the order is actually ready-for-handling. Previously any status that wasn\'t already past handling would trigger the call, so a hook firing (or being re-delivered) one step early could call Start Handling before VTEX allows it. Guarded orders stay at ERP_ACCEPTED with a SKIPPED timeline entry and pick back up on the next hook/feed delivery or a Reprocess.' },

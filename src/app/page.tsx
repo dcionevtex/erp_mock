@@ -191,14 +191,30 @@ const TOOLS = [
     href: '/idp',
     label: 'External IDP Simulator',
     description: 'Mock an OAuth 2.0 identity provider for VTEX storefront login. Configure client credentials, manage test users, and watch every step of the authorization code flow — authorize, token exchange, and userinfo — in a live call log.',
-    tag: 'New',
-    tagColor: 'bg-secondary text-primary',
+    tag: 'Live',
+    tagColor: 'bg-success-faded text-success-foreground',
     disabled: false,
     icon: (
       <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
         <path d="M7 11V7a5 5 0 0 1 10 0v4" />
         <circle cx="12" cy="16" r="1" fill="currentColor" />
+      </svg>
+    ),
+  },
+  {
+    href: '/tax',
+    label: 'Tax Provider Simulator',
+    description: 'Mock the VTEX Tax Service protocol. Register a single calculation endpoint on the account\'s orderForm, apply configurable percentage-based tax rules per item, and inspect every Checkout call live.',
+    tag: 'New',
+    tagColor: 'bg-secondary text-primary',
+    disabled: false,
+    icon: (
+      <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M9 15l6-6" />
+        <circle cx="9.5" cy="9.5" r="0.75" fill="currentColor" />
+        <circle cx="14.5" cy="14.5" r="0.75" fill="currentColor" />
       </svg>
     ),
   },
