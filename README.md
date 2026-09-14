@@ -2,7 +2,7 @@
 
 A multi-simulator integration demo tool for VTEX Solution Engineers and SAs. Each simulator exposes real protocol-compliant endpoints and shows every VTEX API call in a live dashboard. Deploy once to Vercel, share a URL with a customer, and run four different integration demos from the same app.
 
-**Current version:** 1.4.0
+**Current version:** 2.0.0
 
 ---
 
@@ -377,4 +377,4 @@ This app is built for demos. Before using in production:
 
 ---
 
-Built by [@dcionevtex](https://github.com/dcionevtex) & his bot army.
+Built by [@dcionevtex](https://github.com/dcionevtex) & his bot army, with contributions from [@afonso-praca](https://github.com/afonso-praca) (Tax Provider Simulator).
