@@ -10,7 +10,7 @@ A multi-simulator demo tool for VTEX Solution Engineers and SAs. Each simulator 
 
 ## 1. What This Platform Is Today
 
-The launcher at `/` is the entry point. It links to five live simulators plus community field tools and The Lab (upcoming experimental utilities).
+The launcher at `/` is the entry point. It links to six live simulators plus community field tools and The Lab (upcoming experimental utilities).
 
 ### Simulators
 
@@ -21,13 +21,14 @@ The launcher at `/` is the entry point. It links to five live simulators plus co
 | External Seller Simulator | `/marketplace` | Beta | Fulfillment simulation, order placement, cancellation, SKU registration via Change Notification + Suggestions flow |
 | Gift Card Provider | `/gift-card` | Beta | Gift Card Provider Protocol endpoints, fictional card auto-return, transaction lifecycle |
 | External IDP Simulator | `/idp` | Live | OAuth 2.0 Authorization Code flow mock; VTEX storefronts authenticate against it via the Authentication admin |
-| Tax Provider Simulator | `/tax` | New | VTEX Tax Service protocol — single calculate-tax endpoint registered via orderForm.taxConfiguration, percentage-based tax rule catalog, scenario toggles |
+| Tax Provider Simulator | `/tax` | Live | VTEX Tax Service protocol — single calculate-tax endpoint registered via orderForm.taxConfiguration, percentage-based tax rule catalog, scenario toggles |
+| Promotion Provider Simulator | `/promotion` | New | VTEX External Promotions Protocol (v1.1) — calculatePromotion + notifyUsage, stacked percentage/fixed discount rules, coupon gating, ticket-based activation |
 
 ### Shared platform features
 
 - **Google OAuth SSO** — NextAuth v5, @vtex.com emails only, configured in `src/auth.ts`
 - **Neon PostgreSQL** — Optional persistence via `DATABASE_URL`. Falls back to globalThis in-memory store without it. `src/lib/db.ts` is the abstraction layer.
-- **Account-scoped isolation** — PPP, Marketplace, Gift Card, and Tax Provider simulators namespace all state by VTEX account name. Each account gets its own URL and call log.
+- **Account-scoped isolation** — PPP, Marketplace, Gift Card, Tax Provider, and Promotion Provider simulators namespace all state by VTEX account name. Each account gets its own URL(s) and call log.
 - **VTEX Platform Status carousel** — Homepage fetches status.vtex.com and surfaces active incidents.
 
 ---
@@ -38,7 +39,7 @@ Follow these patterns when adding features or new simulators.
 
 ### 2.1 Account-scoped simulator pattern
 
-PPP, Marketplace, Gift Card, and Tax Provider all follow the same pattern:
+PPP, Marketplace, Gift Card, Tax Provider, and Promotion Provider all follow the same pattern:
 
 ```
 src/types/[simulator].ts          — types for the protocol
@@ -254,7 +255,27 @@ Key behavior:
 
 ---
 
-## 11. Release Management
+## 11. Promotion Provider Simulator
+
+Implements the VTEX External Promotions Protocol (v1.1). Routes under `/api/promotion/[account]/`.
+
+Different from every other simulator — there's **no self-service registration at all**. VTEX support activates the protocol per account from a support ticket, where the merchant shares both endpoint URLs and the auth header name/value. There is no manifest, no hub API, and no Checkout-config endpoint to call. The Setup tab builds the ticket text; there's no `register` route because there's nothing to call.
+
+Endpoints:
+- `POST calculatePromotion` — the protocol endpoint itself (path matches the literal endpoint name, not kebab-case). Validates the auth header (name is itself configurable per account, defaults `Authorization`, value may include a prefix like `Bearer `) before computing discounts.
+- `POST notifyUsage` — the protocol endpoint itself, called back when an order is placed/cancelled. Validates `orderId` (non-empty string), `type` (must be exactly `NewOrder` or `OrderCancellation` — anything else, or missing, returns `400`), and `promotionUsages[].promotionId`/`.discount` before acknowledging. VTEX retries up to 3x with backoff and only cares about a 2xx — `handleNotifyUsage` in `promotionHandlers.ts` comments where a real integration would idempotently record redemptions, keyed by `(orderId, type)`.
+- `GET/POST config` — scenario, promotion rule catalog, auth header name/value (dashboard use)
+
+Key behavior:
+- Active rules apply **sequentially** — each rule discounts the price already reduced by prior rules (stacking), not the original price. A rule gated by `couponCode` only applies if that code (case-insensitive) is present in the cart's `couponCodes`.
+- Per the spec, VTEX derives the actual discount only from `items[].promotions[].discount × quantity`, and only when that id is also present in `allPromotions` — `originalPrice`/`discountedPrice` are informational only. `allPromotions` always lists every active rule considered, whether or not it ended up applying, which trivially satisfies that requirement.
+- The protocol supports **`Nominal` discounts only** — a fixed monetary amount per unit. `Percentual` and `Shipping` types are explicitly rejected by VTEX, so a `PERCENTAGE` rule here is only a way to *compute* the amount; the wire response always reports `type: 'Nominal'` with the resolved fixed amount. Every response item also echoes `quantity` (coerced from numeric strings), per the response schema's required fields.
+- Scenario toggle: apply promotions / no promotions (empty response) / simulate error (HTTP 500)
+- Hybrid-orchestration v1.1 fields (`nativePromotionLayer`, `customFields`, `qualificationProgress`, `nativePromotionRemovals`) are accepted on the request type but not used in calculation — same deliberate scope limit as the Tax Provider's unused Avalara jurisdiction fields.
+
+---
+
+## 12. Release Management
 
 Every meaningful set of changes must add an entry to the `RELEASES` array in `src/app/release-notes/page.tsx`.
 
@@ -263,18 +284,18 @@ Version rules:
 - `MINOR` (x.+1.0) — new self-contained features or significant UX changes
 - `MAJOR` (+1.0.0) — new simulator or full architectural redesign
 
-Simulator tags available: `'platform' | 'erp' | 'ppp' | 'marketplace' | 'giftcard' | 'idp' | 'tax'`
+Simulator tags available: `'platform' | 'erp' | 'ppp' | 'marketplace' | 'giftcard' | 'idp' | 'tax' | 'promotion'`
 
 How to update:
 1. Remove `tag: 'latest'` from the previous top entry
 2. Prepend a new entry with new version, today's date, `tag: 'latest'`, correct simulators, and changes
 3. Commit: `chore: update release notes to vX.Y.Z`
 
-**Current baseline: `1.6.0`**
+**Current baseline: `3.0.0`**
 
 ---
 
-## 12. What Is Out of Scope
+## 13. What Is Out of Scope
 
 Do not build these unless explicitly requested:
 
@@ -289,7 +310,7 @@ Do not build these unless explicitly requested:
 
 ---
 
-## 13. Development Notes
+## 14. Development Notes
 
 - `npm run dev` starts at localhost:3000
 - `npm run build` must exit 0 before any PR

@@ -1,8 +1,8 @@
 # VTEX Demo Platform
 
-A multi-simulator integration demo tool for VTEX Solution Engineers and SAs. Each simulator exposes real protocol-compliant endpoints and shows every VTEX API call in a live dashboard. Deploy once to Vercel, share a URL with a customer, and run four different integration demos from the same app.
+A multi-simulator integration demo tool for VTEX Solution Engineers and SAs. Each simulator exposes real protocol-compliant endpoints and shows every VTEX API call in a live dashboard. Deploy once to Vercel, share a URL with a customer, and run seven different integration demos from the same app.
 
-**Current version:** 2.0.0
+**Current version:** 3.0.0
 
 ---
 
@@ -15,7 +15,8 @@ A multi-simulator integration demo tool for VTEX Solution Engineers and SAs. Eac
 | External Seller Simulator | `/marketplace` | Beta | Fulfillment simulation, order placement, cancellation, SKU registration via Change Notification + Suggestions |
 | Gift Card Provider | `/gift-card` | Beta | Gift Card Provider Protocol — fictional card auto-return, transaction lifecycle (debit, settle, cancel) |
 | External IDP Simulator | `/idp` | Live | OAuth 2.0 Authorization Code flow mock for VTEX storefront login |
-| Tax Provider Simulator | `/tax` | New | VTEX Tax Service protocol — single calculate-tax endpoint, percentage-based tax rules, scenario toggles |
+| Tax Provider Simulator | `/tax` | Live | VTEX Tax Service protocol — single calculate-tax endpoint, percentage-based tax rules, scenario toggles |
+| Promotion Provider Simulator | `/promotion` | New | VTEX External Promotions Protocol — calculatePromotion + notifyUsage, stacked discount rules, coupon gating, ticket-based activation |
 
 ---
 
@@ -246,6 +247,31 @@ Toggle **Apply taxes** (calculates each active rule against every item's price),
 
 ---
 
+## Promotion Provider Simulator
+
+Implements the [VTEX External Promotions Protocol](https://developers.vtex.com/docs/api-reference/external-promotions-protocol-api) (v1.1). Unlike every other simulator here, activation isn't self-service — VTEX support enables it per account from a support ticket, where you share both endpoint URLs and the auth header configuration.
+
+### Setup in VTEX
+
+1. Open `/promotion`, enter a VTEX account name — both endpoint URLs and the auth header appear.
+2. Use the **Setup** tab to copy a ready-made support ticket template with the two endpoint URLs and the auth header name/value.
+3. File the ticket with VTEX support. Once they confirm activation, add items to cart and reach checkout — every cart change triggers a call, shown live in the call log.
+
+### Protocol endpoints exposed
+
+```
+POST /api/promotion/[account]/calculatePromotion   — the calculatePromotion endpoint
+POST /api/promotion/[account]/notifyUsage          — the notifyUsage endpoint, called on order placement/cancellation
+```
+
+### Scenario control
+
+Toggle **Apply promotions** (active rules stack sequentially against each item's running price), **No promotions** (empty response), or **Simulate error** (HTTP 500). Rules are percentage or fixed discounts, optionally gated by a coupon code — add, edit, or deactivate them from the Scenario tab, including their description. The auth header name and value are both configurable, since VTEX lets support set either independently per account.
+
+Per the protocol, response items always report `type: "Nominal"` (the only discount type VTEX accepts) plus the item's `quantity`. `notifyUsage` validates every request — `orderId`, the `type` enum (`NewOrder` \| `OrderCancellation`), and each `promotionUsages` entry — returning `400` on a malformed body instead of silently acknowledging it.
+
+---
+
 ## Demo Script
 
 ### Before the demo
@@ -290,6 +316,13 @@ Toggle **Apply taxes** (calculates each active rule against every item's price),
 2. Add a product to cart, reach checkout — show the calculate-tax call and applied taxes in the log.
 3. Toggle **No tax**, repeat checkout — show taxes disappear.
 4. Toggle **Simulate error**, repeat checkout — show how Checkout behaves when the provider fails.
+
+### Promotion Provider demo (~3 min)
+
+1. Show the Setup tab's ticket template — explain this protocol is activated by VTEX support, not self-service.
+2. Add items to cart, reach checkout — show the calculatePromotion call and stacked discounts in the log.
+3. Apply a coupon code matching one of the configured rules — show it unlock an extra discount.
+4. Toggle **No promotions**, repeat checkout — show discounts disappear.
 
 ---
 
@@ -379,7 +412,7 @@ This app is built for demos. Before using in production:
 
 Built by [@dcionevtex](https://github.com/dcionevtex) & his bot army.
 
-## Colaboradores
+## Contributors
 
 - [@dcionevtex](https://github.com/dcionevtex) — ERP/OMS, Payment Provider, External Seller, Gift Card, External IDP
-- [@afonso-praca](https://github.com/afonso-praca) — Tax Provider Simulator
+- [@afonso-praca](https://github.com/afonso-praca) — Tax Provider Simulator, Promotion Provider Simulator

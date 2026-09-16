@@ -206,8 +206,8 @@ const TOOLS = [
     href: '/tax',
     label: 'Tax Provider Simulator',
     description: 'Mock the VTEX Tax Service protocol. Register a single calculation endpoint on the account\'s orderForm, apply configurable percentage-based tax rules per item, and inspect every Checkout call live.',
-    tag: 'New',
-    tagColor: 'bg-secondary text-primary',
+    tag: 'Live',
+    tagColor: 'bg-success-faded text-success-foreground',
     disabled: false,
     icon: (
       <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -215,6 +215,20 @@ const TOOLS = [
         <path d="M9 15l6-6" />
         <circle cx="9.5" cy="9.5" r="0.75" fill="currentColor" />
         <circle cx="14.5" cy="14.5" r="0.75" fill="currentColor" />
+      </svg>
+    ),
+  },
+  {
+    href: '/promotion',
+    label: 'Promotion Provider Simulator',
+    description: 'Mock the VTEX External Promotions Protocol. Calculate and stack configurable percentage/fixed discounts per item, track coupon-gated rules, and inspect every calculatePromotion and notifyUsage call live. Activation is ticket-based — the Setup tab builds the request for you.',
+    tag: 'New',
+    tagColor: 'bg-secondary text-primary',
+    disabled: false,
+    icon: (
+      <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M20.59 13.41L11 3.83A2 2 0 0 0 9.59 3.24L4 3a1 1 0 0 0-1 1l.24 5.59a2 2 0 0 0 .59 1.41l9.58 9.58a2 2 0 0 0 2.83 0l4.35-4.35a2 2 0 0 0 0-2.82z" />
+        <circle cx="8.5" cy="8.5" r="1" fill="currentColor" />
       </svg>
     ),
   },

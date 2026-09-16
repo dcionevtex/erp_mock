@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-type Simulator = 'platform' | 'erp' | 'ppp' | 'marketplace' | 'giftcard' | 'idp' | 'tax';
+type Simulator = 'platform' | 'erp' | 'ppp' | 'marketplace' | 'giftcard' | 'idp' | 'tax' | 'promotion';
 
 type ReleaseEntry = {
   version: string;
@@ -18,6 +18,7 @@ const SIMULATOR_STYLE: Record<Simulator, { label: string; cls: string }> = {
   giftcard:    { label: 'Gift Card',          cls: 'bg-warning-faded text-warning-foreground' },
   idp:         { label: 'External IDP',      cls: 'bg-indigo-50 text-indigo-700' },
   tax:         { label: 'Tax Provider',      cls: 'bg-rose-50 text-rose-700' },
+  promotion:   { label: 'Promotion Provider', cls: 'bg-fuchsia-50 text-fuchsia-700' },
 };
 
 const CHANGE_TYPE_STYLE: Record<'feat' | 'fix' | 'chore', { label: string; cls: string }> = {
@@ -28,9 +29,17 @@ const CHANGE_TYPE_STYLE: Record<'feat' | 'fix' | 'chore', { label: string; cls: 
 
 const RELEASES: ReleaseEntry[] = [
   {
+    version: '3.0.0',
+    date: 'September 14, 2026',
+    tag: 'latest',
+    simulators: ['promotion', 'platform'],
+    changes: [
+      { type: 'feat', text: 'New Promotion Provider Simulator (/promotion) — implements the VTEX External Promotions Protocol (v1.1): calculatePromotion and notifyUsage. Unlike the other simulators, activation isn\'t self-service — VTEX support enables it per account from a support ticket, so the Setup tab builds that ticket for you with both endpoint URLs and the configurable auth header. Promotion rules are percentage or fixed discounts that stack sequentially against each item\'s running price, optionally gated by a coupon code, with Apply/No promotions/Simulate error scenario toggles, editable rule descriptions, and a live call log. Response items report the protocol\'s required quantity and Nominal discount type (the only type VTEX accepts — Percentual and Shipping are rejected), and notifyUsage validates the request — orderId, the NewOrder/OrderCancellation type enum, and promotionUsages shape — returning 400 on a malformed body instead of silently acknowledging it.' },
+    ],
+  },
+  {
     version: '2.0.0',
     date: 'September 11, 2026',
-    tag: 'latest',
     simulators: ['tax', 'platform'],
     changes: [
       { type: 'feat', text: 'New Tax Provider Simulator (/tax) — implements the VTEX Tax Service protocol. Unlike PPP/Marketplace/Gift Card, this protocol has no manifest or hub API: VTEX registers a single calculate-tax URL via the Checkout API\'s orderForm.taxConfiguration, and Checkout calls it synchronously on every cart change. Tax rules are configurable flat percentages applied independently per line item, with Apply/No tax/Simulate error scenario toggles and a Register tab that reads and updates the account\'s orderForm config directly from the dashboard.' },
