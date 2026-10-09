@@ -40,6 +40,7 @@ export default function TaxProviderPage() {
   const [expandedIds, setExpandedIds]   = useState<Set<string>>(new Set());
   const [newRuleName, setNewRuleName]   = useState('');
   const [newRulePct, setNewRulePct]     = useState('');
+  const [newRuleDesc, setNewRuleDesc]   = useState('');
   const configInitialized               = useRef(false);
 
   // Register tab state
@@ -127,9 +128,10 @@ export default function TaxProviderPage() {
   function addRule() {
     const percentage = Number(newRulePct);
     if (!newRuleName.trim() || !percentage || percentage <= 0) return;
-    patchConfig({ addRule: { name: newRuleName.trim(), percentage } });
+    patchConfig({ addRule: { name: newRuleName.trim(), description: newRuleDesc.trim(), percentage } });
     setNewRuleName('');
     setNewRulePct('');
+    setNewRuleDesc('');
   }
 
   function saveRegCreds(key: string, token: string) {
@@ -442,30 +444,39 @@ export default function TaxProviderPage() {
                   </div>
 
                   {/* Add rule */}
-                  <div className="flex gap-2 pt-1">
+                  <div className="flex flex-col gap-2 pt-1">
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={newRuleName}
+                        onChange={e => setNewRuleName(e.target.value)}
+                        placeholder="Tax name"
+                        className="flex-1 text-xs rounded-md px-2 py-1.5 outline-none border border-border bg-background text-foreground placeholder:text-muted-foreground focus:ring-1 focus:ring-ring"
+                      />
+                      <input
+                        type="number"
+                        value={newRulePct}
+                        onChange={e => setNewRulePct(e.target.value)}
+                        placeholder="%"
+                        min={0}
+                        max={100}
+                        className="w-16 text-xs rounded-md px-2 py-1.5 outline-none font-mono border border-border bg-background text-foreground placeholder:text-muted-foreground focus:ring-1 focus:ring-ring"
+                      />
+                      <button
+                        onClick={addRule}
+                        disabled={!newRuleName.trim() || !newRulePct}
+                        className="px-2.5 py-1.5 rounded-md text-xs font-semibold bg-primary text-primary-foreground hover:opacity-90 transition-opacity disabled:opacity-40"
+                      >
+                        Add
+                      </button>
+                    </div>
                     <input
                       type="text"
-                      value={newRuleName}
-                      onChange={e => setNewRuleName(e.target.value)}
-                      placeholder="Tax name"
-                      className="flex-1 text-xs rounded-md px-2 py-1.5 outline-none border border-border bg-background text-foreground placeholder:text-muted-foreground focus:ring-1 focus:ring-ring"
+                      value={newRuleDesc}
+                      onChange={e => setNewRuleDesc(e.target.value)}
+                      placeholder="Description (optional)"
+                      className="w-full text-xs rounded-md px-2 py-1.5 outline-none border border-border bg-background text-foreground placeholder:text-muted-foreground focus:ring-1 focus:ring-ring"
                     />
-                    <input
-                      type="number"
-                      value={newRulePct}
-                      onChange={e => setNewRulePct(e.target.value)}
-                      placeholder="%"
-                      min={0}
-                      max={100}
-                      className="w-16 text-xs rounded-md px-2 py-1.5 outline-none font-mono border border-border bg-background text-foreground placeholder:text-muted-foreground focus:ring-1 focus:ring-ring"
-                    />
-                    <button
-                      onClick={addRule}
-                      disabled={!newRuleName.trim() || !newRulePct}
-                      className="px-2.5 py-1.5 rounded-md text-xs font-semibold bg-primary text-primary-foreground hover:opacity-90 transition-opacity disabled:opacity-40"
-                    >
-                      Add
-                    </button>
                   </div>
                 </div>
               </div>
