@@ -29,7 +29,7 @@ const CHANGE_TYPE_STYLE: Record<'feat' | 'fix' | 'chore', { label: string; cls: 
 
 const RELEASES: ReleaseEntry[] = [
   {
-    version: '3.0.1',
+    version: '3.0.2',
     date: 'October 8, 2026',
     tag: 'latest',
     simulators: ['tax'],
