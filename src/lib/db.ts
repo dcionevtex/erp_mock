@@ -47,5 +47,12 @@ export async function ensureSchema(sql: NeonQueryFunction<false, false>): Promis
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
   `;
+  await sql`
+    CREATE TABLE IF NOT EXISTS tax_configs (
+      account    TEXT PRIMARY KEY,
+      data       JSONB NOT NULL,
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
   _schemaReady = true;
 }

@@ -1,8 +1,13 @@
-// In-memory store for the Tax Service simulator.
+// Store for the Tax Service simulator.
 // Account-scoped — each VTEX account gets its own tax rule catalog, scenario, and call log.
-// Same globalThis singleton pattern as pppStore.ts / giftCardStore.ts — resets on cold start.
+//
+// Config (scenario, rule catalog, secret) is persisted to Neon (`tax_configs`) when
+// DATABASE_URL is set, so it survives cold starts and is shared across serverless
+// instances. Without a database it falls back to a globalThis Map (resets on cold start).
+// The call log stays in memory — it's a short-lived debugging aid, not configuration.
 
 import { randomUUID, createHash } from 'crypto';
+import { getSql, ensureSchema } from '@/lib/db';
 import type { TaxConfig, TaxRule, TaxScenario, TaxCallLogEntry } from '@/types/tax';
 
 declare global {
@@ -45,36 +50,67 @@ function defaultConfig(account: string): TaxConfig {
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
-export function getTaxConfig(account: string): TaxConfig {
-  if (!configs().has(account)) configs().set(account, defaultConfig(account));
-  return configs().get(account)!;
+async function loadFromDb(account: string): Promise<TaxConfig | null> {
+  const sql = getSql();
+  if (!sql) return null;
+  await ensureSchema(sql);
+  const rows = await sql`SELECT data FROM tax_configs WHERE account = ${account} LIMIT 1`;
+  return rows.length ? (rows[0].data as TaxConfig) : null;
 }
 
-export function setTaxScenario(account: string, scenario: TaxScenario): TaxConfig {
-  const updated = { ...getTaxConfig(account), scenario };
-  configs().set(account, updated);
-  return updated;
+async function saveConfig(account: string, config: TaxConfig): Promise<TaxConfig> {
+  const sql = getSql();
+  if (!sql) {
+    configs().set(account, config);
+    return config;
+  }
+  await ensureSchema(sql);
+  await sql`
+    INSERT INTO tax_configs (account, data, updated_at)
+    VALUES (${account}, ${JSON.stringify(config)}::jsonb, NOW())
+    ON CONFLICT (account) DO UPDATE SET data = EXCLUDED.data, updated_at = NOW()
+  `;
+  return config;
 }
 
-export function setMarketplaceResponsible(account: string, isMarketplaceResponsibleForTaxes: boolean): TaxConfig {
-  const updated = { ...getTaxConfig(account), isMarketplaceResponsibleForTaxes };
-  configs().set(account, updated);
-  return updated;
+export async function getTaxConfig(account: string): Promise<TaxConfig> {
+  const sql = getSql();
+  if (!sql) {
+    if (!configs().has(account)) configs().set(account, defaultConfig(account));
+    return configs().get(account)!;
+  }
+  const existing = await loadFromDb(account);
+  if (existing) return existing;
+  // First access: persist the defaults so rule ids stay stable across requests.
+  // DO NOTHING + re-read keeps this safe if two requests race on a new account.
+  await ensureSchema(sql);
+  await sql`
+    INSERT INTO tax_configs (account, data)
+    VALUES (${account}, ${JSON.stringify(defaultConfig(account))}::jsonb)
+    ON CONFLICT (account) DO NOTHING
+  `;
+  return (await loadFromDb(account))!;
 }
 
-export function regenerateSecret(account: string): TaxConfig {
-  const updated = { ...getTaxConfig(account), authorizationHeader: randomUUID().replace(/-/g, '') };
-  configs().set(account, updated);
-  return updated;
+export async function setTaxScenario(account: string, scenario: TaxScenario): Promise<TaxConfig> {
+  return saveConfig(account, { ...(await getTaxConfig(account)), scenario });
+}
+
+export async function setMarketplaceResponsible(account: string, isMarketplaceResponsibleForTaxes: boolean): Promise<TaxConfig> {
+  return saveConfig(account, { ...(await getTaxConfig(account)), isMarketplaceResponsibleForTaxes });
+}
+
+export async function regenerateSecret(account: string): Promise<TaxConfig> {
+  return saveConfig(account, { ...(await getTaxConfig(account)), authorizationHeader: randomUUID().replace(/-/g, '') });
 }
 
 // ── Tax rule catalog (percentage-based, applied to every item — mirrors the reference
 // implementation's model) ─────────────────────────────────────────────────────
 
-export function addTaxRule(
+export async function addTaxRule(
   account: string,
   rule: { name: string; description?: string; percentage: number },
-): TaxConfig {
+): Promise<TaxConfig> {
   const newRule: TaxRule = {
     id: randomUUID(),
     name: rule.name,
@@ -83,28 +119,22 @@ export function addTaxRule(
     active: true,
     createdAt: new Date().toISOString(),
   };
-  const cfg = getTaxConfig(account);
-  const updated = { ...cfg, rules: [...cfg.rules, newRule] };
-  configs().set(account, updated);
-  return updated;
+  const cfg = await getTaxConfig(account);
+  return saveConfig(account, { ...cfg, rules: [...cfg.rules, newRule] });
 }
 
-export function updateTaxRule(
+export async function updateTaxRule(
   account: string,
   id: string,
   patch: Partial<Pick<TaxRule, 'name' | 'description' | 'percentage' | 'active'>>,
-): TaxConfig {
-  const cfg = getTaxConfig(account);
-  const updated = { ...cfg, rules: cfg.rules.map(r => (r.id === id ? { ...r, ...patch } : r)) };
-  configs().set(account, updated);
-  return updated;
+): Promise<TaxConfig> {
+  const cfg = await getTaxConfig(account);
+  return saveConfig(account, { ...cfg, rules: cfg.rules.map(r => (r.id === id ? { ...r, ...patch } : r)) });
 }
 
-export function removeTaxRule(account: string, id: string): TaxConfig {
-  const cfg = getTaxConfig(account);
-  const updated = { ...cfg, rules: cfg.rules.filter(r => r.id !== id) };
-  configs().set(account, updated);
-  return updated;
+export async function removeTaxRule(account: string, id: string): Promise<TaxConfig> {
+  const cfg = await getTaxConfig(account);
+  return saveConfig(account, { ...cfg, rules: cfg.rules.filter(r => r.id !== id) });
 }
 
 // ── Call log ──────────────────────────────────────────────────────────────────

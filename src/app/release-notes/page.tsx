@@ -29,9 +29,18 @@ const CHANGE_TYPE_STYLE: Record<'feat' | 'fix' | 'chore', { label: string; cls: 
 
 const RELEASES: ReleaseEntry[] = [
   {
+    version: '3.0.1',
+    date: 'October 8, 2026',
+    tag: 'latest',
+    simulators: ['tax'],
+    changes: [
+      { type: 'fix', text: 'Tax Provider Simulator: the "add tax" form now includes a Description field, so custom tax rules can carry a description like the default ones.' },
+      { type: 'fix', text: 'Tax Provider Simulator: per-account config (scenario, tax rules, authorization secret) is now persisted to Neon when DATABASE_URL is set, so it survives cold starts. The call log remains in memory.' },
+    ],
+  },
+  {
     version: '3.0.0',
     date: 'September 14, 2026',
-    tag: 'latest',
     simulators: ['promotion', 'platform'],
     changes: [
       { type: 'feat', text: 'New Promotion Provider Simulator (/promotion) — implements the VTEX External Promotions Protocol (v1.1): calculatePromotion and notifyUsage. Unlike the other simulators, activation isn\'t self-service — VTEX support enables it per account from a support ticket, so the Setup tab builds that ticket for you with both endpoint URLs and the configurable auth header. Promotion rules are percentage or fixed discounts that stack sequentially against each item\'s running price, optionally gated by a coupon code, with Apply/No promotions/Simulate error scenario toggles, editable rule descriptions, and a live call log. Response items report the protocol\'s required quantity and Nominal discount type (the only type VTEX accepts — Percentual and Shipping are rejected), and notifyUsage validates the request — orderId, the NewOrder/OrderCancellation type enum, and promotionUsages shape — returning 400 on a malformed body instead of silently acknowledging it.' },
