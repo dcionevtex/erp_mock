@@ -28,6 +28,6 @@ export async function POST(
 
   const authHeader = request.headers.get('authorization');
   const serviceUrl = `${url.origin}/api/tax/${account}`;
-  const result = handleCalculateTax(account, body, authHeader, url.pathname, start, serviceUrl);
+  const result = await handleCalculateTax(account, body, authHeader, url.pathname, start, serviceUrl);
   return NextResponse.json(result.body, { status: result.status });
 }

@@ -50,15 +50,15 @@ export function isAuthorized(providedHeader: string | null, expected: string): b
   return providedHeader === expected;
 }
 
-export function handleCalculateTax(
+export async function handleCalculateTax(
   account: string,
   body: TaxCalculationRequest,
   authHeader: string | null,
   pathname: string,
   start: number,
   serviceUrl: string,
-): { body: unknown; status: number } {
-  const config = getTaxConfig(account);
+): Promise<{ body: unknown; status: number }> {
+  const config = await getTaxConfig(account);
   const now = new Date().toISOString();
   const items = Array.isArray(body?.items) ? body.items : [];
 

@@ -19,7 +19,7 @@ export async function GET(
   { params }: { params: Promise<{ account: string }> },
 ) {
   const { account } = await params;
-  const config = getTaxConfig(account);
+  const config = await getTaxConfig(account);
   const calls = listTaxCallLog(account);
   return NextResponse.json({ config, calls });
 }
@@ -43,16 +43,16 @@ export async function POST(
 
   if (body.clear) {
     clearTaxCallLog(account);
-    return NextResponse.json({ ok: true, config: getTaxConfig(account) });
+    return NextResponse.json({ ok: true, config: await getTaxConfig(account) });
   }
 
-  if (body.scenario) setTaxScenario(account, body.scenario);
+  if (body.scenario) await setTaxScenario(account, body.scenario);
   if (body.isMarketplaceResponsibleForTaxes !== undefined) {
-    setMarketplaceResponsible(account, body.isMarketplaceResponsibleForTaxes);
+    await setMarketplaceResponsible(account, body.isMarketplaceResponsibleForTaxes);
   }
-  if (body.regenerateSecret) regenerateSecret(account);
+  if (body.regenerateSecret) await regenerateSecret(account);
   if (body.addRule) {
-    addTaxRule(account, {
+    await addTaxRule(account, {
       name: body.addRule.name,
       description: body.addRule.description ?? '',
       percentage: body.addRule.percentage,
@@ -60,9 +60,9 @@ export async function POST(
   }
   if (body.updateRule) {
     const { id, ...patch } = body.updateRule;
-    updateTaxRule(account, id, patch);
+    await updateTaxRule(account, id, patch);
   }
-  if (body.removeRule) removeTaxRule(account, body.removeRule.id);
+  if (body.removeRule) await removeTaxRule(account, body.removeRule.id);
 
-  return NextResponse.json({ ok: true, config: getTaxConfig(account) });
+  return NextResponse.json({ ok: true, config: await getTaxConfig(account) });
 }

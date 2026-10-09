@@ -72,8 +72,8 @@ describe('isAuthorized', () => {
 });
 
 describe('handleCalculateTax', () => {
-  it('returns 401 when the Authorization header does not match', () => {
-    const result = handleCalculateTax(
+  it('returns 401 when the Authorization header does not match', async () => {
+    const result = await handleCalculateTax(
       'demoaccount-401-test', { items: [item()] }, 'wrong-secret',
       '/api/tax/demoaccount/calculate-tax', Date.now(), 'http://localhost:3000/api/tax/demoaccount-401-test',
     );
@@ -81,9 +81,9 @@ describe('handleCalculateTax', () => {
     expect(result.body).toEqual({ error: 'Unauthorized' });
   });
 
-  it('attaches a hooks.commit.url pointing at commit-tax on every item', () => {
-    const { authorizationHeader } = getTaxConfig('demoaccount-hooks-test');
-    const result = handleCalculateTax(
+  it('attaches a hooks.commit.url pointing at commit-tax on every item', async () => {
+    const { authorizationHeader } = await getTaxConfig('demoaccount-hooks-test');
+    const result = await handleCalculateTax(
       'demoaccount-hooks-test', { items: [item({ id: 'a' }), item({ id: 'b' })] }, authorizationHeader,
       '/api/tax/demoaccount/calculate-tax', Date.now(), 'http://localhost:3000/api/tax/demoaccount-hooks-test',
     );
